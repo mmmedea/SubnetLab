@@ -2,15 +2,18 @@
 -- Remove legacy uniqueness that ignored address family and broke IPv4/IPv6 coexistence.
 drop index if exists public.ip_active_unique;
 drop index if exists public.reservation_unique;
+-- Reuse the original query indexes and remove redundant copies.
+drop index if exists public.plans_user_updated_idx;
+drop index if exists public.ip_records_user_plan_idx;
+drop index if exists public.reservations_user_plan_idx;
+drop index if exists public.attempts_user_time;
+drop index if exists public.practice_questions_user_id_idx;
 -- Server-only custom JWT auth. Do not grant direct browser table access.
 create unique index if not exists users_email_lower_unique on public.users (lower(email));
 create unique index if not exists ip_records_active_address_unique
   on public.ip_records (user_id, family, address_int) where status = 'active';
 create unique index if not exists reservations_address_unique
   on public.reservations (user_id, family, address_int);
-create index if not exists plans_user_updated_idx on public.plans (user_id, updated_at desc);
-create index if not exists ip_records_user_plan_idx on public.ip_records (user_id, plan_id, status);
-create index if not exists reservations_user_plan_idx on public.reservations (user_id, plan_id);
 create index if not exists attempts_user_created_idx on public.attempts (user_id, created_at desc);
 create index if not exists practice_questions_user_created_idx on public.practice_questions (user_id, created_at desc);
 
