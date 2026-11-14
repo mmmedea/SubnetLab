@@ -74,6 +74,36 @@ begin
 end;
 $$;
 
+create or replace function public.update_plan_guarded(
+  p_user_id bigint, p_plan_id bigint, p_name text, p_family smallint, p_base text, p_data_json text
+) returns jsonb
+language plpgsql
+set search_path = ''
+as $
+declare
+  plan_row public.plans%rowtype;
+begin
+  select * into plan_row from public.plans
+  where id = p_plan_id and user_id = p_user_id
+  for update;
+  if not found then
+    raise exception using errcode = 'P0002', message = 'Plan not found';
+  end if;
+  if exists (select 1 from public.ip_records where user_id=p_user_id and plan_id=p_plan_id)
+     or exists (select 1 from public.reservations where user_id=p_user_id and plan_id=p_plan_id) then
+    if plan_row.family <> p_family
+       or (plan_row.data_json::jsonb -> 'allocations') is distinct from (p_data_json::jsonb -> 'allocations') then
+      raise exception using errcode = '23514', message = 'Plan changes would invalidate existing IPAM allocations';
+    end if;
+  end if;
+  update public.plans
+  set name=p_name, family=p_family, base=p_base, data_json=p_data_json, updated_at=pg_catalog.now()
+  where id=p_plan_id and user_id=p_user_id
+  returning pg_catalog.to_jsonb(plans.*) into plan_row;
+  return pg_catalog.to_jsonb(plan_row);
+end;
+$;
+
 create or replace function public.record_practice_attempt(
   p_user_id bigint, p_question_id uuid, p_topic text, p_difficulty text, p_correct boolean
 ) returns boolean
@@ -100,5 +130,7 @@ $$;
 
 revoke all on function public.record_ipam(text,bigint,bigint,text,smallint,text,numeric,text,text) from public, anon, authenticated;
 revoke all on function public.record_practice_attempt(bigint,uuid,text,text,boolean) from public, anon, authenticated;
+revoke all on function public.update_plan_guarded(bigint,bigint,text,smallint,text,text) from public, anon, authenticated;
 grant execute on function public.record_ipam(text,bigint,bigint,text,smallint,text,numeric,text,text) to service_role;
 grant execute on function public.record_practice_attempt(bigint,uuid,text,text,boolean) to service_role;
+grant execute on function public.update_plan_guarded(bigint,bigint,text,smallint,text,text) to service_role;
