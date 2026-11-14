@@ -45,6 +45,20 @@ Configure these Vercel environment variables for **Preview and Production**:
 
 The backend also accepts `NEXT_PUBLIC_SUPABASE_URL` as a URL fallback, `SUPABASE_SERVICE_ROLE_KEY` as a legacy server-secret fallback, and the existing lowercase `supabase` environment variable as a server-secret fallback. Do not use a `NEXT_PUBLIC_` name for the secret key.
 
+## API rate limiting
+
+Production rate limits are stored in Supabase PostgreSQL, not in process memory, so they are shared across Vercel serverless instances and deployments. The server HMAC-hashes rate-limit keys before storing them. Raw client IP addresses and email addresses are not stored in the rate-limit table.
+
+| Scope | Limit |
+| --- | ---: |
+| General API traffic | 300 requests per IP per minute |
+| Login attempts | 20 per IP per 15 minutes |
+| Login attempts for one email from one IP | 5 per 15 minutes |
+| Account registration | 5 per IP per hour |
+| Practice endpoints | 90 requests per IP per minute |
+
+Rate-limited responses use HTTP 429 with `Retry-After` and rate-limit headers. If the persistent rate-limit service is unavailable, API requests fail closed with HTTP 503 instead of silently running without protection. The migration `supabase/migrations/20261114000200_persistent_rate_limiting.sql` creates the protected counter table and atomic RPC. Keep the Supabase secret key server-side.
+
 The production entrypoint (`npm start`, used by Vercel) always loads the Supabase backend. The local development entrypoint (`npm run dev`) loads SQLite separately. This keeps the native SQLite driver out of the Vercel serverless bundle. Vercel deployments must have both Supabase variables configured before accepting real users because serverless filesystems are ephemeral.
 
 The Supabase migration is in `supabase/migrations/`. It adds case-insensitive email uniqueness, IPAM uniqueness and query indexes, server-only table permissions, and transactional RPC functions for IP assignment/reservation and practice-answer submission. Row Level Security remains enabled. Browser roles have no direct table privileges; the server uses its secret key only after verifying the application's own JWT and filtering every user-owned query by the authenticated user ID.
