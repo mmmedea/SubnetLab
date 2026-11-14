@@ -2,23 +2,47 @@
 <html lang="en">
 <head>
   <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-  <meta name="theme-color" content="#17263c"><title>SubnetLab — Network planning</title>
+  <meta name="theme-color" content="#101b2d">
+  <meta name="description" content="Plan IPv4 and IPv6 networks, allocate subnets with VLSM, manage IP addresses, and practice subnetting in one workspace.">
+  <meta name="color-scheme" content="light dark">
+  <title>SubnetLab — Plan. Allocate. Understand.</title>
   <link rel="stylesheet" href="/styles.css"><link rel="stylesheet" href="/overrides.css">
 </head>
 <body>
   <div id="authView" class="auth-shell" hidden>
     <button class="button theme-toggle" type="button" data-action="toggle-theme" aria-label="Switch to dark mode">Dark mode</button>
-    <section class="auth-card">
+    <section class="auth-intro" aria-label="About SubnetLab">
       <a class="brand auth-brand" href="#"><span class="brand-mark">S</span><span>Subnet<span class="brand-light">Lab</span></span></a>
-<h1 id="authTitle">Sign in to your workspace</h1>
-      <p class="muted">Plan address space, track assignments, and build your subnetting skills.</p>
+      <div class="intro-copy">
+        <span class="eyebrow">NETWORK PLANNING, MADE CLEAR</span>
+        <h2>Make every address<br><span>count.</span></h2>
+        <p>Plan smarter networks, keep your IP space organized, and build real subnetting confidence.</p>
+      </div>
+      <div class="network-preview" aria-label="Illustrative network allocation preview">
+        <div class="preview-top"><span>ADDRESS SPACE</span><span class="preview-status"><i></i> VISUAL OVERVIEW</span></div>
+        <div class="preview-cidr">192.168.10.0<span>/24</span></div>
+        <div class="preview-track"><i></i><i></i><i></i><i></i><i></i></div>
+        <div class="preview-legend"><span><i class="legend-a"></i> Engineering</span><span><i class="legend-b"></i> Sales</span><span><i class="legend-c"></i> Guest</span></div>
+        <div class="preview-foot"><span>IPv4 VLSM</span><span>Sample layout · not live data</span></div>
+      </div>
+      <div class="intro-benefits">
+        <span><b>01</b> IPv4 + IPv6 planning</span>
+        <span><b>02</b> IP address management</span>
+        <span><b>03</b> Hands-on subnetting practice</span>
+      </div>
+    </section>
+    <section class="auth-card">
+      <div class="auth-card-kicker"><span class="auth-kicker-dot"></span> YOUR NETWORK WORKSPACE</div>
+      <h1 id="authTitle">Sign in to your workspace</h1>
+      <p class="muted">Pick up where you left off, or create an account to get started.</p>
       <form id="authForm" class="stack-form">
         <label>Email address<input name="email" type="email" autocomplete="email" required></label>
         <label>Password<input name="password" type="password" minlength="10" autocomplete="current-password" required></label>
         <button class="button primary full" id="authSubmit">Sign in</button>
       </form>
       <p class="auth-switch"><span id="authSwitchText">New to SubnetLab?</span> <button class="text-button" id="authSwitch" type="button">Create account</button></p>
-      <p class="auth-message" id="authMessage" role="status"></p>
+      <p class="auth-message" id="authMessage" role="status" aria-live="polite"></p>
+      <div class="auth-trust"><span><icon></icon> Private workspace</span><span>Passwords are securely hashed</span></div>
     </section>
   </div>
   <div id="appView" class="app-shell" hidden>
