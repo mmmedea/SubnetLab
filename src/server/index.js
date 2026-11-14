@@ -41,7 +41,7 @@ app.use('/api/v1', (req,res,next) => {
   res.setHeader('Cache-Control', 'no-store');
   if (!['GET','HEAD','OPTIONS'].includes(req.method)) {
     const requestOrigin = req.headers.origin;
-    const hasBearerToken = /^Bearer\\s+/i.test(String(req.headers.authorization || ''));
+    const hasBearerToken = /^Bearer\s+/i.test(String(req.headers.authorization || ''));
     if (requestOrigin && requestOrigin !== origin) return next(new HttpError(403, 'Request origin is not allowed.'));
     if (!requestOrigin && !hasBearerToken) return next(new HttpError(403, 'Origin header is required for browser-session requests.'));
   }
