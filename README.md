@@ -7,7 +7,7 @@ SubnetLab provides a focused workspace for network planning and learning. The in
 ## Prerequisites
 
 - Node.js 22 or newer and npm
-- macOS, Linux, or Windows with a supported `better-sqlite3` build toolchain if no prebuilt binary is available
+- Supabase project for persistent hosted data (PostgreSQL)
 
 ## Install and configure
 
@@ -16,29 +16,40 @@ npm install
 cp .env.example .env
 ```
 
-Set `JWT_SECRET` in `.env` to a private random value of at least 32 characters. For example, generate one with `openssl rand -base64 48` and paste the output into your local `.env`. Do not commit `.env` or production secrets.
+Set `JWT_SECRET` to a private random value of at least 32 characters. For local development, SQLite remains available when Supabase environment variables are absent. To use the hosted database locally, set `SUPABASE_URL` and `SUPABASE_SECRET_KEY`.
 
-The default database is `./data/subnetlab.sqlite`. SQLite creates this file and its parent directory when the server starts. To explicitly initialize the schema:
-
-```sh
-npm run db:init
-```
+**Never put the Supabase secret key in browser code or a `NEXT_PUBLIC_*` variable.** It is a server-only credential and must only exist in trusted server environments. The existing SubnetLab email/password and HS256 JWT flow is retained. Supabase stores password hashes and user-owned application records; it does not replace the app's sign-in experience with Supabase Auth.
 
 ## Run
 
 ```sh
-npm run dev       # development with Node watch mode
-npm start         # production-style server
+npm run dev
+npm start
 ```
 
-The app listens on `http://localhost:3000` by default. Set `PORT`, `APP_ORIGIN`, and `COOKIE_SECURE=true` to match the deployed site and HTTPS configuration. Production deployments must use HTTPS and `COOKIE_SECURE=true`.
+The app listens on `http://localhost:3000` by default. Set `APP_ORIGIN` to the exact deployed site origin and use `COOKIE_SECURE=true` behind HTTPS.
 
-## Deployment note for Vercel
+## Vercel and Supabase deployment
 
-**Do not use the current SQLite-backed Vercel deployment for real user accounts or durable data.** Vercel function filesystems are ephemeral, and the current app opens SQLite on the local filesystem. The Vercel preview can verify the interface and server startup, but it is not a persistent production data store.
+SubnetLab is an Express 5 application, not a Next.js application. It uses a server-only Supabase REST client built on Node's native `fetch`, so no Next.js `page.tsx`, `middleware.ts`, or `@supabase/ssr` files are required.
 
+Configure these Vercel environment variables for **Preview and Production**:
 
-This repository currently uses SQLite through `better-sqlite3`. A local SQLite file is suitable for development and for hosts with a persistent disk, but Vercel serverless function filesystems are ephemeral and must not be treated as durable storage. Do not use the default `./data/subnetlab.sqlite` path for production user data on Vercel. Before relying on a Vercel deployment for real accounts, migrate the persistence layer to a managed database (for example, PostgreSQL) and configure backups, connection pooling, and production secrets. The current application has not yet been migrated to PostgreSQL.
+| Variable | Purpose |
+| --- | --- |
+| `SUPABASE_URL` | Supabase project URL |
+| `SUPABASE_SECRET_KEY` | Server-only Supabase secret key. Never expose it to the browser. |
+| `JWT_SECRET` | Private random value of at least 32 characters |
+| `APP_ORIGIN` | Exact public URL of the deployed SubnetLab site |
+| `COOKIE_SECURE` | `true` |
+
+The backend also accepts `NEXT_PUBLIC_SUPABASE_URL` as a URL fallback and `SUPABASE_SERVICE_ROLE_KEY` as a legacy server-secret fallback. Do not use a `NEXT_PUBLIC_` name for the secret key.
+
+When both Supabase variables are present, the server selects the Supabase PostgreSQL backend automatically. Without them, local development falls back to SQLite. Vercel deployments must have the Supabase variables configured before accepting real users because serverless filesystems are ephemeral.
+
+The Supabase migration is in `supabase/migrations/`. It adds case-insensitive email uniqueness, IPAM uniqueness and query indexes, server-only table permissions, and transactional RPC functions for IP assignment/reservation and practice-answer submission. Row Level Security remains enabled. Browser roles have no direct table privileges; the server uses its secret key only after verifying the application's own JWT and filtering every user-owned query by the authenticated user ID.
+
+After changing environment variables, redeploy the Vercel Preview and Production deployments. Verify registration, login, `GET /api/v1/auth/me`, plan CRUD, IPAM assignment/reservation, practice scoring, and analytics before using the deployment with real data.
 
 ## Publish with Render
 
