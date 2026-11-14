@@ -1,6 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import request from 'supertest';
+import jwt from 'jsonwebtoken';
 
 process.env.JWT_SECRET ||= 'test-secret-long-enough-for-subnetlab-123456';
 process.env.APP_ORIGIN ||= 'http://127.0.0.1:3000';
@@ -12,6 +13,12 @@ test('accounts isolate plans and IPAM; practice answers are checked and saved se
   const a=request.agent(app),b=request.agent(app),origin=process.env.APP_ORIGIN;
   assert.equal((await request(app).get('/')).status,200);
   assert.equal((await request(app).get('/app.js')).status,200);
+  const preflight=await request(app).options('/api/v1/plans').set('Origin',origin).set('Access-Control-Request-Method','POST').set('Access-Control-Request-Headers','authorization,content-type');
+  assert.equal(preflight.status,204);
+  assert.match(preflight.headers['access-control-allow-headers'],/authorization/i,'CORS preflight must allow Authorization headers');
+  const bearerToken=jwt.sign({},process.env.JWT_SECRET,{algorithm:'HS256',subject:String(1),expiresIn:'8h'});
+  assert.equal((await request(app).get('/api/v1/plans').set('Authorization',`Bearer ${bearerToken}`)).status,200,'Bearer authorization headers are parsed correctly');
+  assert.equal((await request(app).post('/api/v1/plans/compute').set('Authorization',`Bearer ${bearerToken}`).send({family:4,base:'10.0.0.0/24',requirements:[{name:'Test',hosts:10}]})).status,200,'Bearer-authenticated API clients can make originless requests');
   const registerA=await a.post('/api/v1/auth/register').set('Origin',origin).send({email:'a@example.test',password:'strong-password-1'});assert.equal(registerA.status,201);
   const registerB=await b.post('/api/v1/auth/register').set('Origin',origin).send({email:'b@example.test',password:'strong-password-2'});assert.equal(registerB.status,201);
   assert.equal((await a.post('/api/v1/auth/login').set('Origin',origin).send({email:'a@example.test',password:'strong-password-1'})).status,200);
@@ -20,6 +27,10 @@ test('accounts isolate plans and IPAM; practice answers are checked and saved se
   assert.equal((await b.post('/api/v1/auth/login').set('Origin',origin).send({email:'b@example.test',password:'strong-password-2'})).status,200);
   const plan=await a.post('/api/v1/plans').set('Origin',origin).send({name:'Office',family:4,base:'10.20.0.0/24',requirements:[{name:'Staff',hosts:30}]});assert.equal(plan.status,201);
   const ipv6Plan=await a.post('/api/v1/plans').set('Origin',origin).send({name:'IPv6 office',family:6,base:'2001:db8:1200::/48',subnetPrefix:64,names:['Staff']});assert.equal(ipv6Plan.status,201);
+  const lowV4=await a.post('/api/v1/plans').set('Origin',origin).send({name:'Low IPv4',family:4,base:'0.0.0.0/24',requirements:[{name:'Loopback range',hosts:10}]});assert.equal(lowV4.status,201);
+  const lowV6=await a.post('/api/v1/plans').set('Origin',origin).send({name:'Low IPv6',family:6,base:'::/48',subnetPrefix:64,names:['Loopback range']});assert.equal(lowV6.status,201);
+  assert.equal((await a.post('/api/v1/ipam/records').set('Origin',origin).send({planId:lowV4.body.data.id,allocationIndex:0,address:'0.0.0.1',label:'IPv4 loopback'})).status,201);
+  assert.equal((await a.post('/api/v1/ipam/records').set('Origin',origin).send({planId:lowV6.body.data.id,allocationIndex:0,address:'::1',label:'IPv6 loopback'})).status,201,'IPv4 and IPv6 addresses with equal integer values must not conflict');
   const ipv6Config=await a.get(`/api/v1/plans/${ipv6Plan.body.data.id}/config`);assert.equal(ipv6Config.status,200);assert.match(ipv6Config.body.data.text,/ipv6 address 2001:db8:1200::\/64/);assert.match(ipv6Config.body.data.platform,/IPv4 DHCP pools are omitted/);
   assert.equal((await a.post('/api/v1/plans/compute').set('Origin',origin).send({family:5,base:'10.0.0.0/24'})).status,400);
   assert.equal((await b.get(`/api/v1/plans/${plan.body.data.id}`)).status,404);
