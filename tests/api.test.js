@@ -31,6 +31,10 @@ test('accounts isolate plans and IPAM; practice answers are checked and saved se
   const lowV6=await a.post('/api/v1/plans').set('Origin',origin).send({name:'Low IPv6',family:6,base:'::/48',subnetPrefix:64,names:['Loopback range']});assert.equal(lowV6.status,201);
   assert.equal((await a.post('/api/v1/ipam/records').set('Origin',origin).send({planId:lowV4.body.data.id,allocationIndex:0,address:'0.0.0.1',label:'IPv4 loopback'})).status,201);
   assert.equal((await a.post('/api/v1/ipam/records').set('Origin',origin).send({planId:lowV6.body.data.id,allocationIndex:0,address:'::1',label:'IPv6 loopback'})).status,201,'IPv4 and IPv6 addresses with equal integer values must not conflict');
+  assert.equal((await a.post('/api/v1/ipam/records').set('Origin',origin).send({planId:lowV4.body.data.id,allocationIndex:0,address:'0.0.0.2',label:'Second IPv4'})).status,201);
+  assert.equal((await a.post('/api/v1/ipam/records').set('Origin',origin).send({planId:lowV4.body.data.id,allocationIndex:0,address:'0.0.0.10',label:'Tenth IPv4'})).status,201);
+  const sortedIpam=await a.get(`/api/v1/ipam?planId=${lowV4.body.data.id}`);
+  assert.deepEqual(sortedIpam.body.data.records.map(x=>x.address),['0.0.0.1','0.0.0.2','0.0.0.10'],'IPAM records must sort by numeric address, not decimal text');
   const ipv6Config=await a.get(`/api/v1/plans/${ipv6Plan.body.data.id}/config`);assert.equal(ipv6Config.status,200);assert.match(ipv6Config.body.data.text,/ipv6 address 2001:db8:1200::\/64/);assert.match(ipv6Config.body.data.platform,/IPv4 DHCP pools are omitted/);
   assert.equal((await a.post('/api/v1/plans/compute').set('Origin',origin).send({family:5,base:'10.0.0.0/24'})).status,400);
   assert.equal((await b.get(`/api/v1/plans/${plan.body.data.id}`)).status,404);
