@@ -151,4 +151,5 @@ app.use(express.static('public'));
 app.use((req,res,next)=>req.path.startsWith('/api/')?next(new HttpError(404,'API route not found.')):res.sendFile(path.resolve('public/index.html')));
 app.use((err,req,res,_next)=>{const status=err.status||500;if(status>=500)console.error(err.message);res.status(status).json({error:{message:status>=500?'Something went wrong. Please try again.':err.message}})});
 export { app };
+export default app;
 if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.meta.url)) app.listen(port,()=>console.log(`SubnetLab listening on ${origin}`));
