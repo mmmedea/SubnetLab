@@ -9,7 +9,7 @@
   },
   "scripts": {
     "start": "node src/server/index.js",
-    "dev": "node --watch src/server/index.js",
+    "dev": "node --watch src/server/sqlite-app.js",
     "db:init": "node src/server/init-db.js",
     "test": "node --test",
     "check": "node --check src/server/index.js && node --check src/server/sqlite-app.js && node --check src/server/supabase-app.js && node --check public/app.js"
