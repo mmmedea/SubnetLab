@@ -1,4 +1,7 @@
 -- SubnetLab Supabase persistence hardening
+-- Remove legacy uniqueness that ignored address family and broke IPv4/IPv6 coexistence.
+drop index if exists public.ip_active_unique;
+drop index if exists public.reservation_unique;
 -- Server-only custom JWT auth. Do not grant direct browser table access.
 create unique index if not exists users_email_lower_unique on public.users (lower(email));
 create unique index if not exists ip_records_active_address_unique
