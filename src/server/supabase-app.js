@@ -29,7 +29,7 @@ async function rest(table,opts={}){const qs=new URLSearchParams();for(const [k,v
 const select=(t,q)=>rest(t,{query:q}),one=async(t,q)=>(await select(t,{...q,limit:1}))[0]||null,insert=(t,b)=>rest(t,{method:'POST',body:b}),patch=(t,q,b)=>rest(t,{method:'PATCH',query:q,body:b}),del=(t,q)=>rest(t,{method:'DELETE',query:q});
 async function allRows(table,query){const result=[];let offset=0;while(true){const batch=await select(table,{...query,limit:1000,offset});result.push(...batch);if(batch.length<1000)return result;offset+=batch.length;}}
 async function persistentRateLimit(req,res,next,{bucket,limit,windowSeconds,identity}){
-  if(req.path==='/health')return next();
+  if(req.path==='/health'&&(!secret||!supabaseKey))return next();
   try{
     const ip=req.ip||req.socket.remoteAddress||'unknown';
     const raw=[bucket,ip,typeof identity==='function'?identity(req):''].join(':');
