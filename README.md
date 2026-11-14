@@ -2,7 +2,7 @@
 
 SubnetLab is a full-stack subnet planning and learning workspace for networking students, junior network administrators, and small offices. It combines IPv4 VLSM, IPv6 prefix allocation, IP address management, DHCP reservations, Cisco-style examples, and server-checked practice with personal progress analytics.
 
-The proposal images in this folder were used as product and visual references. They describe largest-first VLSM, `/48` or `/56` to `/64` IPv6 planning, IPAM duplicate prevention, accessible address-space views, Cisco examples, CSV/print reports, and practice analytics. The UI reference informs the navy navigation and blue-accented workspace. A persistent theme toggle offers both light and dark appearances. The more detailed request supplied with this project defines the implementation scope where the images are less specific.
+SubnetLab provides a focused workspace for network planning and learning. The interface uses a responsive workspace layout, accessible allocation tables, light/dark themes, and a public product introduction before sign-in.
 
 ## Prerequisites
 
@@ -32,6 +32,10 @@ npm start         # production-style server
 ```
 
 The app listens on `http://localhost:3000` by default. Set `PORT`, `APP_ORIGIN`, and `COOKIE_SECURE=true` to match the deployed site and HTTPS configuration. Production deployments must use HTTPS and `COOKIE_SECURE=true`.
+
+## Deployment note for Vercel
+
+This repository currently uses SQLite through `better-sqlite3`. A local SQLite file is suitable for development and for hosts with a persistent disk, but Vercel serverless function filesystems are ephemeral and must not be treated as durable storage. Do not use the default `./data/subnetlab.sqlite` path for production user data on Vercel. Before relying on a Vercel deployment for real accounts, migrate the persistence layer to a managed database (for example, PostgreSQL) and configure backups, connection pooling, and production secrets. The current application has not yet been migrated to PostgreSQL.
 
 ## Publish with Render
 
