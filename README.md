@@ -35,6 +35,9 @@ The app listens on `http://localhost:3000` by default. Set `PORT`, `APP_ORIGIN`,
 
 ## Deployment note for Vercel
 
+**Do not use the current SQLite-backed Vercel deployment for real user accounts or durable data.** Vercel function filesystems are ephemeral, and the current app opens SQLite on the local filesystem. The Vercel preview can verify the interface and server startup, but it is not a persistent production data store.
+
+
 This repository currently uses SQLite through `better-sqlite3`. A local SQLite file is suitable for development and for hosts with a persistent disk, but Vercel serverless function filesystems are ephemeral and must not be treated as durable storage. Do not use the default `./data/subnetlab.sqlite` path for production user data on Vercel. Before relying on a Vercel deployment for real accounts, migrate the persistence layer to a managed database (for example, PostgreSQL) and configure backups, connection pooling, and production secrets. The current application has not yet been migrated to PostgreSQL.
 
 ## Publish with Render
