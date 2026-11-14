@@ -100,6 +100,7 @@ All endpoints are versioned under `/api/v1` and return `{ "data": ... }` on succ
 | Endpoint | Purpose |
 | --- | --- |
 | `POST /auth/register`, `POST /auth/login`, `POST /auth/logout`, `GET /auth/me` | Create account, sign in/out, retrieve current account |
+| `GET /health` | Supabase database readiness check (hosted backend) |
 | `GET /dashboard` | Current-account totals and recent activity |
 | `GET /plans`, `POST /plans/compute`, `POST /plans`, `GET/PUT/DELETE /plans/:id` | Compute and manage saved plans |
 | `GET /plans/:id/config`, `GET /plans/:id/export.csv` | Generated examples and allocation export |
