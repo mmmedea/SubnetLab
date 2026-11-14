@@ -1,6 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import request from 'supertest';
+import jwt from 'jsonwebtoken';
 
 process.env.JWT_SECRET ||= 'test-secret-long-enough-for-subnetlab-123456';
 process.env.APP_ORIGIN ||= 'http://127.0.0.1:3000';
@@ -12,6 +13,9 @@ test('accounts isolate plans and IPAM; practice answers are checked and saved se
   const a=request.agent(app),b=request.agent(app),origin=process.env.APP_ORIGIN;
   assert.equal((await request(app).get('/')).status,200);
   assert.equal((await request(app).get('/app.js')).status,200);
+  const bearerToken=jwt.sign({},process.env.JWT_SECRET,{algorithm:'HS256',subject:String(1),expiresIn:'8h'});
+  assert.equal((await request(app).get('/api/v1/plans').set('Authorization',`Bearer ${bearerToken}`)).status,200,'Bearer authorization headers are parsed correctly');
+  assert.equal((await request(app).post('/api/v1/plans/compute').set('Authorization',`Bearer ${bearerToken}`).send({family:4,base:'10.0.0.0/24',requirements:[{name:'Test',hosts:10}]})).status,200,'Bearer-authenticated API clients can make originless requests');
   const registerA=await a.post('/api/v1/auth/register').set('Origin',origin).send({email:'a@example.test',password:'strong-password-1'});assert.equal(registerA.status,201);
   const registerB=await b.post('/api/v1/auth/register').set('Origin',origin).send({email:'b@example.test',password:'strong-password-2'});assert.equal(registerB.status,201);
   assert.equal((await a.post('/api/v1/auth/login').set('Origin',origin).send({email:'a@example.test',password:'strong-password-1'})).status,200);
