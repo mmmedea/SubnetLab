@@ -27,7 +27,8 @@ CREATE TABLE IF NOT EXISTS ip_records (
  address_int TEXT NOT NULL, label TEXT NOT NULL, status TEXT NOT NULL DEFAULT 'active' CHECK(status IN ('active','released')),
  created_at TEXT NOT NULL DEFAULT (datetime('now')), updated_at TEXT NOT NULL DEFAULT (datetime('now'))
 );
-CREATE UNIQUE INDEX IF NOT EXISTS ip_active_unique ON ip_records(user_id, address_int) WHERE status='active';
+DROP INDEX IF EXISTS ip_active_unique;
+CREATE UNIQUE INDEX ip_active_unique ON ip_records(user_id, family, address_int) WHERE status='active';
 CREATE INDEX IF NOT EXISTS ip_user_plan ON ip_records(user_id, plan_id, status);
 CREATE TABLE IF NOT EXISTS reservations (
  id INTEGER PRIMARY KEY, user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
@@ -36,7 +37,8 @@ CREATE TABLE IF NOT EXISTS reservations (
  address_int TEXT NOT NULL, label TEXT NOT NULL, mac TEXT NOT NULL,
  created_at TEXT NOT NULL DEFAULT (datetime('now'))
 );
-CREATE UNIQUE INDEX IF NOT EXISTS reservation_unique ON reservations(user_id, address_int);
+DROP INDEX IF EXISTS reservation_unique;
+CREATE UNIQUE INDEX reservation_unique ON reservations(user_id, family, address_int);
 CREATE INDEX IF NOT EXISTS reservation_user_plan ON reservations(user_id, plan_id);
 CREATE TABLE IF NOT EXISTS practice_questions (
  id TEXT PRIMARY KEY, user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
