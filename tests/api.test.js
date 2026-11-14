@@ -15,6 +15,8 @@ test('accounts isolate plans and IPAM; practice answers are checked and saved se
   const registerA=await a.post('/api/v1/auth/register').set('Origin',origin).send({email:'a@example.test',password:'strong-password-1'});assert.equal(registerA.status,201);
   const registerB=await b.post('/api/v1/auth/register').set('Origin',origin).send({email:'b@example.test',password:'strong-password-2'});assert.equal(registerB.status,201);
   assert.equal((await a.post('/api/v1/auth/login').set('Origin',origin).send({email:'a@example.test',password:'strong-password-1'})).status,200);
+  assert.equal((await a.post('/api/v1/auth/logout')).status,403,'cookie-authenticated mutations require an Origin header');
+  assert.equal((await a.get('/api/v1/dashboard')).headers['cache-control'],'no-store');
   assert.equal((await b.post('/api/v1/auth/login').set('Origin',origin).send({email:'b@example.test',password:'strong-password-2'})).status,200);
   const plan=await a.post('/api/v1/plans').set('Origin',origin).send({name:'Office',family:4,base:'10.20.0.0/24',requirements:[{name:'Staff',hosts:30}]});assert.equal(plan.status,201);
   const ipv6Plan=await a.post('/api/v1/plans').set('Origin',origin).send({name:'IPv6 office',family:6,base:'2001:db8:1200::/48',subnetPrefix:64,names:['Staff']});assert.equal(ipv6Plan.status,201);

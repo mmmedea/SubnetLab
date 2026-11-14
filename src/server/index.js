@@ -38,7 +38,13 @@ function auth(req, res, next) {
 }
 // SameSite cookies plus strict same-origin checks on every state-changing request.
 app.use('/api/v1', (req,res,next) => {
-  if (!['GET','HEAD','OPTIONS'].includes(req.method) && req.headers.origin && req.headers.origin !== origin) return next(new HttpError(403, 'Request origin is not allowed.'));
+  res.setHeader('Cache-Control', 'no-store');
+  if (!['GET','HEAD','OPTIONS'].includes(req.method)) {
+    const requestOrigin = req.headers.origin;
+    const hasBearerToken = /^Bearer\\s+/i.test(String(req.headers.authorization || ''));
+    if (requestOrigin && requestOrigin !== origin) return next(new HttpError(403, 'Request origin is not allowed.'));
+    if (!requestOrigin && !hasBearerToken) return next(new HttpError(403, 'Origin header is required for browser-session requests.'));
+  }
   next();
 });
 
@@ -48,7 +54,7 @@ router.post('/auth/register', async (req,res,next) => {
     const email = String(req.body.email || '').trim().toLowerCase();
     const password = String(req.body.password || '');
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email) || email.length > 254) throw new HttpError(400,'Enter a valid email address.');
-    if (password.length < 10 || password.length > 128) throw new HttpError(400,'Password must be 10–128 characters.');
+    if (password.length < 10 || Buffer.byteLength(password, 'utf8') > 72) throw new HttpError(400,'Password must contain at least 10 characters and no more than 72 UTF-8 bytes.');
     const hash = await bcrypt.hash(password, 12);
     const result = db.prepare('INSERT INTO users(email,password_hash) VALUES(?,?)').run(email,hash);
     res.status(201).json({ data: { id: Number(result.lastInsertRowid), email } });
