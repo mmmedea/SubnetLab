@@ -12,7 +12,7 @@ import { parseIPv4, parseIPv4Cidr, parseIPv6, parseIPv6Cidr, planVLSM, planIPv6 
 
 const app=express(),port=Number(process.env.PORT||3000),secret=process.env.JWT_SECRET;
 const supabaseUrl=(process.env.SUPABASE_URL||process.env.NEXT_PUBLIC_SUPABASE_URL||'').replace(/\/+$/,'');
-const supabaseKey=process.env.SUPABASE_SECRET_KEY||process.env.SUPABASE_SERVICE_ROLE_KEY;
+const supabaseKey=process.env.SUPABASE_SECRET_KEY||process.env.SUPABASE_SERVICE_ROLE_KEY||process.env.supabase;
 if(!secret||secret.length<32)throw new Error('JWT_SECRET must contain at least 32 characters.');
 if(!supabaseUrl||!supabaseKey)throw new Error('SUPABASE_URL and SUPABASE_SECRET_KEY are required.');
 const origin=process.env.APP_ORIGIN||'http://localhost:3000',apiBase=supabaseUrl+'/rest/v1';
