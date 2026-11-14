@@ -43,7 +43,7 @@ Configure these Vercel environment variables for **Preview and Production**:
 | `APP_ORIGIN` | Exact public URL of the deployed SubnetLab site |
 | `COOKIE_SECURE` | `true` |
 
-The backend also accepts `NEXT_PUBLIC_SUPABASE_URL` as a URL fallback and `SUPABASE_SERVICE_ROLE_KEY` as a legacy server-secret fallback. Do not use a `NEXT_PUBLIC_` name for the secret key.
+The backend also accepts `NEXT_PUBLIC_SUPABASE_URL` as a URL fallback, `SUPABASE_SERVICE_ROLE_KEY` as a legacy server-secret fallback, and the existing lowercase `supabase` environment variable as a server-secret fallback. Do not use a `NEXT_PUBLIC_` name for the secret key.
 
 The production entrypoint (`npm start`, used by Vercel) always loads the Supabase backend. The local development entrypoint (`npm run dev`) loads SQLite separately. This keeps the native SQLite driver out of the Vercel serverless bundle. Vercel deployments must have both Supabase variables configured before accepting real users because serverless filesystems are ephemeral.
 
