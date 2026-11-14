@@ -18,14 +18,14 @@ if (!secret || secret.length < 32) throw new Error('JWT_SECRET must contain at l
 const origin = process.env.APP_ORIGIN || `http://localhost:${port}`;
 app.disable('x-powered-by');
 app.use(helmet({ crossOriginResourcePolicy: { policy: 'same-site' } }));
-app.use(cors({ origin, credentials: true, methods: ['GET','POST','PUT','DELETE','OPTIONS'], allowedHeaders: ['Content-Type'] }));
+app.use(cors({ origin, credentials: true, methods: ['GET','POST','PUT','DELETE','OPTIONS'], allowedHeaders: ['Content-Type','Authorization'] }));
 app.use(express.json({ limit: '2mb' }));
 app.use('/api/v1/auth', rateLimit({ windowMs: 15 * 60 * 1000, limit: 30, standardHeaders: true, legacyHeaders: false }));
 app.use('/api/v1/practice', rateLimit({ windowMs: 60 * 1000, limit: 90, standardHeaders: true, legacyHeaders: false }));
 
 class HttpError extends Error { constructor(status, message) { super(message); this.status = status; } }
 const ok = (data, status=200) => ({ status, body: { data } });
-const cookieOptions = { httpOnly: true, sameSite: 'strict', secure: process.env.COOKIE_SECURE === 'true', path: '/', maxAge: 8 * 60 * 60 * 1000 };
+const cookieOptions = { httpOnly: true, sameSite: 'strict', secure: process.env.COOKIE_SECURE === 'true' || process.env.NODE_ENV === 'production', path: '/', maxAge: 8 * 60 * 60 * 1000 };
 function auth(req, res, next) {
   try {
     const cookie = String(req.headers.cookie || '').split(';').map(x=>x.trim()).find(x=>x.startsWith('subnetlab='));
@@ -111,7 +111,7 @@ router.post('/ipam/records',auth,(req,res,next)=>{try{
   const plan=getPlan(req.user.id,req.body.planId),allocation=selectedNetwork(plan,req.body.allocationIndex),family=plan.family;
   const address=String(req.body.address||'').trim(),label=String(req.body.label||'').trim();if(!label||label.length>120)throw new HttpError(400,'Record label must contain 1–120 characters.');
   const value=addressInteger(family,address);if(!contains(allocation,family,value))throw new HttpError(400,'Address is outside the selected network.');if(!assignable(allocation,family,value))throw new HttpError(400,'The network and broadcast addresses cannot be assigned in an IPv4 subnet larger than /31.');
-  if(db.prepare("SELECT 1 FROM ip_records WHERE user_id=? AND address_int=? AND status='active' UNION SELECT 1 FROM reservations WHERE user_id=? AND address_int=?").get(req.user.id,value,req.user.id,value))throw new HttpError(409,'That address is already actively assigned or reserved in your account.');
+  if(db.prepare("SELECT 1 FROM ip_records WHERE user_id=? AND family=? AND address_int=? AND status='active' UNION SELECT 1 FROM reservations WHERE user_id=? AND family=? AND address_int=?").get(req.user.id,family,value,req.user.id,family,value))throw new HttpError(409,'That address is already actively assigned or reserved in your account.');
   const row=db.prepare('INSERT INTO ip_records(user_id,plan_id,network_cidr,family,address,address_int,label) VALUES(?,?,?,?,?,?,?)').run(req.user.id,plan.id,allocation.network||`${allocation.network}/${allocation.prefix}`,family,address,value,label);
   res.status(201).json({data:{id:Number(row.lastInsertRowid),address,label,status:'active'}});
 }catch(e){next(e)}});
@@ -122,7 +122,7 @@ router.post('/ipam/reservations',auth,(req,res,next)=>{try{
   const address=String(req.body.address||'').trim(),label=String(req.body.label||'').trim(),mac=String(req.body.mac||'').trim().toLowerCase();
   if(!label||label.length>120)throw new HttpError(400,'Reservation label must contain 1–120 characters.');if(!/^([0-9a-f]{2}:){5}[0-9a-f]{2}$/.test(mac))throw new HttpError(400,'Enter a MAC address in aa:bb:cc:dd:ee:ff format.');
   const value=addressInteger(family,address);if(!contains(allocation,family,value))throw new HttpError(400,'Address is outside the selected network.');if(!assignable(allocation,family,value))throw new HttpError(400,'The network and broadcast addresses cannot be reserved in an IPv4 subnet larger than /31.');
-  if(db.prepare("SELECT 1 FROM ip_records WHERE user_id=? AND address_int=? AND status='active' UNION SELECT 1 FROM reservations WHERE user_id=? AND address_int=?").get(req.user.id,value,req.user.id,value))throw new HttpError(409,'That address is already actively assigned or reserved in your account.');
+  if(db.prepare("SELECT 1 FROM ip_records WHERE user_id=? AND family=? AND address_int=? AND status='active' UNION SELECT 1 FROM reservations WHERE user_id=? AND family=? AND address_int=?").get(req.user.id,family,value,req.user.id,family,value))throw new HttpError(409,'That address is already actively assigned or reserved in your account.');
   const row=db.prepare('INSERT INTO reservations(user_id,plan_id,network_cidr,family,address,address_int,label,mac) VALUES(?,?,?,?,?,?,?,?)').run(req.user.id,plan.id,allocation.network||`${allocation.network}/${allocation.prefix}`,family,address,value,label,mac);
   res.status(201).json({data:{id:Number(row.lastInsertRowid),address,label,mac}});
 }catch(e){next(e)}});
