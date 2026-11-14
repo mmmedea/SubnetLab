@@ -99,7 +99,7 @@ begin
   update public.plans
   set name=p_name, family=p_family, base=p_base, data_json=p_data_json, updated_at=pg_catalog.now()
   where id=p_plan_id and user_id=p_user_id
-  returning pg_catalog.to_jsonb(plans.*) into plan_row;
+  returning * into plan_row;
   return pg_catalog.to_jsonb(plan_row);
 end;
 $;
