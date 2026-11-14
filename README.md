@@ -16,7 +16,7 @@ npm install
 cp .env.example .env
 ```
 
-Set `JWT_SECRET` to a private random value of at least 32 characters. For local development, SQLite remains available when Supabase environment variables are absent. To use the hosted database locally, set `SUPABASE_URL` and `SUPABASE_SECRET_KEY`.
+Set `JWT_SECRET` to a private random value of at least 32 characters. `npm run dev` starts the local SQLite-backed app. To run the hosted backend locally with `npm start`, set `SUPABASE_URL` and `SUPABASE_SECRET_KEY`.
 
 **Never put the Supabase secret key in browser code or a `NEXT_PUBLIC_*` variable.** It is a server-only credential and must only exist in trusted server environments. The existing SubnetLab email/password and HS256 JWT flow is retained. Supabase stores password hashes and user-owned application records; it does not replace the app's sign-in experience with Supabase Auth.
 
@@ -45,7 +45,7 @@ Configure these Vercel environment variables for **Preview and Production**:
 
 The backend also accepts `NEXT_PUBLIC_SUPABASE_URL` as a URL fallback and `SUPABASE_SERVICE_ROLE_KEY` as a legacy server-secret fallback. Do not use a `NEXT_PUBLIC_` name for the secret key.
 
-When both Supabase variables are present, the server selects the Supabase PostgreSQL backend automatically. Without them, local development falls back to SQLite. Vercel deployments must have the Supabase variables configured before accepting real users because serverless filesystems are ephemeral.
+The production entrypoint (`npm start`, used by Vercel) always loads the Supabase backend. The local development entrypoint (`npm run dev`) loads SQLite separately. This keeps the native SQLite driver out of the Vercel serverless bundle. Vercel deployments must have both Supabase variables configured before accepting real users because serverless filesystems are ephemeral.
 
 The Supabase migration is in `supabase/migrations/`. It adds case-insensitive email uniqueness, IPAM uniqueness and query indexes, server-only table permissions, and transactional RPC functions for IP assignment/reservation and practice-answer submission. Row Level Security remains enabled. Browser roles have no direct table privileges; the server uses its secret key only after verifying the application's own JWT and filtering every user-owned query by the authenticated user ID.
 
