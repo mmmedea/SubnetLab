@@ -455,3 +455,77 @@ body[data-theme="dark"] .notice.error{background:#713F2B}
 @media(prefers-reduced-motion:reduce){
  .sidebar,.button,.nav-list a,.action-link{transition:none}
 }
+
+
+/* SubnetLab public web homepage and unified email-first identity entry */
+[hidden]{display:none!important}
+.marketing-home{min-height:100vh;color:#F4F6F8;background:
+ radial-gradient(ellipse at 8% 18%,rgba(217,119,6,.18),transparent 28%),
+ radial-gradient(ellipse at 90% 10%,rgba(91,192,222,.17),transparent 31%),
+ linear-gradient(145deg,#0B132B,#1C2541 58%,#263B58);overflow:hidden}
+.marketing-header{height:82px;max-width:1240px;margin:auto;padding:0 34px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid #ffffff12}
+.marketing-header .brand,.marketing-footer .brand{margin:0;padding:0;color:#fff}
+.marketing-header .brand-light,.marketing-footer .brand-light{color:#AFC9D8}
+.marketing-header nav{display:flex;align-items:center;gap:26px}
+.marketing-header nav>a,.marketing-secondary{color:#C3D4E1;text-decoration:none;font-size:13px}
+.marketing-header nav>a:hover,.marketing-secondary:hover{color:#5BC0DE}
+.marketing-header .button{min-height:40px;padding:0 17px}
+.marketing-hero{max-width:1240px;min-height:620px;margin:auto;padding:88px 34px 84px;display:grid;grid-template-columns:1fr 1fr;align-items:center;gap:60px}
+.marketing-copy{max-width:590px}
+.marketing-eyebrow,.marketing-section-heading>span,.marketing-bottom>div>span{font-size:10px;letter-spacing:2px;font-weight:800;color:#5BC0DE}
+.marketing-eyebrow{display:flex;align-items:center;gap:10px}
+.marketing-eyebrow i{width:7px;height:7px;border-radius:50%;background:#D97706;box-shadow:0 0 16px #D97706}
+.marketing-copy h1{font:800 clamp(40px,5.1vw,66px)/1.05 'Outfit','Inter',sans-serif;letter-spacing:-2.4px;margin:24px 0;color:#FFF9F1}
+.marketing-copy h1 em{font-style:normal;background:linear-gradient(90deg,#5BC0DE,#F4D6B0 70%,#D97706);-webkit-background-clip:text;background-clip:text;color:transparent}
+.marketing-copy>p{max-width:520px;color:#B7C7D5;font-size:16px;line-height:1.8}
+.marketing-actions{display:flex;align-items:center;gap:25px;margin-top:30px;flex-wrap:wrap}
+.marketing-actions .button{min-height:48px;padding:0 22px}
+.marketing-home .button.primary{background:linear-gradient(110deg,#5BC0DE,#D97706);color:#0B132B;border:0;box-shadow:0 12px 32px #5BC0DE25}
+.marketing-home .button.primary:hover{filter:brightness(1.08);transform:translateY(-1px)}
+.marketing-proof{display:flex;gap:24px;flex-wrap:wrap;margin-top:44px;padding-top:22px;border-top:1px solid #ffffff20;color:#AFC1D0;font-size:11px}
+.marketing-proof span{display:grid;gap:5px}
+.marketing-proof b{color:#F4D6B0;font-size:12px}
+.marketing-visual{position:relative;min-height:440px;display:grid;place-items:center;isolation:isolate}
+.marketing-visual:before{content:"";position:absolute;width:340px;height:340px;border-radius:50%;background:radial-gradient(circle,#5BC0DE26,transparent 68%);filter:blur(12px);z-index:-2}
+.visual-orbit{position:absolute;border:1px solid #5BC0DE36;border-radius:50%;transform:rotate(-24deg)}
+.orbit-one{width:410px;height:220px}.orbit-two{width:460px;height:290px;transform:rotate(42deg);border-color:#D9770633}
+.visual-core{width:210px;height:210px;border-radius:50%;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;background:linear-gradient(145deg,#3A506B,#1C2541 75%);border:1px solid #5BC0DE70;box-shadow:0 0 0 14px #5BC0DE0B,0 28px 90px #02081780,inset 0 1px #ffffff20}
+.visual-core span,.visual-core small{font-size:9px;letter-spacing:1.8px;color:#9CCBDD}
+.visual-core strong{font:700 20px 'Geist',sans-serif;color:#FFF9F1}
+.visual-node{position:absolute;min-width:176px;padding:13px 16px 13px 18px;border-radius:14px;background:linear-gradient(135deg,#263B58,#1C2541);border:1px solid #5BC0DE45;box-shadow:0 15px 40px #02081755;display:grid;gap:5px}
+.visual-node:after{content:"";position:absolute;inset:5px auto 5px 0;width:3px;border-radius:4px;background:#5BC0DE}
+.visual-node i{position:absolute;right:14px;top:15px;width:7px;height:7px;border-radius:50%;background:#D97706;box-shadow:0 0 12px #D97706}
+.visual-node b{font-size:12px;color:#FFF9F1}.visual-node span{font:10px 'Geist',sans-serif;color:#AFC1D0}
+.node-a{top:34px;left:0}.node-b{right:-4px;top:174px}.node-c{left:15px;bottom:24px}
+.marketing-caption,.visual-caption{position:absolute;bottom:-3px;font-size:9px;letter-spacing:2px;color:#7895AA}
+.marketing-features{background:linear-gradient(180deg,#F4F6F8,#F4D6B0 180%);color:#1C2541;padding:86px 34px 100px}
+.marketing-section-heading{max-width:680px;margin:0 auto 38px;text-align:center}
+.marketing-section-heading>span{color:#247D9C}
+.marketing-section-heading h2,.marketing-bottom h2{font:700 clamp(28px,3.4vw,42px)/1.12 'Outfit',sans-serif;letter-spacing:-1.2px;color:#0B132B;margin:14px 0}
+.marketing-section-heading p,.marketing-bottom p{font-size:14px;line-height:1.7;color:#60748A}
+.marketing-feature-grid{max-width:1120px;margin:auto;display:grid;grid-template-columns:repeat(3,1fr);gap:18px}
+.marketing-feature-grid article{padding:28px;border:1px solid #3A506B1C;border-radius:18px;background:linear-gradient(145deg,#FFFCF7,#EAF4F6);box-shadow:0 16px 36px #0B132B0C}
+.feature-symbol{display:grid;place-items:center;width:42px;height:42px;border-radius:12px;background:linear-gradient(135deg,#DDF4F8,#F4D6B0);color:#1C6179;font-size:22px}
+.marketing-feature-grid h3{font:700 18px 'Outfit',sans-serif;color:#1C2541;margin:20px 0 8px}
+.marketing-feature-grid p{font-size:13px;line-height:1.7;color:#60748A;margin:0}
+.marketing-bottom{max-width:1120px;margin:auto;padding:76px 34px;display:flex;align-items:center;justify-content:space-between;gap:30px}
+.marketing-bottom>div{max-width:650px}
+.marketing-bottom>div>span{color:#247D9C}
+.marketing-bottom h2{margin-bottom:8px}
+.marketing-bottom p{margin:0}
+.marketing-bottom .button{min-height:48px;padding:0 22px;flex:none}
+.marketing-footer{border-top:1px solid #ffffff18;background:#0B132B;padding:24px max(34px,calc((100% - 1120px)/2));display:flex;align-items:center;justify-content:space-between;gap:20px;color:#8EA5B9;font-size:11px}
+.marketing-footer .brand{font-size:16px}
+.marketing-footer .brand-logo{width:32px;height:30px;flex-basis:32px}
+.auth-shell{background:
+ radial-gradient(ellipse at 5% 20%,rgba(217,119,6,.22),transparent 30%),
+ radial-gradient(ellipse at 95% 10%,rgba(91,192,222,.24),transparent 32%),
+ linear-gradient(145deg,#0B132B,#1C2541 60%,#3A506B)}
+.auth-card{background:linear-gradient(155deg,#FFFCF7,#F4D6B0 170%);border:1px solid #F4D6B0;box-shadow:0 30px 90px #02081766}
+.auth-back{margin-top:14px;font-size:12px}
+.auth-card .stack-form[hidden]{display:none}
+.auth-card .stack-form input{background:#FFFDF9;border-color:#CFD9DF;color:#1C2541}
+.auth-card .stack-form input:focus{border-color:#5BC0DE;box-shadow:0 0 0 4px #5BC0DE30}
+.auth-card .button.primary{background:linear-gradient(110deg,#1C2541,#3A506B 65%,#247D9C);color:#FFF9F1}
+@media(max-width:900px){.marketing-hero{grid-template-columns:1fr;gap:20px;padding-top:72px}.marketing-copy{max-width:720px}.marketing-visual{min-height:390px}.marketing-feature-grid{grid-template-columns:1fr 1fr}}
+@media(max-width:620px){.marketing-header{height:70px;padding:0 18px}.marketing-header nav{gap:10px}.marketing-header nav>a{display:none}.marketing-header .button{min-height:36px;padding:0 11px;font-size:11px}.marketing-header .brand{font-size:17px}.marketing-header .brand-logo{width:36px;height:32px;flex-basis:36px}.marketing-hero{padding:58px 22px 64px;min-height:0}.marketing-copy h1{font-size:43px;letter-spacing:-1.8px}.marketing-copy>p{font-size:14px}.marketing-proof{gap:15px}.marketing-visual{min-height:330px;transform:scale(.88);margin:-12px -18px}.orbit-one{width:340px}.orbit-two{width:360px}.visual-core{width:175px;height:175px}.visual-core strong{font-size:17px}.visual-node{min-width:148px;padding:11px 12px}.node-a{left:-5px;top:18px}.node-b{right:-8px;top:142px}.node-c{left:-3px;bottom:15px}.marketing-features{padding:65px 20px 70px}.marketing-feature-grid{grid-template-columns:1fr}.marketing-feature-grid article{padding:22px}.marketing-bottom{padding:58px 22px;display:block}.marketing-bottom .button{margin-top:22px}.marketing-footer{padding:22px;flex-wrap:wrap}.marketing-footer>span:nth-child(2){display:none}}
