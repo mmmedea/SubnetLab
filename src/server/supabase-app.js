@@ -53,8 +53,8 @@ async function persistentRateLimit(req,res,next,{bucket,limit,windowSeconds,iden
 }
 const apiRateLimit=(req,res,next)=>persistentRateLimit(req,res,next,{bucket:'api',limit:300,windowSeconds:60});
 const registerRateLimit=(req,res,next)=>persistentRateLimit(req,res,next,{bucket:'register-ip',limit:5,windowSeconds:3600});
-const loginIpRateLimit=(req,res,next)=>persistentRateLimit(req,res,next,{bucket:'login-ip',limit:20,windowSeconds:900});
-const loginIdentityRateLimit=(req,res,next)=>persistentRateLimit(req,res,next,{bucket:'login-identity',limit:5,windowSeconds:900,identity:req=>String(req.body?.email||'').trim().toLowerCase().slice(0,254)});
+const loginIpRateLimit=(req,res,next)=>persistentRateLimit(req,res,next,{bucket:'login-ip-v2',limit:60,windowSeconds:900});
+const loginIdentityRateLimit=(req,res,next)=>persistentRateLimit(req,res,next,{bucket:'login-identity-v2',limit:12,windowSeconds:900,identity:req=>String(req.body?.email||'').trim().toLowerCase().slice(0,254)});
 const practiceRateLimit=(req,res,next)=>persistentRateLimit(req,res,next,{bucket:'practice',limit:90,windowSeconds:60});
 function dbError(e){if(e.code==='P0002')return new HttpError(404,'Question not found or already unavailable.');if(e.code==='23505')return new HttpError(409,'That record already exists.');if(e.code==='23514')return new HttpError(409,'This plan change would invalidate saved IPAM records.');if(e.status===401||e.status===403)return new HttpError(503,'Supabase server credentials or table permissions are incorrect.');return e}
 function calculate(b){const f=Number(b.family??4);if(f!==4&&f!==6)throw new HttpError(400,'Address family must be 4 or 6.');return f===6?planIPv6(b.base,b.subnetPrefix,b.names):planVLSM(b.base,b.requirements)}
