@@ -6,7 +6,7 @@ import jwt from 'jsonwebtoken';
 process.env.JWT_SECRET ||= 'test-secret-long-enough-for-subnetlab-123456';
 process.env.APP_ORIGIN ||= 'http://127.0.0.1:3000';
 process.env.DB_PATH = ':memory:';
-const { app } = await import('../src/server/index.js');
+const { app } = await import('../src/server/sqlite-app.js');
 const { db } = await import('../src/server/db.js');
 
 test('accounts isolate plans and IPAM; practice answers are checked and saved server-side',async()=>{

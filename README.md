@@ -7,7 +7,7 @@ SubnetLab provides a focused workspace for network planning and learning. The in
 ## Prerequisites
 
 - Node.js 22 or newer and npm
-- macOS, Linux, or Windows with a supported `better-sqlite3` build toolchain if no prebuilt binary is available
+- Supabase project for persistent hosted data (PostgreSQL)
 
 ## Install and configure
 
@@ -16,29 +16,54 @@ npm install
 cp .env.example .env
 ```
 
-Set `JWT_SECRET` in `.env` to a private random value of at least 32 characters. For example, generate one with `openssl rand -base64 48` and paste the output into your local `.env`. Do not commit `.env` or production secrets.
+Set `JWT_SECRET` to a private random value of at least 32 characters. `npm run dev` starts the local SQLite-backed app. To run the hosted backend locally with `npm start`, set `SUPABASE_URL` and `SUPABASE_SECRET_KEY`.
 
-The default database is `./data/subnetlab.sqlite`. SQLite creates this file and its parent directory when the server starts. To explicitly initialize the schema:
-
-```sh
-npm run db:init
-```
+**Never put the Supabase secret key in browser code or a `NEXT_PUBLIC_*` variable.** It is a server-only credential and must only exist in trusted server environments. The existing SubnetLab email/password and HS256 JWT flow is retained. Supabase stores password hashes and user-owned application records; it does not replace the app's sign-in experience with Supabase Auth.
 
 ## Run
 
 ```sh
-npm run dev       # development with Node watch mode
-npm start         # production-style server
+npm run dev
+npm start
 ```
 
-The app listens on `http://localhost:3000` by default. Set `PORT`, `APP_ORIGIN`, and `COOKIE_SECURE=true` to match the deployed site and HTTPS configuration. Production deployments must use HTTPS and `COOKIE_SECURE=true`.
+The app listens on `http://localhost:3000` by default. Set `APP_ORIGIN` to the exact deployed site origin and use `COOKIE_SECURE=true` behind HTTPS.
 
-## Deployment note for Vercel
+## Vercel and Supabase deployment
 
-**Do not use the current SQLite-backed Vercel deployment for real user accounts or durable data.** Vercel function filesystems are ephemeral, and the current app opens SQLite on the local filesystem. The Vercel preview can verify the interface and server startup, but it is not a persistent production data store.
+SubnetLab is an Express 5 application, not a Next.js application. It uses a server-only Supabase REST client built on Node's native `fetch`, so no Next.js `page.tsx`, `middleware.ts`, or `@supabase/ssr` files are required.
 
+Configure these Vercel environment variables for **Preview and Production**:
 
-This repository currently uses SQLite through `better-sqlite3`. A local SQLite file is suitable for development and for hosts with a persistent disk, but Vercel serverless function filesystems are ephemeral and must not be treated as durable storage. Do not use the default `./data/subnetlab.sqlite` path for production user data on Vercel. Before relying on a Vercel deployment for real accounts, migrate the persistence layer to a managed database (for example, PostgreSQL) and configure backups, connection pooling, and production secrets. The current application has not yet been migrated to PostgreSQL.
+| Variable | Purpose |
+| --- | --- |
+| `SUPABASE_URL` | Supabase project URL |
+| `SUPABASE_SECRET_KEY` | Server-only Supabase secret key. Never expose it to the browser. |
+| `JWT_SECRET` | Private random value of at least 32 characters |
+| `APP_ORIGIN` | Exact public URL of the deployed SubnetLab site |
+| `COOKIE_SECURE` | `true` |
+
+The backend also accepts `NEXT_PUBLIC_SUPABASE_URL` as a URL fallback, `SUPABASE_SERVICE_ROLE_KEY` as a legacy server-secret fallback, and the existing lowercase `supabase` environment variable as a server-secret fallback. Do not use a `NEXT_PUBLIC_` name for the secret key.
+
+## API rate limiting
+
+Production rate limits are stored in Supabase PostgreSQL, not in process memory, so they are shared across Vercel serverless instances and deployments. The server HMAC-hashes rate-limit keys before storing them. Raw client IP addresses and email addresses are not stored in the rate-limit table.
+
+| Scope | Limit |
+| --- | ---: |
+| General API traffic | 300 requests per IP per minute |
+| Login attempts | 20 per IP per 15 minutes |
+| Login attempts for one email from one IP | 5 per 15 minutes |
+| Account registration | 5 per IP per hour |
+| Practice endpoints | 90 requests per IP per minute |
+
+Rate-limited responses use HTTP 429 with `Retry-After` and rate-limit headers. If the persistent rate-limit service is unavailable, API requests fail closed with HTTP 503 instead of silently running without protection. The migration `supabase/migrations/20261114000200_persistent_rate_limiting.sql` creates the protected counter table and atomic RPC. Keep the Supabase secret key server-side.
+
+The production entrypoint (`npm start`, used by Vercel) always loads the Supabase backend. The local development entrypoint (`npm run dev`) loads SQLite separately. This keeps the native SQLite driver out of the Vercel serverless bundle. Vercel deployments must have both Supabase variables configured before accepting real users because serverless filesystems are ephemeral.
+
+The Supabase migration is in `supabase/migrations/`. It adds case-insensitive email uniqueness, IPAM uniqueness and query indexes, server-only table permissions, and transactional RPC functions for IP assignment/reservation and practice-answer submission. Row Level Security remains enabled. Browser roles have no direct table privileges; the server uses its secret key only after verifying the application's own JWT and filtering every user-owned query by the authenticated user ID.
+
+After changing environment variables, redeploy the Vercel Preview and Production deployments. Verify registration, login, `GET /api/v1/auth/me`, plan CRUD, IPAM assignment/reservation, practice scoring, and analytics before using the deployment with real data.
 
 ## Publish with Render
 
@@ -89,6 +114,7 @@ All endpoints are versioned under `/api/v1` and return `{ "data": ... }` on succ
 | Endpoint | Purpose |
 | --- | --- |
 | `POST /auth/register`, `POST /auth/login`, `POST /auth/logout`, `GET /auth/me` | Create account, sign in/out, retrieve current account |
+| `GET /health` | Supabase database readiness check (hosted backend) |
 | `GET /dashboard` | Current-account totals and recent activity |
 | `GET /plans`, `POST /plans/compute`, `POST /plans`, `GET/PUT/DELETE /plans/:id` | Compute and manage saved plans |
 | `GET /plans/:id/config`, `GET /plans/:id/export.csv` | Generated examples and allocation export |

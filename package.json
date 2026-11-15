@@ -9,10 +9,10 @@
   },
   "scripts": {
     "start": "node src/server/index.js",
-    "dev": "node --watch src/server/index.js",
+    "dev": "node --watch src/server/sqlite-app.js",
     "db:init": "node src/server/init-db.js",
     "test": "node --test",
-    "check": "node --check src/server/index.js && node --check public/app.js"
+    "check": "node --check src/server/index.js && node --check src/server/sqlite-app.js && node --check src/server/supabase-app.js && node --check public/app.js"
   },
   "dependencies": {
     "bcryptjs": "^3.0.2",
@@ -24,7 +24,9 @@
     "helmet": "^8.1.0",
     "jsonwebtoken": "^9.0.2"
   },
-  "devDependencies": { "supertest": "^7.1.4" },
+  "devDependencies": {
+    "supertest": "^7.1.4"
+  },
   "allowScripts": {
     "better-sqlite3@12.11.1": true
   }
