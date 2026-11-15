@@ -79,7 +79,7 @@ create or replace function public.update_plan_guarded(
 ) returns jsonb
 language plpgsql
 set search_path = ''
-as $
+as $$
 declare
   plan_row public.plans%rowtype;
 begin
@@ -102,7 +102,7 @@ begin
   returning * into plan_row;
   return pg_catalog.to_jsonb(plan_row);
 end;
-$;
+$$;
 
 create or replace function public.record_practice_attempt(
   p_user_id bigint, p_question_id uuid, p_topic text, p_difficulty text, p_correct boolean
