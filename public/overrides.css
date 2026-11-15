@@ -200,3 +200,12 @@ h1,h2,h3,h4{font-family:var(--font-display)}
 .panel-heading h2{font-weight:650;letter-spacing:-.025em}
 .auth-card h1{font-weight:650;letter-spacing:-.04em}
 .stat-value{font-weight:650;letter-spacing:-.04em}
+
+
+/* Official SubnetLab mark: consistent sizing across authentication and workspace navigation. */
+.brand{gap:12px;}
+.brand-logo{display:block;width:46px;height:40px;flex:0 0 46px;object-fit:contain;}
+.auth-intro .brand-logo{width:58px;height:50px;flex-basis:58px;}
+.sidebar .brand-logo{width:42px;height:38px;flex-basis:42px;}
+body[data-theme="dark"] .sidebar .brand-logo{filter:drop-shadow(0 2px 8px #16c9e655);}
+@media(max-width:700px){.auth-intro .brand-logo{width:50px;height:44px;flex-basis:50px;}}
