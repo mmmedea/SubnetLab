@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 410 347" role="img" aria-labelledby="title">
+<title id="title">SubnetLab circuit logo</title>
+<defs>
+ <linearGradient id="ribbon" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#071a49"/><stop offset=".42" stop-color="#0759bd"/><stop offset=".72" stop-color="#12d7df"/><stop offset="1" stop-color="#0871d8"/></linearGradient>
+ <linearGradient id="lower" x1="0" y1="1" x2="1" y2="0"><stop stop-color="#071a49"/><stop offset=".5" stop-color="#0869ca"/><stop offset="1" stop-color="#10d7dc"/></linearGradient>
+ <filter id="glow"><feGaussianBlur stdDeviation="5" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+</defs>
+<g fill="none" stroke-linecap="round" stroke-linejoin="round">
+ <path d="M250 24H104C57 24 25 57 25 101s31 74 78 74h195c35 0 57 20 57 49 0 30-23 52-58 52h-73" stroke="url(#ribbon)" stroke-width="61"/>
+ <path d="M251 24H104C57 24 25 57 25 101s31 74 78 74h195c35 0 57 20 57 49 0 30-23 52-58 52h-73" stroke="#13c9ed" stroke-width="6" opacity=".65"/>
+ <path d="M158 322h45l55-75h-53l-34 46h-30z" fill="#071a49" stroke="#071a49" stroke-width="2"/>
+ <path d="M252 24h91l-54 76h-91z" fill="#0b347c" stroke="#0b347c" stroke-width="2"/>
+ <path d="M251 24h91l-54 76h-91z" fill="url(#ribbon)" opacity=".75"/>
+ <path d="M111 55h72m-72 0a45 45 0 0 0-45 45m45-45h90m-90 120h55m-55 0a47 47 0 0 1-47-47m244 65a47 47 0 0 1 24 43m-24-43h-68" stroke="#18c7f2" stroke-width="5"/>
+ <path d="M265 98l30-42m-17 54 35-49m-56 67 27-38m-96 155-30 42m48-55-30 42m-32-26-18 25" stroke="#3aa7e9" stroke-width="2" opacity=".8"/>
+ <path d="M282 72l-9 13m-9 13-9 13m-84 140-9 12m-9 12-9 12" stroke="#6cc9f5" stroke-width="2"/>
+</g>
+<g fill="#28e4e5" filter="url(#glow)"><circle cx="183" cy="55" r="11"/><circle cx="145" cy="175" r="11"/><circle cx="295" cy="55" r="11"/><circle cx="183" cy="292" r="11"/><circle cx="274" cy="292" r="11"/></g>
+</svg>
