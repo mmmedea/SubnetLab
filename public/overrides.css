@@ -536,3 +536,35 @@ body[data-theme="dark"] .notice.error{background:#713F2B}
 .marketing-bottom h2{color:#FFF9F1}
 .marketing-bottom p{color:#D5E1E8}
 @media(max-width:620px){.marketing-bottom{padding:34px 24px;border-radius:18px}}
+
+
+/* Collapsible desktop sidebar with persistent preference */
+.sidebar-brand-row{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:34px;min-width:0}
+.sidebar-brand-row .brand{min-width:0;white-space:nowrap;overflow:hidden}
+.sidebar-brand-row .brand-name{overflow:hidden}
+.sidebar-collapse{display:grid;place-items:center;flex:0 0 36px;width:36px;height:36px;padding:0;border:1px solid rgba(91,192,222,.22);border-radius:10px;background:rgba(91,192,222,.08);color:#D9EAF2;transition:background .2s ease,transform .2s ease}
+.sidebar-collapse:hover{background:rgba(91,192,222,.2);transform:translateY(-1px)}
+.sidebar-collapse svg{width:19px;height:19px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round}
+.sidebar .side-label{margin-bottom:12px}
+@media(min-width:721px){
+ .sidebar{transition:width 260ms cubic-bezier(.22,1,.36,1),padding 260ms ease}
+ .main-area{transition:margin-left 260ms cubic-bezier(.22,1,.36,1)}
+ body.sidebar-collapsed .sidebar{width:82px;padding-left:13px;padding-right:13px}
+ body.sidebar-collapsed .main-area{margin-left:82px}
+ body.sidebar-collapsed .sidebar-brand-row{justify-content:center;flex-direction:column;gap:12px}
+ body.sidebar-collapsed .sidebar-brand-row .brand{justify-content:center;padding:0}
+ body.sidebar-collapsed .sidebar-brand-row .brand-name,
+ body.sidebar-collapsed .side-label,
+ body.sidebar-collapsed .nav-label,
+ body.sidebar-collapsed .sidebar .user-copy,
+ body.sidebar-collapsed .sidebar .logout{display:none}
+ body.sidebar-collapsed .sidebar .nav-list a{justify-content:center;padding:13px 8px;font-size:0}
+ body.sidebar-collapsed .sidebar .nav-icon{margin:0;font-size:19px}
+ body.sidebar-collapsed .sidebar .user-mini{justify-content:center;padding:0}
+ body.sidebar-collapsed .sidebar-collapse svg{transform:rotate(180deg)}
+}
+@media(max-width:720px){
+ .sidebar-brand-row{margin-bottom:28px}
+ .sidebar-collapse{display:none}
+}
+@media(prefers-reduced-motion:reduce){.sidebar,.main-area,.sidebar-collapse{transition:none!important}}
