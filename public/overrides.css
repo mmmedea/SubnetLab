@@ -568,3 +568,41 @@ body[data-theme="dark"] .notice.error{background:#713F2B}
  .sidebar-collapse{display:none}
 }
 @media(prefers-reduced-motion:reduce){.sidebar,.main-area,.sidebar-collapse{transition:none!important}}
+
+
+/* Consistent breathing room between dashboard actions and controls */
+.top-actions,
+.heading-actions,
+.form-actions,
+.modal-actions,
+.quick-actions{
+  gap:12px;
+}
+.tab-row{
+  display:flex;
+  flex-wrap:wrap;
+  align-items:center;
+  gap:8px;
+}
+.button,
+.icon-button,
+.link-button,
+.text-button{
+  flex-shrink:0;
+}
+@media(max-width:720px){
+  .heading-actions,
+  .form-actions,
+  .modal-actions,
+  .quick-actions{
+    gap:10px;
+  }
+  .form-actions{
+    flex-wrap:wrap;
+  }
+  .heading-actions .button,
+  .form-actions .button,
+  .modal-actions .button{
+    margin:0;
+  }
+}
