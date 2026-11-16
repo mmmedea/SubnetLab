@@ -95,14 +95,14 @@
   </div>
   <div id="appView" class="app-shell" hidden>
     <aside class="sidebar" id="sidebar">
-      <a class="brand" href="#dashboard"><img class="brand-logo" src="/logo.svg" alt="" aria-hidden="true"><span>Subnet<span class="brand-light">Lab</span></span></a>
+      <div class="sidebar-brand-row"><a class="brand" href="#dashboard"><img class="brand-logo" src="/logo.svg" alt="" aria-hidden="true"><span class="brand-name">Subnet<span class="brand-light">Lab</span></span></a><button id="sidebarCollapse" class="icon-button sidebar-collapse" type="button" aria-label="Collapse sidebar" aria-expanded="true" title="Collapse sidebar"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 6h16M4 12h16M4 18h16" /></svg></button></div>
       <div class="side-label">WORKSPACE</div>
       <nav class="nav-list" aria-label="Main navigation">
-        <a href="#dashboard" data-page="dashboard"><span class="nav-icon">▦</span>Overview</a>
-        <a href="#planner" data-page="planner"><span class="nav-icon">⌗</span>Subnet planner</a>
-        <a href="#ipam" data-page="ipam"><span class="nav-icon">◉</span>IP address manager</a>
-        <a href="#practice" data-page="practice"><span class="nav-icon">▤</span>Practice lab</a>
-        <a href="#analytics" data-page="analytics"><span class="nav-icon">⌁</span>Progress</a>
+        <a href="#dashboard" data-page="dashboard"><span class="nav-icon">▦</span><span class="nav-label">Overview</span></a>
+        <a href="#planner" data-page="planner"><span class="nav-icon">⌗</span><span class="nav-label">Subnet planner</span></a>
+        <a href="#ipam" data-page="ipam"><span class="nav-icon">◉</span><span class="nav-label">IP address manager</span></a>
+        <a href="#practice" data-page="practice"><span class="nav-icon">▤</span><span class="nav-label">Practice lab</span></a>
+        <a href="#analytics" data-page="analytics"><span class="nav-icon">⌁</span><span class="nav-label">Progress</span></a>
       </nav>
       <div class="sidebar-bottom"><div class="user-mini"><div class="avatar" id="avatar">U</div><div class="user-copy"><strong id="userEmail">Account</strong><span>Personal workspace</span></div><button class="icon-button logout" id="logout" aria-label="Sign out" title="Sign out">↪</button></div></div>
     </aside>
