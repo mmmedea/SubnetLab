@@ -111,6 +111,45 @@ router.post('/practice/answer',practiceRateLimit,auth,async(req,res,next)=>{try{
 router.get('/analytics/me',auth,async(req,res,next)=>{try{const a=await allRows('attempts',{select:'topic,difficulty,correct,created_at',user_id:'eq.'+req.user.id,order:'created_at.desc'}),correct=a.filter(x=>x.correct).length,g=new Map();for(const x of a){const v=g.get(x.topic)||{topic:x.topic,attempts:0,correct:0};v.attempts++;if(x.correct)v.correct++;g.set(x.topic,v)}const topics=[...g.values()].sort((x,y)=>x.topic.localeCompare(y.topic)).map(x=>({...x,accuracy:Math.round(x.correct/x.attempts*100)})),recent=a.slice(0,30).map(x=>({topic:x.topic,difficulty:x.difficulty,correct:x.correct,createdAt:x.created_at})),cut=Date.now()-13*86400000,d=new Map();for(const x of a){const dt=new Date(x.created_at);if(dt.getTime()<cut)continue;const day=dt.toISOString().slice(0,10),v=d.get(day)||{day,attempts:0,correct:0};v.attempts++;if(x.correct)v.correct++;d.set(day,v)}const daily=[...d.values()].sort((x,y)=>x.day.localeCompare(y.day)).map(x=>({...x,accuracy:Math.round(x.correct/x.attempts*100)}));res.json({data:{totalAttempts:a.length,correct,accuracy:a.length?Math.round(correct/a.length*100):null,topics,recent,daily}})}catch(e){next(dbError(e))}});
 router.get('/dashboard',auth,async(req,res,next)=>{try{const [p,ips,rs,ats,ri,ra]=await Promise.all([allRows('plans',{select:'id,name,family,base,data_json,updated_at',user_id:'eq.'+req.user.id,order:'updated_at.desc'}),allRows('ip_records',{select:'id',user_id:'eq.'+req.user.id,status:'eq.active'}),allRows('reservations',{select:'id',user_id:'eq.'+req.user.id}),allRows('attempts',{select:'correct',user_id:'eq.'+req.user.id}),select('ip_records',{select:'label,created_at',user_id:'eq.'+req.user.id,order:'created_at.desc',limit:6}),select('attempts',{select:'topic,created_at',user_id:'eq.'+req.user.id,order:'created_at.desc',limit:6})]),correct=ats.filter(x=>x.correct).length,recent=[...ri.map(x=>({kind:'assignment',detail:x.label,createdAt:x.created_at})),...ra.map(x=>({kind:'practice',detail:x.topic,createdAt:x.created_at}))].sort((x,y)=>y.createdAt.localeCompare(x.createdAt)).slice(0,6);res.json({data:{plans:p.map(x=>({id:Number(x.id),name:x.name,family:x.family,base:x.base,updatedAt:x.updated_at,allocationCount:JSON.parse(x.data_json).allocations.length})),activeAssignments:ips.length,reservations:rs.length,practice:{attempts:ats.length,accuracy:ats.length?Math.round(correct/ats.length*100):null},recent}})}catch(e){next(dbError(e))}});
 
+router.post('/integrations/tinyfish/search',auth,async(req,res,next)=>{
+  try{
+    const apiKey=process.env.TINYFISH_API_KEY;
+    if(!apiKey)throw new HttpError(503,'TinyFish is not configured. Add TINYFISH_API_KEY to Vercel Environment Variables and redeploy.');
+    const query=String(req.body?.query||'').trim();
+    const location=String(req.body?.location||'US').trim();
+    const language=String(req.body?.language||'en').trim();
+    if(query.length<3||query.length>500)throw new HttpError(400,'Search query must contain 3–500 characters.');
+    if(location.length>80||language.length>20)throw new HttpError(400,'Location or language is invalid.');
+    const params=new URLSearchParams({query,location,language});
+    const upstream=await fetch('https://api.search.tinyfish.ai?'+params.toString(),{
+      method:'GET',
+      headers:{
+        'X-API-Key':apiKey,
+        'X-TF-Request-Origin':'api',
+        'X-TF-API-Source':'api-keys',
+        'X-TF-API-Example':'curl-search',
+        'X-TF-Connect-Source':'setup_page',
+        'X-TF-Connect-Client':'curl',
+        'X-TF-Connect-Attempt-Id':'a807dba9-b8ce-457e-902c-c0c6e0994a86',
+        'Accept':'application/json'
+      },
+      signal:AbortSignal.timeout(20000)
+    });
+    const raw=await upstream.text();
+    let payload;
+    try{payload=raw?JSON.parse(raw):null}catch{payload={message:raw.slice(0,2000)}}
+    if(!upstream.ok){
+      const detail=payload?.error?.message||payload?.message||'TinyFish request failed.';
+      return res.status(upstream.status>=400&&upstream.status<500?upstream.status:502).json({error:{message:String(detail).slice(0,500),provider:'tinyfish',upstreamStatus:upstream.status}});
+    }
+    res.status(200).json({data:{provider:'tinyfish',status:upstream.status,result:payload}});
+  }catch(e){
+    if(e instanceof HttpError)return next(e);
+    if(e.name==='TimeoutError'||e.name==='AbortError')return res.status(504).json({error:{message:'TinyFish did not respond within 20 seconds.'}});
+    next(new HttpError(502,'Unable to reach TinyFish. Please try again later.'));
+  }
+});
+
 app.use('/api/v1',apiRateLimit,router);
 const publicDir=path.resolve(path.dirname(fileURLToPath(import.meta.url)),'../../public');
 app.use(express.static(publicDir));
