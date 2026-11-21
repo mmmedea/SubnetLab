@@ -3,9 +3,9 @@ const content=$('#pageContent');
 const state={user:null,page:'dashboard',plans:[],plan:null,computed:null,family:4,question:null,answered:false};
 const esc=(v='')=>String(v).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const fmtDate=v=>v?new Date(v.replace(' ','T')+'Z').toLocaleString([], {month:'short',day:'numeric',hour:'numeric',minute:'2-digit'}):'';
-function setTheme(theme){const blackout=theme==='dark';document.body.dataset.theme=blackout?'dark':'light';try{localStorage.setItem('subnetlab-theme',blackout?'dark':'light')}catch{}document.querySelector('meta[name="theme-color"]')?.setAttribute('content',blackout?'#020617':'#071A49');document.querySelectorAll('[data-action="toggle-theme"]').forEach(button=>{const next=blackout?'Deep blue mode':'Blackout mode';button.textContent=next;button.setAttribute('aria-label',`Switch to ${next.toLowerCase()}`);button.title=next;button.setAttribute('aria-pressed',String(blackout))})}
+function setTheme(theme){const blackout=theme==='dark';document.body.dataset.theme=blackout?'dark':'light';try{localStorage.setItem('subnetlab-theme',blackout?'dark':'light')}catch{}document.querySelector('meta[name="theme-color"]')?.setAttribute('content',blackout?'#020617':'#071A49');document.querySelectorAll('[data-action="toggle-theme"]').forEach(button=>{const next=blackout?'Light mode':'Dark mode';button.textContent=next;button.setAttribute('aria-label',`Switch to ${next.toLowerCase()}`);button.title=next;button.setAttribute('aria-pressed',String(blackout))})}
 function toggleTheme(){setTheme(document.body.dataset.theme==='dark'?'light':'dark')}
-let savedTheme='light';try{savedTheme=localStorage.getItem('subnetlab-theme')||'light'}catch{}setTheme(savedTheme==='dark'?'dark':'light');
+let savedTheme='dark';try{savedTheme=localStorage.getItem('subnetlab-theme')||'dark'}catch{}setTheme(savedTheme==='dark'?'dark':'light');
 function notify(message,error=false){const el=$('#notice');el.textContent=message;el.className=`notice show${error?' error':''}`;clearTimeout(notify.timer);notify.timer=setTimeout(()=>el.className='notice',3500)}
 async function api(path,opts={}){
   const response=await fetch(`/api/v1${path}`,{credentials:'same-origin',...opts,headers:{...(opts.body?{'Content-Type':'application/json'}:{}),...opts.headers}});
