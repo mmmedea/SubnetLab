@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-  <meta name="theme-color" content="#0B132B">
+  <meta name="theme-color" content="#071A49">
   <meta name="description" content="SubnetLab helps students and network teams plan IPv4 and IPv6 networks, calculate VLSM subnets, manage IP addresses, and practice subnetting.">
   <meta name="robots" content="index,follow,max-image-preview:large">
   <link rel="canonical" href="https://subnetlab.vercel.app/">
@@ -12,14 +12,15 @@
   <meta property="og:url" content="https://subnetlab.vercel.app/">
   <meta name="twitter:card" content="summary">
   <script type="application/ld+json">{"@context":"https://schema.org","@type":"WebApplication","name":"SubnetLab","applicationCategory":"EducationalApplication","operatingSystem":"Web","description":"Plan IPv4 and IPv6 networks, calculate VLSM subnets, manage IP addresses, and practice subnetting."}</script>
-  <meta name="color-scheme" content="light dark">
+  <meta name="color-scheme" content="dark">
   <title>SubnetLab — Plan. Allocate. Understand.</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&family=Inter:wght@400;500;600;700;800&family=Outfit:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="/styles.css"><link rel="stylesheet" href="/overrides.css">
 </head>
-<body>
+<body data-theme="light">
+  <a class="skip-link" href="#pageContent">Skip to workspace content</a>
   <main id="homeView" class="marketing-home">
     <header class="marketing-header">
       <a class="brand" href="/" aria-label="SubnetLab home"><img class="brand-logo" src="/logo.svg" alt=""><span>Subnet<span class="brand-light">Lab</span></span></a>
@@ -109,7 +110,7 @@
     <main class="main-area">
       <header class="topbar"><button id="menuToggle" class="icon-button menu-toggle" aria-label="Open navigation">☰</button><div class="breadcrumbs"><span>SubnetLab</span><span class="crumb-divider">/</span><strong id="pageName">Overview</strong></div><div class="top-actions"><span class="live-dot"></span><span>Workspace ready</span><button class="button theme-toggle" type="button" data-action="toggle-theme" aria-label="Switch to dark mode">Dark mode</button></div></header>
       <div id="notice" class="notice" role="status" aria-live="polite"></div>
-      <div id="pageContent" class="content"></div>
+      <div id="pageContent" class="content" tabindex="-1" aria-live="polite" aria-busy="false"></div>
     </main>
   </div>
   <script type="module" src="/app.js"></script>
