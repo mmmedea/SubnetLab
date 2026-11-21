@@ -71,7 +71,7 @@ a{color:#00FFFF}
 .visual-core{background:linear-gradient(145deg,rgba(7,26,73,.96),rgba(2,6,23,.98));border-color:rgba(0,255,255,.48);box-shadow:0 0 70px rgba(37,99,235,.2),0 28px 90px rgba(2,6,23,.65)}
 .visual-core strong{color:#F8FAFC;font-size:clamp(19px,2vw,25px)}
 .visual-node{background:rgba(2,6,23,.92);border-color:rgba(0,255,255,.22);backdrop-filter:blur(16px)}
-.visual-node b{color:#F8FAFC}.visual-node span{color:#A7B0DB}
+.visual-node b{color:#F8FAFC}.visual-node span{color:rgba(248,250,252,.65)}
 .marketing-features{background:linear-gradient(180deg,rgba(2,6,23,.94),rgba(7,26,73,.56));border-top-color:rgba(0,255,255,.13)}
 .marketing-feature-grid article{transition:transform .22s,border-color .22s,box-shadow .22s}
 .marketing-feature-grid article:hover{transform:translateY(-5px);border-color:rgba(0,255,255,.42);box-shadow:0 24px 65px rgba(2,6,23,.5)}
@@ -80,7 +80,7 @@ a{color:#00FFFF}
 .marketing-footer{border-top-color:rgba(248,250,252,.1)}
 .auth-shell{background:radial-gradient(ellipse at 10% 12%,rgba(0,255,255,.08),transparent 32%),linear-gradient(145deg,#020617,#071A49 56%,#020617)}
 .intro-copy h2{color:#F8FAFC}.intro-copy h2 span{color:#00FFFF}
-.auth-card h1{letter-spacing:-.035em}.auth-card>.muted{color:#A7B0DB}
+.auth-card h1{letter-spacing:-.035em}.auth-card>.muted{color:rgba(248,250,252,.65)}
 .network-preview{background:linear-gradient(145deg,rgba(7,26,73,.78),rgba(2,6,23,.92))}
 .preview-cidr{color:#F8FAFC}.preview-cidr span{color:#00FFFF}
 .table-wrap{border-color:rgba(0,255,255,.16)}th{background:rgba(2,6,23,.96);color:#F8FAFC}td{color:#F8FAFC}
