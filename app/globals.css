@@ -79,3 +79,66 @@ input,button,select,textarea{font-family:"Space Grotesk",Inter,system-ui,sans-se
 input.mono,.mono input{font-family:"Space Mono",ui-monospace,monospace}
 ::selection{background:rgba(183,255,42,.28);color:#f8ffe9}
 @media(max-width:620px){body{background-size:32px 32px,32px 32px,auto}}
+
+
+/* Multicolor neon atmosphere: cyan, electric blue, violet, and neon lime */
+:root{
+  --neon-cyan:#35e7ff;
+  --neon-blue:#397bff;
+  --neon-violet:#9b6bff;
+  --neon-lime:#b7ff2a;
+  --neon-pink:#ff4fd8;
+}
+body{
+  background-color:var(--bg);
+  background-image:
+    radial-gradient(ellipse 42% 34% at 8% 8%,rgba(53,231,255,.15),transparent 72%),
+    radial-gradient(ellipse 42% 38% at 92% 4%,rgba(57,123,255,.20),transparent 72%),
+    radial-gradient(ellipse 36% 34% at 86% 78%,rgba(155,107,255,.14),transparent 72%),
+    radial-gradient(ellipse 34% 30% at 12% 88%,rgba(183,255,42,.105),transparent 72%),
+    radial-gradient(ellipse 28% 24% at 52% 48%,rgba(255,79,216,.055),transparent 76%),
+    linear-gradient(var(--grid-line) 1px,transparent 1px),
+    linear-gradient(90deg,var(--grid-line) 1px,transparent 1px),
+    linear-gradient(145deg,#050f25 0%,#071936 48%,#06132d 100%);
+  background-size:auto,auto,auto,auto,auto,48px 48px,48px 48px,auto;
+  background-attachment:fixed;
+}
+.auth-wrap,.workspace-main{
+  background-image:
+    radial-gradient(ellipse at 12% 8%,rgba(53,231,255,.12),transparent 34%),
+    radial-gradient(ellipse at 92% 12%,rgba(57,123,255,.14),transparent 38%),
+    radial-gradient(ellipse at 85% 92%,rgba(155,107,255,.10),transparent 34%),
+    radial-gradient(ellipse at 8% 92%,rgba(183,255,42,.07),transparent 32%);
+}
+.sidebar{
+  background:
+    radial-gradient(ellipse at 0% 0%,rgba(53,231,255,.10),transparent 42%),
+    radial-gradient(ellipse at 100% 100%,rgba(155,107,255,.10),transparent 42%),
+    linear-gradient(180deg,#081a38,#06142c);
+}
+.panel{
+  position:relative;
+  background:
+    radial-gradient(ellipse at 100% 0%,rgba(53,231,255,.065),transparent 48%),
+    radial-gradient(ellipse at 0% 100%,rgba(57,123,255,.07),transparent 48%),
+    linear-gradient(145deg,rgba(16,41,79,.96),rgba(8,25,53,.98));
+}
+.panel:focus-within{border-color:rgba(53,231,255,.38)}
+.button.primary{
+  background:linear-gradient(105deg,var(--neon-lime),#d5ff65);
+  border-color:var(--neon-lime);
+  color:#101d08;
+}
+.button.primary:hover{
+  background:linear-gradient(105deg,#d5ff65,#a8ff37);
+  box-shadow:0 0 24px rgba(183,255,42,.24),0 8px 28px rgba(53,231,255,.08);
+}
+.hero .panel:before{
+  background:
+    radial-gradient(ellipse at 100% 0%,rgba(53,231,255,.15),transparent 48%),
+    radial-gradient(ellipse at 0% 100%,rgba(155,107,255,.10),transparent 48%),
+    linear-gradient(135deg,rgba(86,140,255,.08),transparent 55%);
+}
+@media(max-width:620px){
+  body{background-attachment:scroll}
+}
