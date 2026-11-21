@@ -165,3 +165,20 @@ body{
 .auth-card form label{font-size:12px;font-weight:600;color:#d7e5f8}
 .auth-card .input{transition:border-color .18s,box-shadow .18s}
 .auth-card .input:focus{border-color:#35e7ff;box-shadow:0 0 0 3px rgba(53,231,255,.10);outline:none}
+
+/* Collapsible desktop workspace navigation */
+.sidebar{width:248px;min-width:248px;transition:width .22s ease,min-width .22s ease,padding .22s ease;overflow:hidden}
+.sidebar-brand-row{display:flex;align-items:center;justify-content:space-between;gap:8px;min-height:38px}
+.sidebar-toggle{width:36px;height:36px;flex:none;display:grid;place-items:center;border:1px solid transparent;border-radius:10px;background:transparent;color:#a8bad3;cursor:pointer;transition:all .18s ease}
+.sidebar-toggle:hover{color:#35e7ff;background:rgba(53,231,255,.1);border-color:rgba(53,231,255,.2)}
+.sidebar-toggle:focus-visible,.sidebar-signout:focus-visible{outline:2px solid #35e7ff;outline-offset:2px}
+.sidebar.is-collapsed{width:82px;min-width:82px;padding-left:12px;padding-right:12px}
+.sidebar.is-collapsed .sidebar-brand-row{flex-direction:column;gap:15px}
+.sidebar.is-collapsed .brand-word,.sidebar.is-collapsed .nav-label,.sidebar.is-collapsed .nav a span,.sidebar.is-collapsed .side-bottom>span,.sidebar.is-collapsed .sidebar-signout span{display:none}
+.sidebar.is-collapsed .brand{justify-content:center}
+.sidebar.is-collapsed .nav a{justify-content:center;padding:0}
+.sidebar.is-collapsed .side-bottom{display:flex;justify-content:center;padding:14px 0}
+.sidebar-signout{display:flex;align-items:center;gap:9px;width:100%;margin-top:12px;padding:9px 8px;border:1px solid rgba(151,190,235,.12);border-radius:9px;background:rgba(7,23,47,.45);color:#9eb3d0;font-size:12px;cursor:pointer}
+.sidebar-signout:hover{color:#ffaaaa;border-color:rgba(255,133,133,.25);background:rgba(255,133,133,.06)}
+.session-indicator{font:600 10px "Space Mono",monospace;letter-spacing:.1em;color:#b7ff2a}
+@media(max-width:620px){.sidebar,.sidebar.is-collapsed{width:100%;min-width:0;padding:6px}.sidebar-brand-row,.sidebar>.nav-label,.sidebar>.side-bottom{display:none}.sidebar.is-collapsed .sidebar-brand-row{display:none}.sidebar.is-collapsed .nav a span{display:block}.sidebar.is-collapsed .nav a{justify-content:center}}
