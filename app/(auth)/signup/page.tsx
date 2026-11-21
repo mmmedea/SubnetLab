@@ -1,0 +1,1 @@
+import AuthForm from "@/components/auth/AuthForm"; export default function Page({searchParams}:{searchParams:Promise<{next?:string}>}){return <AuthForm mode="signup" searchParams={searchParams}/>;}
