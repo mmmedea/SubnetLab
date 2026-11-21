@@ -1,3 +1,5 @@
+@import url('https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700;800&family=Outfit:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
+
 /* Additional accessible states and data visualizations. */
 .free-block{background:#e5eaf1;border:1px dashed #b9c4d2}
 .free-block span{color:#64748a}
@@ -687,7 +689,7 @@ body[data-theme="dark"] .auth-card{
 /* SUBNETLAB PREMIUM BLUE SYSTEM
    Unified light blue / deep blue / cyan / restrained neon palette.
    Typography is intentionally limited to Inter, Geist, Plus Jakarta Sans and Outfit. */
-@import url('https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700;800&family=Outfit:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
+
 
 :root{
   --sl-night:#071B35;
