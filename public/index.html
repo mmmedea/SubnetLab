@@ -16,82 +16,65 @@
   <title>SubnetLab — Plan. Allocate. Understand.</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&family=Inter:wght@400;500;600;700;800&family=Outfit:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&family=Geist+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="/styles.css"><link rel="stylesheet" href="/overrides.css">
 </head>
-<body data-theme="light">
+<body data-theme="dark">
   <a class="skip-link" href="#pageContent">Skip to workspace content</a>
   <main id="homeView" class="marketing-home">
     <header class="marketing-header">
       <a class="brand" href="/" aria-label="SubnetLab home"><img class="brand-logo" src="/logo.svg" alt=""><span>Subnet<span class="brand-light">Lab</span></span></a>
-      <nav aria-label="Main navigation"><a href="#features">Features</a><a href="#how-it-works">How it works</a><button class="button" type="button" data-auth="signin">Sign in</button><button class="button primary" type="button" data-auth="signup">Get started</button></nav>
+      <nav aria-label="Main navigation"><a href="#features">Toolkit</a><a href="#workflow">Workflow</a><button class="button" type="button" data-auth="signin">Sign in</button><button class="button primary" type="button" data-auth="signup">Create account</button></nav>
     </header>
     <section class="marketing-hero">
       <div class="marketing-copy">
-        <span class="marketing-eyebrow"><i></i> NETWORK PLANNING, MADE CLEAR</span>
-        <h1>Build better networks.<br><em>Understand every subnet.</em></h1>
-        <p>From your first subnetting exercise to a structured IP address plan, bring the tools and practice you need into one focused workspace.</p>
-        <div class="marketing-actions"><button class="button primary" type="button" data-auth="signup">Create your workspace <span aria-hidden="true">→</span></button><a class="marketing-secondary" href="#features">Explore the toolkit</a></div>
-        <div class="marketing-proof"><span><b>IPv4 + IPv6</b> planning</span><span><b>VLSM</b> calculations</span><span><b>IPAM</b> workspace</span></div>
+        <p class="eyebrow mono-label">SUBNET PLANNING / IPAM / PRACTICE</p>
+        <h1>Make IP space<br><span>make sense.</span></h1>
+        <p>Plan IPv4 and IPv6 networks, calculate VLSM allocations, and keep address assignments organized in one focused workspace.</p>
+        <div class="marketing-actions"><button class="button primary" type="button" data-auth="signup">Open your workspace <span aria-hidden="true">→</span></button><a class="marketing-secondary" href="#features">Explore the tools</a></div>
+        <div class="marketing-proof"><span>IPv4 + IPv6</span><span>VLSM calculator</span><span>IP address management</span></div>
       </div>
-      <div class="marketing-visual" aria-label="Illustration of an IPv4 network being divided into subnets">
-        <div class="visual-orbit orbit-one"></div><div class="visual-orbit orbit-two"></div>
-        <div class="visual-core"><span>NETWORK</span><strong>192.168.10.0</strong><small>/24 ADDRESS SPACE</small></div>
-        <div class="visual-node node-a"><i></i><b>Engineering</b><span>192.168.10.0/26</span></div>
-        <div class="visual-node node-b"><i></i><b>Operations</b><span>192.168.10.64/27</span></div>
-        <div class="visual-node node-c"><i></i><b>Guest</b><span>192.168.10.96/28</span></div>
-        <div class="visual-caption">ONE NETWORK. CLEAR ALLOCATION.</div>
-      </div>
-    </section>
-    <section class="marketing-features" id="features">
-      <div class="marketing-section-heading"><span>THE TOOLKIT</span><h2>Everything you need to work with IP space.</h2><p>Practical tools that keep the details clear, from address planning to progress tracking.</p></div>
-      <div class="marketing-feature-grid">
-        <article><span class="feature-symbol">⌗</span><h3>Subnet planner</h3><p>Calculate IPv4 VLSM allocations and structured IPv6 subnet plans with clear network details.</p></article>
-        <article><span class="feature-symbol">◉</span><h3>IP address manager</h3><p>Keep assignments and reservations organized alongside the plans they belong to.</p></article>
-        <article><span class="feature-symbol">▤</span><h3>Practice lab</h3><p>Build subnetting confidence with questions, explanations, and saved progress.</p></article>
+      <div class="product-preview" aria-label="Example subnet allocation table">
+        <div class="preview-toolbar"><span class="mono-label">PLAN / 192.168.10.0/24</span><span class="mono-label">SAMPLE DATA</span></div>
+        <div class="preview-summary"><div><span class="mono-label">ADDRESS SPACE</span><strong>256</strong><small>total addresses</small></div><div><span class="mono-label">ALLOCATED</span><strong>176</strong><small>68.75% used</small></div></div>
+        <div class="allocation-bar" aria-label="Address allocation visualization"><i style="width:50%"></i><i style="width:25%"></i><i style="width:12.5%"></i><i style="width:12.5%"></i></div>
+        <table class="preview-table"><thead><tr><th>SEGMENT</th><th>NETWORK</th><th>HOSTS</th></tr></thead><tbody>
+          <tr><td>Engineering</td><td>192.168.10.0/25</td><td>126</td></tr>
+          <tr><td>Operations</td><td>192.168.10.128/26</td><td>62</td></tr>
+          <tr><td>Guest</td><td>192.168.10.192/27</td><td>30</td></tr>
+          <tr><td>Reserved</td><td>192.168.10.224/27</td><td>30</td></tr>
+        </tbody></table>
+        <div class="preview-footer"><span class="mono-label">4 SUBNETS</span><span class="mono-label">CIDR / VLSM</span></div>
       </div>
     </section>
-    <section class="marketing-bottom" id="how-it-works"><div><span>START WITH A NETWORK</span><h2>Plan it. Check it. Learn from it.</h2><p>Create a private workspace and keep your network plans and practice history together.</p></div><button class="button primary" type="button" data-auth="signup">Get started <span aria-hidden="true">→</span></button></section>
+    <section class="toolkit-section" id="features">
+      <div class="section-intro"><p class="mono-label">THE WORKSPACE</p><h2>Tools for the work behind every network.</h2></div>
+      <div class="toolkit-list">
+        <article><span class="mono-label">01 / PLAN</span><div><h3>Subnet planner</h3><p>Calculate subnet ranges, masks, usable hosts, and VLSM allocations without losing sight of the full address space.</p></div><span class="toolkit-arrow" aria-hidden="true">↗</span></article>
+        <article><span class="mono-label">02 / TRACK</span><div><h3>IP address manager</h3><p>Record address assignments and reservations so your network plan stays consistent as it changes.</p></div><span class="toolkit-arrow" aria-hidden="true">↗</span></article>
+        <article><span class="mono-label">03 / PRACTICE</span><div><h3>Subnetting lab</h3><p>Work through practical questions, check your reasoning, and track your progress over time.</p></div><span class="toolkit-arrow" aria-hidden="true">↗</span></article>
+      </div>
+    </section>
+    <section class="workflow-section" id="workflow"><div><p class="mono-label">BUILT FOR LEARNING AND NETWORK WORK</p><h2>From a CIDR block to a plan you can explain.</h2></div><button class="button primary" type="button" data-auth="signup">Start planning <span aria-hidden="true">→</span></button></section>
     <footer class="marketing-footer"><a class="brand" href="/"><img class="brand-logo" src="/logo.svg" alt=""><span>Subnet<span class="brand-light">Lab</span></span></a><span>Plan. Allocate. Understand.</span><span>© <span id="year"></span> SubnetLab</span></footer>
   </main>
   <div id="authView" class="auth-shell" hidden>
-    <button class="button theme-toggle" type="button" data-action="toggle-theme" aria-label="Switch to dark mode">Dark mode</button>
-    <section class="auth-intro" aria-label="About SubnetLab">
-      <a class="brand auth-brand" href="#"><img class="brand-logo" src="/logo.svg" alt="" aria-hidden="true"><span>Subnet<span class="brand-light">Lab</span></span></a>
-      <div class="intro-copy">
-        <span class="eyebrow">NETWORK PLANNING, MADE CLEAR</span>
-        <h2>Make every address<br><span>count.</span></h2>
-        <p>Plan smarter networks, keep your IP space organized, and build real subnetting confidence.</p>
-      </div>
-      <div class="network-preview" aria-label="Illustrative network allocation preview">
-        <div class="preview-top"><span>ADDRESS SPACE</span><span class="preview-status"><i></i> VISUAL OVERVIEW</span></div>
-        <div class="preview-cidr">192.168.10.0<span>/24</span></div>
-        <div class="preview-track"><i></i><i></i><i></i><i></i><i></i></div>
-        <div class="preview-legend"><span><i class="legend-a"></i> Engineering</span><span><i class="legend-b"></i> Sales</span><span><i class="legend-c"></i> Guest</span></div>
-        <div class="preview-foot"><span>IPv4 VLSM</span><span>Sample layout · not live data</span></div>
-      </div>
-      <div class="intro-benefits">
-        <span><b>01</b> IPv4 + IPv6 planning</span>
-        <span><b>02</b> IP address management</span>
-        <span><b>03</b> Hands-on subnetting practice</span>
-      </div>
-    </section>
-    <section class="auth-card">
-      <div class="auth-card-kicker"><span class="auth-kicker-dot"></span> YOUR NETWORK WORKSPACE</div>
-      <h1 id="authTitle">Sign in to your workspace</h1>
-      <p class="muted">Pick up where you left off, or create an account to get started.</p>
+    <section class="auth-card auth-card-centered">
+      <a class="brand auth-brand" href="/" aria-label="SubnetLab home"><img class="brand-logo" src="/logo.svg" alt=""><span>Subnet<span class="brand-light">Lab</span></span></a>
+      <p class="mono-label">YOUR NETWORK WORKSPACE</p>
+      <h1 id="authTitle">Sign in to SubnetLab</h1>
       <form id="emailForm" class="stack-form">
-        <label>Email address<input name="email" type="email" autocomplete="email" inputmode="email" maxlength="254" placeholder="you@example.com" required></label>
-        <button class="button primary full" id="emailContinue">Continue</button>
+        <label>Email address<input name="email" type="email" autocomplete="email" inputmode="email" maxlength="254" placeholder="you@example.com" required autofocus></label>
+        <button class="button primary full" id="emailContinue" type="submit">Continue</button>
       </form>
       <form id="authForm" class="stack-form" hidden>
         <label>Password<input name="password" type="password" minlength="10" maxlength="72" autocomplete="current-password" required></label>
-        <button class="button primary full" id="authSubmit">Sign in</button>
+        <button class="button primary full" id="authSubmit" type="submit">Sign in</button>
       </form>
       <p class="auth-switch" id="authChoice" hidden><span id="authSwitchText">New to SubnetLab?</span> <button class="text-button" id="authSwitch" type="button">Create account</button></p>
       <button class="text-button auth-back" id="authBack" type="button" hidden>← Use a different email</button>
       <p class="auth-message" id="authMessage" role="status" aria-live="polite"></p>
-      <div class="auth-trust"><span><b aria-hidden="true">✓</b> Private workspace</span><span>Passwords are securely hashed</span></div>
+      <p class="auth-footnote">Your workspace is private. Passwords are securely hashed.</p>
     </section>
   </div>
   <div id="appView" class="app-shell" hidden>
@@ -99,16 +82,16 @@
       <div class="sidebar-brand-row"><a class="brand" href="#dashboard"><img class="brand-logo" src="/logo.svg" alt="" aria-hidden="true"><span class="brand-name">Subnet<span class="brand-light">Lab</span></span></a><button id="sidebarCollapse" class="icon-button sidebar-collapse" type="button" aria-label="Collapse sidebar" aria-expanded="true" title="Collapse sidebar"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 6h16M4 12h16M4 18h16" /></svg></button></div>
       <div class="side-label">WORKSPACE</div>
       <nav class="nav-list" aria-label="Main navigation">
-        <a href="#dashboard" data-page="dashboard"><span class="nav-icon">▦</span><span class="nav-label">Overview</span></a>
-        <a href="#planner" data-page="planner"><span class="nav-icon">⌗</span><span class="nav-label">Subnet planner</span></a>
-        <a href="#ipam" data-page="ipam"><span class="nav-icon">◉</span><span class="nav-label">IP address manager</span></a>
-        <a href="#practice" data-page="practice"><span class="nav-icon">▤</span><span class="nav-label">Practice lab</span></a>
-        <a href="#analytics" data-page="analytics"><span class="nav-icon">⌁</span><span class="nav-label">Progress</span></a>
+        <a href="#dashboard" data-page="dashboard"><span class="nav-icon" aria-hidden="true">⌂</span><span class="nav-label">Overview</span></a>
+        <a href="#planner" data-page="planner"><span class="nav-icon" aria-hidden="true">⌗</span><span class="nav-label">Subnet planner</span></a>
+        <a href="#ipam" data-page="ipam"><span class="nav-icon" aria-hidden="true">◎</span><span class="nav-label">IP address manager</span></a>
+        <a href="#practice" data-page="practice"><span class="nav-icon" aria-hidden="true">▤</span><span class="nav-label">Practice lab</span></a>
+        <a href="#analytics" data-page="analytics"><span class="nav-icon" aria-hidden="true">↗</span><span class="nav-label">Progress</span></a>
       </nav>
       <div class="sidebar-bottom"><div class="user-mini"><div class="avatar" id="avatar">U</div><div class="user-copy"><strong id="userEmail">Account</strong><span>Personal workspace</span></div><button class="icon-button logout" id="logout" aria-label="Sign out" title="Sign out">↪</button></div></div>
     </aside>
     <main class="main-area">
-      <header class="topbar"><button id="menuToggle" class="icon-button menu-toggle" aria-label="Open navigation">☰</button><div class="breadcrumbs"><span>SubnetLab</span><span class="crumb-divider">/</span><strong id="pageName">Overview</strong></div><div class="top-actions"><span class="live-dot"></span><span>Workspace ready</span><button class="button theme-toggle" type="button" data-action="toggle-theme" aria-label="Switch to dark mode">Dark mode</button></div></header>
+      <header class="topbar"><button id="menuToggle" class="icon-button menu-toggle" aria-label="Open navigation">☰</button><div class="breadcrumbs"><span>SubnetLab</span><span class="crumb-divider">/</span><strong id="pageName">Overview</strong></div><div class="top-actions"><span class="workspace-label mono-label">WORKSPACE</span><button class="button theme-toggle" type="button" data-action="toggle-theme" aria-label="Switch to dark mode">Dark mode</button></div></header>
       <div id="notice" class="notice" role="status" aria-live="polite"></div>
       <div id="pageContent" class="content" tabindex="-1" aria-busy="false"></div>
     </main>
