@@ -182,3 +182,13 @@ body{
 .sidebar-signout:hover{color:#ffaaaa;border-color:rgba(255,133,133,.25);background:rgba(255,133,133,.06)}
 .session-indicator{font:600 10px "Space Mono",monospace;letter-spacing:.1em;color:#b7ff2a}
 @media(max-width:620px){.sidebar,.sidebar.is-collapsed{width:100%;min-width:0;padding:6px}.sidebar-brand-row,.sidebar>.nav-label,.sidebar>.side-bottom{display:none}.sidebar.is-collapsed .sidebar-brand-row{display:none}.sidebar.is-collapsed .nav a span{display:block}.sidebar.is-collapsed .nav a{justify-content:center}}
+
+/* Auth provider placement and official Google brand mark */
+.auth-card .auth-divider{margin:22px 0 14px}
+.auth-card .google-button{display:flex;align-items:center;justify-content:center;gap:12px;width:100%;min-height:50px;margin:0 0 4px;background:#fff;color:#202124;border:1px solid #dadce0;border-radius:11px;font:600 14px Arial,sans-serif;box-shadow:0 2px 7px rgba(0,0,0,.16)}
+.auth-card .google-button:hover{background:#f8faff;border-color:#b8c9e3;transform:translateY(-1px)}
+.auth-card .google-button svg{display:block;flex:none}
+.auth-forgot{display:flex;justify-content:flex-end;margin-top:-7px;font-size:12px}
+.auth-forgot a,.auth-resend{color:#35e7ff;text-decoration:underline;text-underline-offset:3px}
+.auth-resend{justify-self:center;border:0;background:transparent;padding:8px;font:600 12px "Space Grotesk",sans-serif;cursor:pointer}
+.auth-resend:disabled{opacity:.5;cursor:not-allowed}
