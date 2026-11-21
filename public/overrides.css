@@ -606,3 +606,79 @@ body[data-theme="dark"] .notice.error{background:#713F2B}
     margin:0;
   }
 }
+
+
+/* Cyan refresh: replace the warm cream/tan surfaces while preserving SubnetLab's navy, slate, blue and amber identity. */
+:root{
+  --sl-cream:#CDEFF6;
+  --sl-cyan:#5BC0DE;
+  --sl-cyan-soft:#E7F8FC;
+  --sl-cyan-pale:#F3FBFD;
+  --blue:#269FC2;
+  --blue2:#E7F8FC;
+}
+body:not([data-theme="dark"]){
+  --bg:#F1F9FC;
+  --line:#DDEBF1;
+  background:
+    radial-gradient(ellipse at 96% 0%,rgba(91,192,222,.12),transparent 28%),
+    linear-gradient(180deg,#F1F9FC 0%,#F5F8FB 48%,#EFF9FC 100%);
+}
+body:not([data-theme="dark"]) .main-area{
+  background:linear-gradient(180deg,#F2FAFC 0%,#F5F8FB 42%,#F0F9FC 100%);
+}
+body:not([data-theme="dark"]) .topbar{
+  background:rgba(250,254,255,.88);
+  border-color:#DCECF2;
+}
+body:not([data-theme="dark"]) .stat-card:nth-child(3n){
+  background:linear-gradient(145deg,#F7FDFF,#DDF5FA);
+  border-color:#D6EDF4;
+}
+body:not([data-theme="dark"]) .auth-shell{
+  background:
+    radial-gradient(ellipse at 12% 18%,#1C365A 0%,#101B2D 52%,#0B1422 100%);
+}
+body:not([data-theme="dark"]) .auth-card{
+  background:linear-gradient(155deg,#FCFEFF 0%,#E7F8FC 170%);
+  border-color:#CDEBF3;
+  box-shadow:0 30px 90px #02081766,0 0 0 1px #FFFFFF80 inset;
+}
+body:not([data-theme="dark"]) .marketing-features{
+  background:linear-gradient(180deg,#F4F8FB 0%,#DDF5FA 180%);
+}
+.marketing-copy h1 em{
+  background:linear-gradient(90deg,#5BC0DE 0%,#CDEFF6 62%,#D97706 100%);
+  -webkit-background-clip:text;background-clip:text;color:transparent;
+}
+.marketing-feature-grid article{
+  background:linear-gradient(145deg,#FCFEFF 0%,#E8F8FC 100%);
+  border-color:#CFEAF1;
+}
+.feature-symbol{
+  background:linear-gradient(135deg,#DDF7FB 0%,#BFEAF4 100%);
+  color:#1C6179;
+}
+.marketing-proof b{color:#CDEFF6}
+body[data-theme="dark"]{
+  --sl-cream:#CDEFF6;
+  --blue:#5BC0DE;
+  --blue2:#263B50;
+}
+body[data-theme="dark"] .stat-card:nth-child(3n){
+  background:linear-gradient(145deg,#1B3A4B,#20394C);
+  border-color:#34586B;
+}
+body[data-theme="dark"] .tab-row button.active,
+body[data-theme="dark"] .auth-shell>.theme-toggle{
+  color:#CDEFF6;
+}
+body[data-theme="dark"] .auth-card{
+  background:linear-gradient(155deg,#243B52 0%,#1C2940 100%);
+  border-color:#3D6478;
+}
+@media(max-width:900px){
+  body:not([data-theme="dark"]) .main-area{
+    background:linear-gradient(145deg,#F2FAFC 0%,#EDF7FA 70%,#F6FAFC 100%);
+  }
+}
