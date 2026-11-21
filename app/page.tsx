@@ -2,9 +2,10 @@ import Link from "next/link";
 import { ArrowRight, Calculator, Network, BookOpen } from "lucide-react";
 import { details } from "@/lib/subnet/ipv4";
 const d = details("192.168.10.0/24");
+function Brand(){return <Link className="brand" href="/" aria-label="SubnetLab home"><img className="brand-mark" src="/logo.svg" alt="" width="36" height="32"/><span className="brand-word">Subnet<span>Lab</span></span></Link>}
 export default function Home() {
   return <main className="main landing">
-    <header className="topline"><Link className="brand" href="/">Subnet<span>Lab</span></Link><nav className="toolbar"><a href="#tools">Tools</a><a href="#workflow">Workflow</a><Link className="button" href="/login">Sign in</Link><Link className="button primary" href="/signup">Create account</Link></nav></header>
+    <header className="topline"><Brand/><nav className="toolbar" aria-label="Main navigation"><a href="#tools">Tools</a><a href="#workflow">Workflow</a><Link className="button" href="/login">Sign in</Link><Link className="button primary" href="/signup">Create account</Link></nav></header>
     <section className="hero">
       <div><p className="eyebrow">IP ADDRESSING / VLSM / NETWORK PRACTICE</p><h1>Plan. Allocate.<br/><span>Understand.</span></h1><p className="lead">A working subnet planner for the decisions behind every network. Calculate address ranges, divide blocks, and inspect the binary boundary.</p><div className="toolbar"><Link className="button primary" href="/planner">Open subnet planner <ArrowRight size={15}/></Link><Link className="button" href="/signup">Create workspace</Link></div></div>
       <div className="panel planner"><p className="eyebrow">NETWORK BLOCK / SAMPLE</p><strong className="mono cidr-display">192.168.10.0/24</strong><div className="stats two">{[["NETWORK",d.network],["MASK",d.mask],["WILDCARD",d.wildcard],["USABLE HOSTS",d.usable.toString()]].map(([k,v])=><div className="stat" key={k}><small>{k}</small><strong>{v}</strong></div>)}</div><div className="spacebar"><span style={{width:"50%"}}/><span style={{width:"25%"}}/><span style={{width:"12.5%"}}/></div><p className="muted">Illustrative VLSM allocation. The planner calculates actual boundaries.</p></div>
