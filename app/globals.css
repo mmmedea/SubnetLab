@@ -142,3 +142,26 @@ body{
 @media(max-width:620px){
   body{background-attachment:scroll}
 }
+
+/* Auth controls: clear actions, accessible password visibility, and OAuth */
+.auth-card .google-button{width:100%;min-height:49px;margin:4px 0 18px;background:#f8fbff;color:#14233c;border:1px solid #d9e4f2;font-weight:700;box-shadow:0 5px 18px rgba(0,0,0,.16)}
+.auth-card .google-button:hover{background:#fff;border-color:#35e7ff;transform:translateY(-1px);box-shadow:0 8px 24px rgba(53,231,255,.13)}
+.google-g{font:700 19px Arial,sans-serif;background:conic-gradient(from -45deg,#4285f4 0 25%,#34a853 25% 48%,#fbbc05 48% 68%,#ea4335 68% 82%,#4285f4 82%);background-clip:text;-webkit-background-clip:text;color:transparent}
+.auth-divider{display:flex;align-items:center;gap:12px;color:#8fa6c5;font-size:11px;margin:0 0 18px}
+.auth-divider:before,.auth-divider:after{content:"";height:1px;flex:1;background:rgba(151,190,235,.18)}
+.password-field{position:relative}
+.password-field .input{padding-right:52px}
+.password-toggle{position:absolute;right:7px;top:50%;transform:translateY(-50%);width:38px;height:38px;border:0;border-radius:9px;background:transparent;color:#9fb5d2;display:grid;place-items:center;cursor:pointer;transition:color .16s,background .16s}
+.password-toggle:hover{color:#35e7ff;background:rgba(53,231,255,.1)}
+.password-toggle:focus-visible{outline:2px solid #35e7ff;outline-offset:1px}
+.auth-card .auth-submit{display:flex;justify-content:space-between;padding:0 18px;min-height:52px;font-size:14px;cursor:pointer}
+.auth-card .auth-submit:disabled,.auth-card .google-button:disabled{opacity:.58;cursor:wait;transform:none}
+.auth-card .secondary-action{width:100%;cursor:pointer;background:rgba(86,140,255,.13);border-color:rgba(86,140,255,.38);color:#dce9ff}
+.auth-card .secondary-action:hover{background:rgba(86,140,255,.23);border-color:#568cff}
+.auth-switch{color:#b7ff2a;font-weight:700;text-decoration:underline;text-decoration-color:rgba(183,255,42,.45);text-underline-offset:4px}
+.auth-switch:hover{color:#e0ff91;text-decoration-color:currentColor}
+.auth-notice{padding:11px 13px;border:1px solid rgba(53,231,255,.25);background:rgba(53,231,255,.07);border-radius:10px;color:#b9f7ff;font-size:12px;line-height:1.6}
+.auth-card .auth-foot{font-size:12px;letter-spacing:0}
+.auth-card form label{font-size:12px;font-weight:600;color:#d7e5f8}
+.auth-card .input{transition:border-color .18s,box-shadow .18s}
+.auth-card .input:focus{border-color:#35e7ff;box-shadow:0 0 0 3px rgba(53,231,255,.10);outline:none}
