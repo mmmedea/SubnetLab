@@ -68,6 +68,7 @@ export async function GET(request: NextRequest) {
     return failed;
   }
 
+  await supabase.rpc("record_auth_audit_event", { p_event: "google_oauth_login" });
   response.headers.set("Cache-Control", "private, no-store");
   return response;
 }
