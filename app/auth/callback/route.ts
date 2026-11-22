@@ -5,7 +5,7 @@ import { getSupabaseConfig } from "@/utils/supabase/config";
 function safeNext(value: string | null) {
   if (!value || !value.startsWith("/") || value.startsWith("//") || value.includes("\\")) return "/dashboard";
   const path = value.split("?")[0];
-  return ["/dashboard", "/planner", "/ipam", "/practice", "/progress", "/settings"].some((route) => path === route || path.startsWith(route + "/")) ? value : "/dashboard";
+  return ["/dashboard", "/planner", "/ipam", "/practice", "/progress", "/settings", "/reset-password"].some((route) => path === route || path.startsWith(route + "/")) ? value : "/dashboard";
 }
 
 export async function GET(request: NextRequest) {
@@ -48,8 +48,19 @@ export async function GET(request: NextRequest) {
     exchangeError = error instanceof Error ? error : new Error("Session exchange failed");
   }
   if (!exchangeError && requestUrl.searchParams.get("terms") === "1") {
-    const { error } = await supabase.auth.updateUser({ data: { terms_accepted_at: new Date().toISOString() } });
-    if (error) {
+    const acceptedAt = new Date().toISOString();
+    const { data: userData, error: consentError } = await supabase.auth.updateUser({ data: { terms_accepted_at: acceptedAt } });
+    if (consentError || !userData.user) {
+      const failed = NextResponse.redirect(new URL("/login?error=oauth_callback&reason=consent_record_failed", requestUrl.origin));
+      response.cookies.getAll().forEach((cookie) => failed.cookies.set(cookie));
+      return failed;
+    }
+    const { error: profileError } = await supabase.from("profiles").upsert({
+      id: userData.user.id,
+      terms_accepted_at: acceptedAt,
+      updated_at: acceptedAt,
+    });
+    if (profileError) {
       const failed = NextResponse.redirect(new URL("/login?error=oauth_callback&reason=consent_record_failed", requestUrl.origin));
       response.cookies.getAll().forEach((cookie) => failed.cookies.set(cookie));
       return failed;
