@@ -7,8 +7,8 @@ export async function PATCH(request: Request) {
   const supabase = await createClient();
   const { data: { user }, error: authError } = await supabase.auth.getUser();
   if (authError || !user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  const { data: assurance, error: assuranceError } = await supabase.auth.mfa.getAuthenticatorAssuranceLevel();
-  if (assuranceError || assurance?.currentLevel !== "aal2") return NextResponse.json({ error: "Complete phone verification before changing account data." }, { status: 403 });
+  const { data: emailOtpVerified, error: emailOtpError } = await supabase.rpc("is_email_otp_session_verified");
+  if (emailOtpError || !emailOtpVerified) return NextResponse.json({ error: "Verify your email with the six-digit OTP before continuing." }, { status: 403 });
   const { data: securityProfile, error: securityProfileError } = await supabase.from("profiles").select("password_configured_at").eq("id", user.id).maybeSingle();
   if (securityProfileError || !securityProfile?.password_configured_at) return NextResponse.json({ error: "Set your SubnetLab password before continuing." }, { status: 403 });
   let body: Record<string, unknown>;
