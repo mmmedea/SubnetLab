@@ -311,4 +311,4 @@ html[data-theme="light"] .settings-field input,html[data-theme="light"] .setting
 html[data-theme="light"] .settings-nav{background:#fff;border-color:#d7e2f0}html[data-theme="light"] .settings-nav button{color:#526783}html[data-theme="light"] .settings-nav button.active{background:#e8f7fb;color:#10213a}html[data-theme="light"] .settings-toast{background:#fff;color:#10213a}
 @media(prefers-color-scheme:light){html[data-theme="system"]{color-scheme:light}html[data-theme="system"] body{background-color:#edf3fb;color:#10213a}html[data-theme="system"] .settings-card{background:#fff;border-color:#d7e2f0}html[data-theme="system"] .settings-card>header h2,html[data-theme="system"] .settings-field,html[data-theme="system"] .settings-toggle-row b{color:#10213a}html[data-theme="system"] .settings-field input,html[data-theme="system"] .settings-field select,html[data-theme="system"] .settings-field textarea{background:#f5f8fd;color:#10213a}}
 
-html{--settings-mono-size:14px}.mono,.cidr-display,.stat strong,.table td{font-size:var(--settings-mono-size,14px)}
+html{--settings-mono-size:14px}.mono,.table td{font-size:var(--settings-mono-size,14px)}
