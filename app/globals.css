@@ -81,13 +81,13 @@ input.mono,.mono input{font-family:"Space Mono",ui-monospace,monospace}
 @media(max-width:620px){body{background-size:32px 32px,32px 32px,auto}}
 
 
-/* Multicolor neon atmosphere: cyan, electric blue, violet, and neon lime */
+/* Multicolor atmosphere: cyan, electric blue, violet, neon lime, and black */
 :root{
   --neon-cyan:#35e7ff;
   --neon-blue:#397bff;
   --neon-violet:#9b6bff;
   --neon-lime:#b7ff2a;
-  --neon-pink:#ff4fd8;
+  --neon-black:#020408;
 }
 body{
   background-color:var(--bg);
@@ -96,7 +96,7 @@ body{
     radial-gradient(ellipse 42% 38% at 92% 4%,rgba(57,123,255,.20),transparent 72%),
     radial-gradient(ellipse 36% 34% at 86% 78%,rgba(155,107,255,.14),transparent 72%),
     radial-gradient(ellipse 34% 30% at 12% 88%,rgba(183,255,42,.105),transparent 72%),
-    radial-gradient(ellipse 28% 24% at 52% 48%,rgba(255,79,216,.055),transparent 76%),
+    radial-gradient(ellipse 28% 24% at 52% 48%,rgba(2,4,8,.22),transparent 76%),
     linear-gradient(var(--grid-line) 1px,transparent 1px),
     linear-gradient(90deg,var(--grid-line) 1px,transparent 1px),
     linear-gradient(145deg,#050f25 0%,#071936 48%,#06132d 100%);
