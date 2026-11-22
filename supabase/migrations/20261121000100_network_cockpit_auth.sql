@@ -141,26 +141,25 @@ drop trigger if exists ip_assignments_plan_owner on public.ip_assignments;
 create trigger ip_assignments_plan_owner
 before insert or update on public.ip_assignments
 for each row execute function public.enforce_ip_assignment_plan_owner();
-create or replace function public.record_user_consent()
-returns void
+create or replace function public.sync_auth_user_consent()
+returns trigger
 language plpgsql
 security definer
 set search_path=''
 as $$
-declare
-  current_user_id uuid := (select auth.uid());
 begin
-  if current_user_id is null then
-    raise exception 'Authentication required' using errcode='42501';
+  if nullif(new.raw_user_meta_data->>'terms_accepted_at','') is not null
+     and new.raw_user_meta_data->>'terms_accepted_at' is distinct from old.raw_user_meta_data->>'terms_accepted_at' then
+    update public.profiles
+    set terms_accepted_at=now(), consented_at=now(),
+        terms_version='v1', privacy_version='v1', updated_at=now()
+    where id=new.id;
   end if;
-  update public.profiles
-  set terms_accepted_at=now(), consented_at=now(),
-      terms_version='v1', privacy_version='v1', updated_at=now()
-  where id=current_user_id;
-  if not found then
-    raise exception 'Profile not found' using errcode='P0002';
-  end if;
+  return new;
 end;
 $$;
-revoke all on function public.record_user_consent() from public, anon;
-grant execute on function public.record_user_consent() to authenticated;
+revoke all on function public.sync_auth_user_consent() from public, anon, authenticated;
+drop trigger if exists sync_auth_user_consent on auth.users;
+create trigger sync_auth_user_consent
+after update of raw_user_meta_data on auth.users
+for each row execute function public.sync_auth_user_consent();
