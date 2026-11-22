@@ -9,16 +9,22 @@ export async function DELETE(request: Request) {
   if (authError || !user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   let body: { confirmation?: string };
   try { body = await request.json(); } catch { return NextResponse.json({ error: "Invalid confirmation." }, { status: 400 }); }
+  if (!body || typeof body !== "object" || Array.isArray(body)) return NextResponse.json({ error: "Invalid confirmation." }, { status: 400 });
   if (body.confirmation !== "DELETE") return NextResponse.json({ error: "Type DELETE to confirm account removal." }, { status: 400 });
   const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
   if (!serviceKey) return NextResponse.json({ error: "Account deletion is not configured. Contact support." }, { status: 503 });
   const { url } = getSupabaseConfig();
   const admin = createSupabaseClient(url, serviceKey, { auth: { autoRefreshToken: false, persistSession: false } });
-  const { data: files, error: listError } = await admin.storage.from("avatars").list(user.id, { limit: 100 });
-  if (listError) return NextResponse.json({ error: "Could not safely remove account files." }, { status: 500 });
-  if (files?.length) {
-    const { error: removeError } = await admin.storage.from("avatars").remove(files.map(file => user.id + "/" + file.name));
+  // Repeatedly remove the first page so deleting files cannot shift offset pagination
+  // and leave orphaned avatar objects behind.
+  for (;;) {
+    const { data: files, error: listError } = await admin.storage.from("avatars").list(user.id, { limit: 100 });
+    if (listError) return NextResponse.json({ error: "Could not safely remove account files." }, { status: 500 });
+    if (!files?.length) break;
+    const paths = files.map(file => user.id + "/" + file.name);
+    const { error: removeError } = await admin.storage.from("avatars").remove(paths);
     if (removeError) return NextResponse.json({ error: "Could not remove account files." }, { status: 500 });
+    if (files.length < 100) break;
   }
   const { error: deleteError } = await admin.auth.admin.deleteUser(user.id);
   if (deleteError) return NextResponse.json({ error: deleteError.message }, { status: 500 });
