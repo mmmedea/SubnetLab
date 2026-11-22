@@ -11,7 +11,7 @@ function safeNext(value: string | null) {
 export async function GET(request: NextRequest) {
   const requestUrl = new URL(request.url);
   const code = requestUrl.searchParams.get("code");
-  const next = "/dashboard";
+  const next = safeNext(requestUrl.searchParams.get("next"));
 
   if (!code) return NextResponse.redirect(new URL("/login?error=oauth_callback", requestUrl.origin));
 
