@@ -36,7 +36,11 @@ alter table public.profiles enable row level security;
 alter table public.user_preferences enable row level security;
 
 revoke all on public.profiles, public.user_preferences from anon;
-grant select, insert, update, delete on public.profiles, public.user_preferences to authenticated;
+revoke insert, update, delete on public.profiles from authenticated;
+grant select on public.profiles to authenticated;
+grant insert (id, username, display_name, bio, avatar_url, updated_at) on public.profiles to authenticated;
+grant update (username, display_name, bio, avatar_url, updated_at) on public.profiles to authenticated;
+grant select, insert, update, delete on public.user_preferences to authenticated;
 grant all on public.profiles, public.user_preferences to service_role;
 
 do $$
