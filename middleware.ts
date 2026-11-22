@@ -14,7 +14,7 @@ export async function middleware(req: NextRequest) {
   let response = NextResponse.next({ request: req });
   const path = req.nextUrl.pathname;
   const isProtected = protectedRoutes.some((route) => path === route || path.startsWith(route + "/"));
-  const isAuth = ["/login", "/signup"].includes(path);
+  const isAuth = path === "/" || ["/login", "/signup"].includes(path);
 
   try {
     const { url, key } = getSupabaseConfig();
@@ -29,6 +29,7 @@ export async function middleware(req: NextRequest) {
       },
     });
 
+    // Validate the session with Supabase. Never trust the cookie payload alone.
     const { data: { user }, error } = await supabase.auth.getUser();
     if (isProtected && (error || !user)) {
       const target = new URL("/login", req.url);
@@ -39,8 +40,10 @@ export async function middleware(req: NextRequest) {
       return redirect;
     }
     if (isAuth && user) {
-      const redirect = NextResponse.redirect(new URL(safeNext(req.nextUrl.searchParams.get("next")), req.url));
+      const destination = path === "/" ? "/dashboard" : safeNext(req.nextUrl.searchParams.get("next"));
+      const redirect = NextResponse.redirect(new URL(destination, req.url));
       response.cookies.getAll().forEach((cookie) => redirect.cookies.set(cookie));
+      redirect.headers.set("Cache-Control", "private, no-store");
       return redirect;
     }
     if (isProtected) response.headers.set("Cache-Control", "private, no-store");
@@ -52,5 +55,5 @@ export async function middleware(req: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/dashboard/:path*", "/planner/:path*", "/ipam/:path*", "/practice/:path*", "/progress/:path*", "/settings/:path*", "/login", "/signup"],
+  matcher: ["/", "/dashboard/:path*", "/planner/:path*", "/ipam/:path*", "/practice/:path*", "/progress/:path*", "/settings/:path*", "/login", "/signup"],
 };
