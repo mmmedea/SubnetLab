@@ -23,8 +23,8 @@ export default function AuthForm({mode,searchParams}:{mode:"login"|"signup";sear
  const otpInputs=useRef<Array<HTMLInputElement|null>>([]);
  const code=codeDigits.join("");
  const[nextPath,setNextPath]=useState("/dashboard");
- const[resendWait,setResendWait]=useState(false);
- const passwordRules={length:password.length>=10,upper:/[A-Z]/.test(password),lower:/[a-z]/.test(password),number:/[0-9]/.test(password),symbol:/[^A-Za-z0-9]/.test(password)};
+ const[resendSeconds,setResendSeconds]=useState(0);
+  useEffect(()=>{if(resendSeconds<=0)return;const timer=window.setInterval(()=>setResendSeconds(s=>Math.max(0,s-1)),1000);return()=>window.clearInterval(timer);},[resendSeconds]);\n const passwordRules={length:password.length>=10,upper:/[A-Z]/.test(password),lower:/[a-z]/.test(password),number:/[0-9]/.test(password),symbol:/[^A-Za-z0-9]/.test(password)};
  const passwordValid=Object.values(passwordRules).every(Boolean);
  useEffect(()=>{setNextPath(safeNext(searchParams.next));if(searchParams.error==="auth_unavailable")setMessage("Authentication is temporarily unavailable. Supabase configuration could not be loaded.");else if(searchParams.error==="oauth_callback")setMessage(searchParams.reason?`Google sign-in could not finish: ${searchParams.reason}`:"Google sign-in did not complete. Check the Google provider and allowed callback URLs in Supabase.");},[searchParams.next,searchParams.error,searchParams.reason]);
 
@@ -52,7 +52,7 @@ export default function AuthForm({mode,searchParams}:{mode:"login"|"signup";sear
      await startEmailOtp(supabase);
      return;
     }
-    setCodeDigits(["","","","","",""]);setOtp(true);setMessage("A signup confirmation code has been sent. Check your inbox, including spam.");
+    setCodeDigits(["","","","","",""]);setOtp(true);setResendSeconds(60);setMessage("A signup confirmation code has been sent. Check your inbox, Spam, Junk, Promotions, and All Mail folders.");
    }
   }catch(err){setMessage(err instanceof Error?err.message:"Authentication failed. Please try again.");}
   finally{setBusy(false);}
@@ -71,7 +71,7 @@ export default function AuthForm({mode,searchParams}:{mode:"login"|"signup";sear
  }
  async function resendCode(){
   setBusy(true);setMessage("");
-  try{const{error}=await createClient().auth.resend({type:"signup",email:email.trim()});if(error)throw error;setCodeDigits(["","","","","",""]);setMessage("A new verification code has been sent.");setResendWait(true);window.setTimeout(()=>setResendWait(false),60000);}
+  try{const{error}=await createClient().auth.resend({type:"signup",email:email.trim()});if(error)throw error;setCodeDigits(["","","","","",""]);setMessage("A new verification code has been sent. Check your inbox, Spam, Junk, Promotions, and All Mail folders.");setResendSeconds(60);}
   catch(err){setMessage(err instanceof Error?err.message:"Unable to resend the code right now.");}
   finally{setBusy(false);}
  }
@@ -88,7 +88,7 @@ export default function AuthForm({mode,searchParams}:{mode:"login"|"signup";sear
   <Link className="brand" href="/" aria-label="SubnetLab home"><img className="brand-mark" src="/logo.svg" alt="" width="36" height="32"/><span className="brand-word">Subnet<span>Lab</span></span></Link>
   <p className="eyebrow">PRIVATE NETWORK WORKSPACE</p>
   <h1>{otp?"Verify your email":mode==="login"?"Welcome back":"Create your account"}</h1>
-  <p className="muted">{otp?"Enter the 6-digit code sent to "+email:mode==="login"?"Sign in to continue to your network workspace.":"Create an account to save and manage your network plans."}</p>
+  <p className="muted">{otp?"Enter the 6-digit code sent to "+email:mode==="login"?"Sign in to continue to your network workspace.":"Create an account to save and manage your network plans."}</p>{otp&&<p className="auth-notice" role="note">If you don’t see the email, check Spam, Junk, Promotions, and All Mail. Confirm that your email address is correct. Delivery may take a few minutes.</p>}
   {!otp?<form onSubmit={submit}>
    {mode==="signup"&&<label>Username<input className="input" type="text" autoComplete="username" minLength={3} maxLength={32} pattern="[A-Za-z0-9_]{3,32}" required value={username} onChange={e=>setUsername(e.target.value)}/><small className="muted">3–32 characters. Letters, numbers, and underscores only.</small></label>}
    <label>Email address<input className="input" type="email" autoComplete="email" required maxLength={254} value={email} onChange={e=>setEmail(e.target.value)}/></label>
@@ -101,7 +101,7 @@ export default function AuthForm({mode,searchParams}:{mode:"login"|"signup";sear
    <div><label className="field-label">6-DIGIT VERIFICATION CODE</label><div className="otp-inputs">{Array.from({length:6},(_,i)=><input key={i} ref={el=>{otpInputs.current[i]=el;}} className="input mono" aria-label={"Verification digit "+(i+1)} inputMode="numeric" autoComplete={i===0?"one-time-code":"off"} maxLength={1} required value={codeDigits[i]} onChange={e=>{const digit=e.target.value.replace(/\D/g,"").slice(-1);const next=[...codeDigits];next[i]=digit;setCodeDigits(next);if(digit&&i<5)otpInputs.current[i+1]?.focus();}} onKeyDown={e=>{if(e.key==="Backspace"&&!codeDigits[i]&&i>0)otpInputs.current[i-1]?.focus();}} onPaste={e=>{const digits=e.clipboardData.getData("text").replace(/\D/g,"").slice(0,6);if(!digits)return;e.preventDefault();setCodeDigits([...digits.split(""),..."".padEnd(6-digits.length).split("")]);otpInputs.current[Math.min(digits.length,5)]?.focus();}}/> )}</div></div>
    <button className="button primary auth-submit" disabled={busy||code.length!==6}>{busy?"Verifying…":"Verify email"}<span aria-hidden="true">→</span></button>
    <button type="button" className="button secondary-action" disabled={busy} onClick={()=>{setOtp(false);setCodeDigits(["","","","","",""]);setMessage("");}}>Change email</button>
-   <button type="button" className="auth-resend" disabled={busy||resendWait} onClick={resendCode}>{resendWait?"Please wait before resending":"Resend verification code"}</button>
+   <button type="button" className="auth-resend" disabled={busy||resendSeconds>0} onClick={resendCode}>{resendSeconds>0?`Resend code in 00:${String(resendSeconds).padStart(2,"0")}`:"Resend verification code"}</button>
   </form>}
   {!otp&&<><div className="auth-divider"><span>or continue with</span></div><button type="button" className="button google-button" onClick={google} disabled={busy||(mode==="signup"&&!termsAccepted)}>{googleMark}<span>Continue with Google</span></button></>}
   {message&&<p role="status" aria-live="polite" className={message.toLowerCase().includes("sent")?"auth-notice":"error"}>{message}</p>}
