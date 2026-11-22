@@ -12,7 +12,15 @@ export async function GET(request: NextRequest) {
   const requestUrl = new URL(request.url);
   const code = requestUrl.searchParams.get("code");
   const next = safeNext(requestUrl.searchParams.get("next"));
+  const providerError = requestUrl.searchParams.get("error");
+  const providerDescription = requestUrl.searchParams.get("error_description") || providerError;
 
+  if (providerError) {
+    const failed = new URL("/login", requestUrl.origin);
+    failed.searchParams.set("error", "oauth_callback");
+    if (providerDescription) failed.searchParams.set("reason", providerDescription.replace(/[\\u0000-\\u001f]/g, "").slice(0, 220));
+    return NextResponse.redirect(failed);
+  }
   if (!code) return NextResponse.redirect(new URL("/login?error=oauth_callback", requestUrl.origin));
 
   let config;
@@ -32,9 +40,18 @@ export async function GET(request: NextRequest) {
     },
   });
 
-  const { error } = await supabase.auth.exchangeCodeForSession(code);
-  if (error) {
-    const failed = NextResponse.redirect(new URL("/login?error=oauth_callback", requestUrl.origin));
+  let exchangeError: Error | null = null;
+  try {
+    const { error } = await supabase.auth.exchangeCodeForSession(code);
+    exchangeError = error;
+  } catch (error) {
+    exchangeError = error instanceof Error ? error : new Error("Session exchange failed");
+  }
+  if (exchangeError) {
+    const failedUrl = new URL("/login", requestUrl.origin);
+    failedUrl.searchParams.set("error", "oauth_callback");
+    failedUrl.searchParams.set("reason", exchangeError.message.replace(/[\\u0000-\\u001f]/g, "").slice(0, 220));
+    const failed = NextResponse.redirect(failedUrl);
     response.cookies.getAll().forEach((cookie) => failed.cookies.set(cookie));
     return failed;
   }
