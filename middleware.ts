@@ -39,6 +39,21 @@ export async function middleware(req: NextRequest) {
       redirect.headers.set("Cache-Control", "private, no-store");
       return redirect;
     }
+    if (isProtected && user) {
+      const [{ data: assurance, error: assuranceError }, { data: factors, error: factorsError }] = await Promise.all([
+        supabase.auth.mfa.getAuthenticatorAssuranceLevel(),
+        supabase.auth.mfa.listFactors(),
+      ]);
+      const hasVerifiedPhone = Boolean(factors?.phone?.some((factor) => factor.status === "verified"));
+      if (assuranceError || factorsError || !hasVerifiedPhone || assurance?.currentLevel !== "aal2") {
+        const target = new URL("/verify-phone", req.url);
+        target.searchParams.set("next", path + req.nextUrl.search);
+        const redirect = NextResponse.redirect(target);
+        response.cookies.getAll().forEach((cookie) => redirect.cookies.set(cookie));
+        redirect.headers.set("Cache-Control", "private, no-store");
+        return redirect;
+      }
+    }
     if (isAuth && user) {
       const destination = path === "/" ? "/dashboard" : safeNext(req.nextUrl.searchParams.get("next"));
       const redirect = NextResponse.redirect(new URL(destination, req.url));
