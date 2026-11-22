@@ -28,6 +28,13 @@ export default function AuthForm({mode,searchParams}:{mode:"login"|"signup";sear
  const passwordValid=Object.values(passwordRules).every(Boolean);
  useEffect(()=>{setNextPath(safeNext(searchParams.next));if(searchParams.error==="auth_unavailable")setMessage("Authentication is temporarily unavailable. Supabase configuration could not be loaded.");else if(searchParams.error==="oauth_callback")setMessage(searchParams.reason?`Google sign-in could not finish: ${searchParams.reason}`:"Google sign-in did not complete. Check the Google provider and allowed callback URLs in Supabase.");},[searchParams.next,searchParams.error,searchParams.reason]);
 
+ async function startEmailOtp(supabase:ReturnType<typeof createClient>){
+  const{data:challengeId,error:challengeError}=await supabase.rpc("begin_email_otp_challenge");
+  if(challengeError)throw challengeError;
+  const{error:otpError}=await supabase.auth.signInWithOtp({email:email.trim(),options:{shouldCreateUser:false}});
+  if(otpError)throw otpError;
+  router.replace("/verify-email?challenge="+encodeURIComponent(challengeId)+"&next="+encodeURIComponent(nextPath));router.refresh();
+ }
  async function submit(e:React.FormEvent){
   e.preventDefault();setBusy(true);setMessage("");
   try{
@@ -35,12 +42,11 @@ export default function AuthForm({mode,searchParams}:{mode:"login"|"signup";sear
    if(mode==="login"){
     const{error}=await supabase.auth.signInWithPassword({email:email.trim(),password});
     if(error)throw error;
-    router.replace("/verify-phone?next="+encodeURIComponent(nextPath));router.refresh();
+    await startEmailOtp(supabase);
    }else{
-    const{data,error}=await supabase.auth.signUp({email:email.trim(),password,options:{emailRedirectTo:`${window.location.origin}/auth/callback?next=${encodeURIComponent(nextPath)}`,data:{username:username.trim().toLowerCase(),terms_accepted_at:new Date().toISOString()}}});
+    const{error}=await supabase.auth.signUp({email:email.trim(),password,options:{emailRedirectTo:`${window.location.origin}/auth/callback?next=${encodeURIComponent(nextPath)}`,data:{username:username.trim().toLowerCase(),terms_accepted_at:new Date().toISOString()}}});
     if(error)throw error;
-    if(data.session){router.replace("/verify-phone?next="+encodeURIComponent(nextPath));router.refresh();return;}
-    setCodeDigits(["","","","","",""]);setOtp(true);setMessage("A verification code has been sent. Check your inbox, including spam.");
+    setCodeDigits(["","","","","",""]);setOtp(true);setMessage("A signup confirmation code has been sent. Check your inbox, including spam.");
    }
   }catch(err){setMessage(err instanceof Error?err.message:"Authentication failed. Please try again.");}
   finally{setBusy(false);}
@@ -48,9 +54,12 @@ export default function AuthForm({mode,searchParams}:{mode:"login"|"signup";sear
  async function verify(e:React.FormEvent){
   e.preventDefault();setBusy(true);setMessage("");
   try{
-   const{error}=await createClient().auth.verifyOtp({email:email.trim(),token:code,type:"signup"});
+   const supabase=createClient();
+   const{error}=await supabase.auth.verifyOtp({email:email.trim(),token:code,type:"signup"});
    if(error)throw error;
-   router.replace("/verify-phone?next="+encodeURIComponent(nextPath));router.refresh();
+   const{error:passwordError}=await supabase.auth.signInWithPassword({email:email.trim(),password});
+   if(passwordError)throw new Error("Email confirmed, but password sign-in failed. Please return to sign in.");
+   await startEmailOtp(supabase);
   }catch(err){setMessage(err instanceof Error?err.message:"The code could not be verified. Request a new code and try again.");}
   finally{setBusy(false);}
  }
