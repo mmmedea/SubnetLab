@@ -8,7 +8,7 @@ create table if not exists public.profiles (
   role text not null default 'student' check (role in ('student','network_admin','instructor')),
   terms_version text not null default 'v1',
   privacy_version text not null default 'v1',
-  consented_at timestamptz not null default now(),
+  consented_at timestamptz,
   bio text,
   avatar_url text,
   terms_accepted_at timestamptz,
