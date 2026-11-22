@@ -1,22 +1,42 @@
-# SubnetLab Next.js migration (preview only)
+# SubnetLab Next.js migration
 
-This branch starts the App Router migration while retaining the legacy Express implementation and its existing tables. The new UI uses Supabase Auth and a separate UUID-owned schema.
+This branch introduces the Next.js App Router workspace while retaining the legacy Express implementation and its existing bigint-keyed database records.
 
-## Required Vercel preview environment
-- NEXT_PUBLIC_SUPABASE_URL
-- NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY (preferred; legacy anon key is supported only for compatibility)
+## Database status
 
-Never expose a service-role key or Turnstile secret to the browser.
+The Supabase production project has received two additive migrations:
+- `network_cockpit_auth_compatible`: creates UUID-owned profiles, network plans, VLSM allocations, IP assignments, practice attempts, and an auth audit table.
+- `settings_profiles_preferences_storage`: creates account preferences, profile provisioning for Supabase Auth users, and the avatars bucket.
 
-## Supabase setup before testing signup
-1. Review and apply supabase/migrations/20261121000100_network_cockpit_auth.sql in a non-production Supabase project first.
-2. Configure email OTP templates and allowed redirect URLs for the preview deployment.
-3. Configure Google OAuth in Supabase before enabling Google sign-in.
-4. Configure Supabase Auth rate limits and CAPTCHA protection in the Supabase Auth dashboard before opening public registration. Supabase Auth performs password hashing, email verification, token issuance, PKCE code exchange, and cookie-backed session handling through `@supabase/ssr`; do not build a parallel password table or custom JWT store.
+The new workspace uses `public.network_plans`. The legacy `public.plans` table remains unchanged because it uses bigint IDs and has existing foreign-key relationships. Existing legacy users, plans, IP records, reservations, and practice attempts were not deleted or converted.
 
-## Explicitly not complete yet
-- Legacy custom-JWT users are not migrated. Existing tables are not deleted.
-- Application-owned durable per-IP/per-email rate limiting and Turnstile verification are not implemented in this branch. Supabase Auth has provider-level rate limits; configure them and CAPTCHA in the Supabase dashboard before public launch.
-- Profile onboarding, consent recording, auth audit writes, session revocation UI, and full reset-password completion remain to be implemented.
-- IPAM persistence, plan sharing, network tree split/merge, full IPv6 calculator UI, topic heatmap, and full Playwright/RLS isolation suite remain incomplete.
-- Do not merge or switch production to this branch until the missing controls are implemented and tested.
+All new account/workspace tables have RLS enabled and owner-scoped policies. Anonymous access is revoked from the new tables. Existing legacy tables remain separate and are not exposed to the new Supabase Auth identity model.
+
+## Required Supabase and Vercel configuration
+
+- Set `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` for Preview and Production. The project has a publishable-key fallback in `utils/supabase/config.ts`, but deployment environment variables should be authoritative.
+- Configure Supabase email templates to send six-digit OTP codes for signup.
+- Add the preview and production app URLs to Supabase Auth's allowed redirect URLs.
+- Configure the Google OAuth provider and its callback URL before enabling Google sign-in.
+- Configure Supabase Auth rate limits and CAPTCHA protection before opening public registration.
+- Set `SUPABASE_SERVICE_ROLE_KEY` as a server-only Vercel environment variable to enable account deletion. Never prefix it with `NEXT_PUBLIC_` or expose it to browser code.
+- Confirm SMTP delivery with a real signup and password-recovery test. The code handles provider errors, but delivery cannot be proven from repository tests.
+
+## Implemented in this branch
+
+- Supabase password login, email OTP signup and verification, Google OAuth PKCE, protected workspace routes, and safe post-auth redirects.
+- Password recovery request and password-reset completion.
+- Profile editing, avatar upload/removal, account email/password changes, preference persistence, data export, other-session sign-out, and server-side account deletion.
+- Persisted IPv4 network plans and VLSM allocations.
+- IP address inventory CRUD with status updates and plan linking.
+- Persisted subnetting practice attempts and progress summaries.
+- CI workflow for dependency installation, TypeScript checking, tests, and Next.js production build.
+
+## Remaining verification / known limits
+
+- Legacy custom-JWT users are not automatically mapped to Supabase Auth users. Existing legacy accounts and data remain intact.
+- Application-owned durable per-IP/per-email auth rate limiting and Turnstile server verification are not implemented. Configure Supabase Auth's own limits and CAPTCHA before public registration.
+- Auth audit table is created, but application audit writes are not yet wired.
+- The current practice set is a small starter question bank; it is not yet an adaptive curriculum.
+- Full IPv6 calculation UI, network tree split/merge, plan sharing, and automated browser/RLS-isolation test coverage remain incomplete.
+- Test actual OTP email delivery, Google sign-in, password recovery, account deletion, and avatar operations against the deployed preview before merging or switching production traffic.
