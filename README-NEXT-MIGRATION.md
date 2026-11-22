@@ -4,7 +4,7 @@ This branch introduces the Next.js App Router workspace while retaining the lega
 
 ## Database status
 
-The Supabase production project has received two additive migrations:
+The Supabase production project has received the additive migrations recorded in `supabase/migrations/` (including schema compatibility, settings/storage, ownership guards, profile column privileges, and consent-trigger hardening):
 - `network_cockpit_auth_compatible`: creates UUID-owned profiles, network plans, VLSM allocations, IP assignments, practice attempts, and an auth audit table.
 - `settings_profiles_preferences_storage`: creates account preferences, profile provisioning for Supabase Auth users, and the avatars bucket.
 
