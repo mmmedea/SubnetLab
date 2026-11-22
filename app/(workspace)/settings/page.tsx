@@ -1,1 +1,2 @@
-export default function Page(){return <><p className="eyebrow">ACCOUNT / SECURITY</p><h1>Settings</h1><p className="lead">Account and session controls.</p><div className="panel planner"><h2>Session management</h2><p className="muted">Session revocation and audit history require the Supabase security setup to be completed.</p></div></>}
+import SettingsPage from "@/components/settings/SettingsPage";
+export default function Page(){return <SettingsPage/>;}
