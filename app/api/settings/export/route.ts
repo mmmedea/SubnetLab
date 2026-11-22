@@ -8,6 +8,8 @@ export async function GET(request:Request){
  if(authError||!user)return NextResponse.json({error:"Unauthorized"},{status:401});
  const{data:assurance,error:assuranceError}=await supabase.auth.mfa.getAuthenticatorAssuranceLevel();
  if(assuranceError||assurance?.currentLevel!=="aal2")return NextResponse.json({error:"Complete phone verification before exporting account data."},{status:403});
+  const { data: securityProfile, error: securityProfileError } = await supabase.from("profiles").select("password_configured_at").eq("id", user.id).maybeSingle();
+  if (securityProfileError || !securityProfile?.password_configured_at) return NextResponse.json({ error: "Set your SubnetLab password before continuing." }, { status: 403 });
  const [profile,prefs,plans,allocations,assignments,attempts,audit]=await Promise.all([
   supabase.from("profiles").select("*").eq("id",user.id).maybeSingle(),
   supabase.from("user_preferences").select("*").eq("user_id",user.id).maybeSingle(),
