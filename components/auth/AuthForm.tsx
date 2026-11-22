@@ -71,6 +71,7 @@ export default function AuthForm({mode,searchParams}:{mode:"login"|"signup";sear
   {!otp?<form onSubmit={submit}>
    <label>Email address<input className="input" type="email" autoComplete="email" required maxLength={254} value={email} onChange={e=>setEmail(e.target.value)}/></label>
    <label>Password<div className="password-field"><input className="input" type={show?"text":"password"} autoComplete={mode==="login"?"current-password":"new-password"} minLength={8} maxLength={72} required value={password} onChange={e=>setPassword(e.target.value)}/><button type="button" className="password-toggle" onClick={()=>setShow(v=>!v)} aria-label={show?"Hide password":"Show password"} aria-pressed={show} title={show?"Hide password":"Show password"}>{show?<EyeOff size={18}/>:<Eye size={18}/>}</button></div></label>
+   {mode==="signup"&&<ul className="password-checklist" aria-live="polite">{[[passwordRules.length,"At least 8 characters"],[passwordRules.upper,"One uppercase letter"],[passwordRules.lower,"One lowercase letter"],[passwordRules.symbol,"One symbol"]].map(([valid,label])=><li key={String(label)} data-valid={valid}>{valid?"✓":"○"} {label}</li>)}</ul>}
    {mode==="login"&&<div className="auth-forgot"><Link href="/forgot-password">Forgot password?</Link></div>}
    <button className="button primary auth-submit" disabled={busy||(mode==="signup"&&!passwordValid)}>{busy?"Please wait…":mode==="login"?"Sign in":"Create account"}<span aria-hidden="true">→</span></button>
   </form>:<form onSubmit={verify}>
