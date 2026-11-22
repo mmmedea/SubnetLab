@@ -192,3 +192,7 @@ body{
 .auth-forgot a,.auth-resend{color:#35e7ff;text-decoration:underline;text-underline-offset:3px}
 .auth-resend{justify-self:center;border:0;background:transparent;padding:8px;font:600 12px "Space Grotesk",sans-serif;cursor:pointer}
 .auth-resend:disabled{opacity:.5;cursor:not-allowed}
+
+.password-checklist{display:grid;grid-template-columns:1fr 1fr;gap:7px 12px;list-style:none;padding:0;margin:-8px 0 2px;color:#8fa6c5;font-size:11px}
+.password-checklist li[data-valid="true"]{color:#b7ff2a}
+.password-checklist li{transition:color .15s ease}
