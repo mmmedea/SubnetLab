@@ -5,7 +5,7 @@ import Link from "next/link";
 import {useRouter} from "next/navigation";
 import {createClient} from "@/utils/supabase/client";
 import {useWorkspaceProfile,useUpdateWorkspaceProfile} from "@/components/workspace/UserProfileProvider";
-import {Check,Download,Eye,EyeOff,ShieldCheck,Trash2,UserRound,Settings2,Mail,FileDown,LockKeyhole,History} from "lucide-react";
+import {Check,Download,Eye,EyeOff,ShieldCheck,Trash2,UserRound,Settings2,FileDown,LockKeyhole,History} from "lucide-react";
 
 type Tab="profile"|"security"|"preferences"|"danger";
 type AuditEvent={event:string;created_at:string};
