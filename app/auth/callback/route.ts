@@ -47,6 +47,15 @@ export async function GET(request: NextRequest) {
   } catch (error) {
     exchangeError = error instanceof Error ? error : new Error("Session exchange failed");
   }
+  if (!exchangeError && requestUrl.searchParams.get("terms") === "1") {
+    const { error } = await supabase.auth.updateUser({ data: { terms_accepted_at: new Date().toISOString() } });
+    if (error) {
+      const failed = NextResponse.redirect(new URL("/login?error=oauth_callback&reason=consent_record_failed", requestUrl.origin));
+      response.cookies.getAll().forEach((cookie) => failed.cookies.set(cookie));
+      return failed;
+    }
+  }
+
   if (exchangeError) {
     const failedUrl = new URL("/login", requestUrl.origin);
     failedUrl.searchParams.set("error", "oauth_callback");
