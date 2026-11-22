@@ -22,7 +22,7 @@ export default function AuthForm({mode,searchParams}:{mode:"login"|"signup";sear
  const[resendWait,setResendWait]=useState(false);
  const passwordRules={length:password.length>=8,upper:/[A-Z]/.test(password),lower:/[a-z]/.test(password),symbol:/[^A-Za-z0-9]/.test(password)};
  const passwordValid=Object.values(passwordRules).every(Boolean);
- useEffect(()=>{let active=true;searchParams.then(p=>{if(!active)return;setNextPath(safeNext(p.next));if(p.error==="auth_unavailable")setMessage("Authentication is temporarily unavailable. Supabase configuration could not be loaded.");else if(p.error==="oauth_callback")setMessage("Google sign-in did not complete. Confirm Google is enabled in Supabase and the OAuth redirect URLs match this site.");});return()=>{active=false};},[searchParams]);
+ useEffect(()=>{let active=true;searchParams.then(p=>{if(!active)return;setNextPath(safeNext(p.next));if(p.error==="auth_unavailable")setMessage("Authentication is temporarily unavailable. Supabase configuration could not be loaded.");else if(p.error==="oauth_callback")setMessage(p.reason?`Google sign-in could not finish: ${p.reason}`:"Google sign-in did not complete. Check the Google provider and allowed callback URLs in Supabase.");});return()=>{active=false};},[searchParams]);
 
  async function submit(e:React.FormEvent){
   e.preventDefault();setBusy(true);setMessage("");
