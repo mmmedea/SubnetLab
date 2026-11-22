@@ -95,7 +95,7 @@ set search_path = ''
 as $$
 begin
   begin
-    insert into public.profiles (id, username, display_name, avatar_url, terms_accepted_at)
+    insert into public.profiles (id, username, display_name, avatar_url, terms_accepted_at, consented_at)
     values (
       new.id,
       nullif(lower(coalesce(new.raw_user_meta_data->>'username', new.raw_user_meta_data->>'user_name')), ''),
