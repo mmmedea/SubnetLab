@@ -20,6 +20,8 @@ export default function AuthForm({mode,searchParams}:{mode:"login"|"signup";sear
  const[code,setCode]=useState("");
  const[nextPath,setNextPath]=useState("/dashboard");
  const[resendWait,setResendWait]=useState(false);
+ const passwordRules={length:password.length>=8,upper:/[A-Z]/.test(password),lower:/[a-z]/.test(password),symbol:/[^A-Za-z0-9]/.test(password)};
+ const passwordValid=Object.values(passwordRules).every(Boolean);
  useEffect(()=>{let active=true;searchParams.then(p=>{if(!active)return;setNextPath(safeNext(p.next));if(p.error==="auth_unavailable")setMessage("Authentication is temporarily unavailable. Supabase configuration could not be loaded.");else if(p.error==="oauth_callback")setMessage("Google sign-in did not complete. Confirm Google is enabled in Supabase and the OAuth redirect URLs match this site.");});return()=>{active=false};},[searchParams]);
 
  async function submit(e:React.FormEvent){
@@ -68,9 +70,9 @@ export default function AuthForm({mode,searchParams}:{mode:"login"|"signup";sear
   <p className="muted">{otp?"Enter the 6-digit code sent to "+email:mode==="login"?"Sign in to continue to your network workspace.":"Create an account to save and manage your network plans."}</p>
   {!otp?<form onSubmit={submit}>
    <label>Email address<input className="input" type="email" autoComplete="email" required maxLength={254} value={email} onChange={e=>setEmail(e.target.value)}/></label>
-   <label>Password<div className="password-field"><input className="input" type={show?"text":"password"} autoComplete={mode==="login"?"current-password":"new-password"} minLength={10} maxLength={72} required value={password} onChange={e=>setPassword(e.target.value)}/><button type="button" className="password-toggle" onClick={()=>setShow(v=>!v)} aria-label={show?"Hide password":"Show password"} aria-pressed={show} title={show?"Hide password":"Show password"}>{show?<EyeOff size={18}/>:<Eye size={18}/>}</button></div></label>
+   <label>Password<div className="password-field"><input className="input" type={show?"text":"password"} autoComplete={mode==="login"?"current-password":"new-password"} minLength={8} maxLength={72} required value={password} onChange={e=>setPassword(e.target.value)}/><button type="button" className="password-toggle" onClick={()=>setShow(v=>!v)} aria-label={show?"Hide password":"Show password"} aria-pressed={show} title={show?"Hide password":"Show password"}>{show?<EyeOff size={18}/>:<Eye size={18}/>}</button></div></label>
    {mode==="login"&&<div className="auth-forgot"><Link href="/forgot-password">Forgot password?</Link></div>}
-   <button className="button primary auth-submit" disabled={busy}>{busy?"Please wait…":mode==="login"?"Sign in":"Create account"}<span aria-hidden="true">→</span></button>
+   <button className="button primary auth-submit" disabled={busy||(mode==="signup"&&!passwordValid)}>{busy?"Please wait…":mode==="login"?"Sign in":"Create account"}<span aria-hidden="true">→</span></button>
   </form>:<form onSubmit={verify}>
    <label>6-digit verification code<input className="input mono" inputMode="numeric" autoComplete="one-time-code" pattern="[0-9]{6}" maxLength={6} required value={code} onChange={e=>setCode(e.target.value.replace(/\D/g,"").slice(0,6))}/></label>
    <button className="button primary auth-submit" disabled={busy||code.length!==6}>{busy?"Verifying…":"Verify email"}<span aria-hidden="true">→</span></button>
