@@ -40,6 +40,21 @@ export async function middleware(req: NextRequest) {
       return redirect;
     }
     if (isProtected && user) {
+      const { data: securityProfile, error: securityProfileError } = await supabase
+        .from("profiles")
+        .select("password_configured_at")
+        .eq("id", user.id)
+        .maybeSingle();
+      if (securityProfileError || !securityProfile?.password_configured_at) {
+        const target = new URL("/google-password", req.url);
+        target.searchParams.set("next", path + req.nextUrl.search);
+        const redirect = NextResponse.redirect(target);
+        response.cookies.getAll().forEach((cookie) => redirect.cookies.set(cookie));
+        redirect.headers.set("Cache-Control", "private, no-store");
+        return redirect;
+      }
+    }
+    if (isProtected && user) {
       const [{ data: assurance, error: assuranceError }, { data: factors, error: factorsError }] = await Promise.all([
         supabase.auth.mfa.getAuthenticatorAssuranceLevel(),
         supabase.auth.mfa.listFactors(),
