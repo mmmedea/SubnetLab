@@ -26,6 +26,7 @@ export async function DELETE(request: Request) {
     if (removeError) return NextResponse.json({ error: "Could not remove account files." }, { status: 500 });
     if (files.length < 100) break;
   }
+  await supabase.rpc("record_auth_audit_event",{p_event:"account_deletion_requested"});
   const { error: deleteError } = await admin.auth.admin.deleteUser(user.id);
   if (deleteError) return NextResponse.json({ error: deleteError.message }, { status: 500 });
   await supabase.auth.signOut();
