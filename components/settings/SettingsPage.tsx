@@ -8,7 +8,8 @@ type Tab="profile"|"security"|"preferences"|"danger";
 const tabs:{id:Tab;label:string;icon:typeof UserRound}[]=[{id:"profile",label:"Profile",icon:UserRound},{id:"security",label:"Account & Security",icon:ShieldCheck},{id:"preferences",label:"Preferences",icon:Settings2},{id:"danger",label:"Danger Zone",icon:Trash2}];
 const defaults={theme:"dark",emailNotifications:true,inAppNotifications:true,defaultNetwork:"IPv4",fontSize:"14",compact:false};
 export default function SettingsPage(){
- const profile=useWorkspaceProfile(),supabase=useMemo(()=>createClient(),[]);\n useEffect(()=>{try{const raw=localStorage.getItem("subnetlab-preferences");if(raw){const parsed=JSON.parse(raw);setPrefs({...defaults,...parsed});}}catch{}},[]);
+ const profile=useWorkspaceProfile(),supabase=useMemo(()=>createClient(),[]);
+ useEffect(()=>{try{const raw=localStorage.getItem("subnetlab-preferences");if(raw){const parsed=JSON.parse(raw);setPrefs({...defaults,...parsed});}}catch{}},[]);
  const [tab,setTab]=useState<Tab>("profile"),[username,setUsername]=useState(profile.username||""),[displayName,setDisplayName]=useState(profile.displayName||""),[bio,setBio]=useState("");
  const [email,setEmail]=useState(profile.email),[password,setPassword]=useState(""),[confirm,setConfirm]=useState(""),[visible,setVisible]=useState(false);
  const [saving,setSaving]=useState(false),[error,setError]=useState(""),[message,setMessage]=useState(""),[toast,setToast]=useState("");
