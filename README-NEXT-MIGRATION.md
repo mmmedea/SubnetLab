@@ -42,7 +42,7 @@ All new account/workspace tables have RLS enabled and owner-scoped policies. Ano
 
 - Legacy custom-JWT users are not automatically mapped to Supabase Auth users. Existing legacy accounts and data remain intact.
 - Application-owned durable per-IP/per-email auth rate limiting and Turnstile server verification are not implemented. Configure Supabase Auth's own limits and CAPTCHA before public registration.
-- Auth audit writes are wired for successful password/Google sign-in after MFA, profile/avatar changes, preferences, exports, other-session sign-out, and account deletion.
+- Auth audit writes are wired for successful password/Google sign-in after email OTP, profile/avatar changes, preferences, exports, other-session sign-out, and account deletion.
 - The current practice set is a small starter question bank; it is not yet an adaptive curriculum.
 - Full IPv6 calculation UI, network tree split/merge, plan sharing, and automated browser/RLS-isolation test coverage remain incomplete.
 - Test actual OTP email delivery, Google sign-in, password recovery, account deletion, and avatar operations against the deployed preview before merging or switching production traffic.
