@@ -15,16 +15,22 @@ All new account/workspace tables have RLS enabled and owner-scoped policies. Ano
 ## Required Supabase and Vercel configuration
 
 - Set `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` for Preview and Production. The project has a publishable-key fallback in `utils/supabase/config.ts`, but deployment environment variables should be authoritative.
-- Configure Supabase email templates to send six-digit OTP codes for signup.
+- Configure Supabase email templates to send six-digit OTP codes for signup and email changes.
+- Enable Supabase Auth Phone MFA and configure an SMS provider (or Send SMS Hook). Phone MFA uses the same messaging provider configuration as phone login. SMS delivery cannot work until this is configured and tested with a real phone number.
+- Keep Phone MFA verification enabled and use a six-digit code. The Supabase Auth provider controls OTP expiry and rate limits.
 - Add the preview and production app URLs to Supabase Auth's allowed redirect URLs.
 - Configure the Google OAuth provider and its callback URL before enabling Google sign-in.
 - Configure Supabase Auth rate limits and CAPTCHA protection before opening public registration.
+- Enable leaked-password protection in Supabase Auth. The database advisor currently reports this setting is disabled.
 - Set `SUPABASE_SERVICE_ROLE_KEY` as a server-only Vercel environment variable to enable account deletion. Never prefix it with `NEXT_PUBLIC_` or expose it to browser code.
 - Confirm SMTP delivery with a real signup and password-recovery test. The code handles provider errors, but delivery cannot be proven from repository tests.
 
 ## Implemented in this branch
 
-- Supabase password login, email OTP signup and verification, Google OAuth PKCE, protected workspace routes, and safe post-auth redirects.
+- Supabase password login, email OTP signup and verification, Google OAuth PKCE, and safe post-auth redirects.
+- Google sign-in is not a passwordless bypass: Google OAuth returns to a SubnetLab password setup/check step, then requires verified phone MFA before workspace access.
+- Email/password login and signup also require phone MFA. Phone verification uses Supabase Auth Phone MFA with six-digit SMS challenges, resend, paste, and auto-advance support.
+- Middleware, Settings APIs, Storage writes, and workspace RLS policies require AAL2 with a verified phone factor.
 - Password recovery request and password-reset completion.
 - Profile editing, avatar upload/removal, account email/password changes, preference persistence, data export, other-session sign-out, and server-side account deletion.
 - Persisted IPv4 network plans and VLSM allocations.
