@@ -59,8 +59,10 @@ export default function AuthForm({mode,searchParams}:{mode:"login"|"signup";sear
  async function google(){
   setBusy(true);setMessage("");
   try{
-   const{error}=await createClient().auth.signInWithOAuth({provider:"google",options:{redirectTo:`${window.location.origin}/auth/callback?next=${encodeURIComponent(nextPath)}`,queryParams:{access_type:"offline",prompt:"select_account"}}});
+   const{data,error}=await createClient().auth.signInWithOAuth({provider:"google",options:{redirectTo:`${window.location.origin}/auth/callback?next=${encodeURIComponent(nextPath)}`,queryParams:{prompt:"select_account"},skipBrowserRedirect:true}});
    if(error)throw error;
+   if(!data.url)throw new Error("Google did not return an authorization URL. Check that the Google provider is enabled in Supabase.");
+   window.location.assign(data.url);
   }catch(err){setMessage(err instanceof Error?err.message:"Google sign-in is unavailable. Check the Google provider configuration in Supabase.");setBusy(false);}
  }
  return <main className="auth-wrap"><section className="auth-card">
