@@ -30,7 +30,7 @@ All new account/workspace tables have RLS enabled and owner-scoped policies. Ano
 - Supabase password login, email OTP signup and verification, Google OAuth PKCE, and safe post-auth redirects.
 - Google sign-in is not a passwordless bypass: Google OAuth returns to a SubnetLab password setup/check step, then requires verified phone MFA before workspace access.
 - Email/password login and signup also require phone MFA. Phone verification uses Supabase Auth Phone MFA with six-digit SMS challenges, resend, paste, and auto-advance support.
-- Middleware, Settings APIs, Storage writes, and workspace RLS policies require AAL2 with a verified phone factor.
+- Middleware, Settings APIs, Storage writes, and workspace RLS policies require both a server-confirmed SubnetLab password and AAL2 with a verified phone factor. Profile reads needed for Google password setup remain available to the account owner before AAL2.
 - Password recovery request and password-reset completion.
 - Profile editing, avatar upload/removal, email-change OTP confirmation, password re-authentication, phone MFA status/challenge, persistent preferences, full JSON/CSV export, other-session sign-out, recent security activity, and server-side account deletion.
 - Persisted IPv4 network plans and VLSM allocations.
