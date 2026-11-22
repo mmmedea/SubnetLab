@@ -196,3 +196,75 @@ body{
 .password-checklist{display:grid;grid-template-columns:1fr 1fr;gap:7px 12px;list-style:none;padding:0;margin:-8px 0 2px;color:#8fa6c5;font-size:11px}
 .password-checklist li[data-valid="true"]{color:#b7ff2a}
 .password-checklist li{transition:color .15s ease}
+
+
+/* SubnetLab welcome experience */
+:root{--welcome-canvas:#050f25;--welcome-black:#020408;--welcome-card:#0c2042;--welcome-raised:#10294f;--welcome-hover:#15345f;--welcome-lime:#b7ff2a;--welcome-cyan:#35e7ff;--welcome-blue:#397bff;--welcome-violet:#9b6bff;--welcome-white:#f4f8ff;--welcome-muted:#a4b6d0;--welcome-subtle:#748cac;--welcome-focus:#9aeafa}
+.welcome-page{min-height:100vh;overflow:hidden;background:radial-gradient(ellipse 44% 32% at 9% 8%,rgba(53,231,255,.08),transparent 72%),radial-gradient(ellipse 42% 30% at 91% 5%,rgba(155,107,255,.08),transparent 72%),linear-gradient(rgba(116,140,172,.035) 1px,transparent 1px),linear-gradient(90deg,rgba(116,140,172,.035) 1px,transparent 1px),var(--welcome-canvas);background-size:auto,auto,48px 48px,48px 48px,auto;color:var(--welcome-white);font-family:"Space Grotesk",Inter,sans-serif}
+.welcome-nav{height:76px;position:sticky;top:0;z-index:20;background:rgba(5,15,37,.82);backdrop-filter:blur(14px);border-bottom:1px solid rgba(116,140,172,.15)}
+.welcome-nav-inner{max-width:1440px;height:100%;margin:auto;padding:0 clamp(20px,5vw,76px);display:flex;align-items:center;justify-content:space-between;gap:26px}
+.welcome-nav .brand{font-size:21px}.welcome-nav .brand-word span{color:var(--welcome-cyan)}
+.welcome-links,.welcome-actions{display:flex;align-items:center;gap:clamp(12px,2.2vw,30px)}
+.welcome-links a,.welcome-ghost{font-size:13px;font-weight:500;color:var(--welcome-muted);transition:color .18s ease}
+.welcome-links a:hover,.welcome-ghost:hover{color:var(--welcome-white)}
+.welcome-ghost{padding:10px 4px}
+.welcome-primary,.welcome-secondary{min-height:48px;padding:0 19px;border-radius:8px;display:inline-flex;align-items:center;justify-content:center;gap:10px;font:600 14px "Space Grotesk",Inter,sans-serif;transition:transform .18s ease,background .18s ease,border-color .18s ease,box-shadow .18s ease}
+.welcome-primary{background:var(--welcome-lime);color:var(--welcome-black);border:1px solid var(--welcome-lime);box-shadow:0 0 0 1px rgba(183,255,42,.12)}
+.welcome-primary:hover{background:#d4ff75;border-color:#d4ff75;box-shadow:0 0 20px rgba(183,255,42,.35);transform:translateY(-1px)}
+.welcome-secondary{background:var(--welcome-raised);color:var(--welcome-white);border:1px solid rgba(53,231,255,.3)}
+.welcome-secondary:hover{background:var(--welcome-hover);border-color:var(--welcome-cyan);transform:translateY(-1px)}
+.welcome-primary:focus-visible,.welcome-secondary:focus-visible,.welcome-ghost:focus-visible,.welcome-links a:focus-visible{outline:2px solid var(--welcome-focus);outline-offset:2px}
+.nav-cta{min-height:40px;padding:0 15px;font-size:13px}
+.welcome-hero{max-width:1440px;margin:auto;padding:clamp(70px,9vw,132px) clamp(20px,5vw,76px) clamp(78px,9vw,124px);display:grid;grid-template-columns:minmax(0,1.12fr) minmax(390px,.88fr);gap:clamp(44px,7vw,100px);align-items:center}
+.welcome-hero-copy{max-width:720px}
+.welcome-eyebrow,.welcome-kicker{font:600 11px "Space Mono","Geist Mono",monospace;letter-spacing:.1em;color:var(--welcome-cyan)}
+.welcome-eyebrow{display:inline-flex;align-items:center;gap:10px;padding:9px 12px;border:1px solid rgba(53,231,255,.38);border-radius:999px;background:rgba(16,41,79,.75)}
+.welcome-eyebrow>span{width:7px;height:7px;border-radius:50%;background:var(--welcome-lime);box-shadow:0 0 10px rgba(183,255,42,.65)}
+.welcome-hero h1{font-size:clamp(44px,5.3vw,72px);line-height:1.02;letter-spacing:-.065em;font-weight:700;margin:25px 0 22px}
+.welcome-hero h1 span{background:linear-gradient(95deg,var(--welcome-cyan),var(--welcome-blue));background-clip:text;-webkit-background-clip:text;color:transparent}
+.welcome-lead{max-width:620px;font-size:clamp(16px,1.4vw,18px);line-height:1.75;color:var(--welcome-muted);margin:0}
+.welcome-cta-row{display:flex;gap:12px;flex-wrap:wrap;margin-top:30px}
+.welcome-proof{display:flex;gap:24px;flex-wrap:wrap;margin-top:32px;color:var(--welcome-subtle);font:11px "Space Mono","Geist Mono",monospace}
+.welcome-proof span{display:inline-flex;align-items:center;gap:8px}.welcome-proof svg{color:var(--welcome-cyan)}
+.welcome-terminal{position:relative;min-width:0;border:1px solid rgba(53,231,255,.22);border-radius:14px;background:var(--welcome-black);box-shadow:0 28px 90px rgba(0,0,0,.38),0 0 55px rgba(53,231,255,.055);overflow:hidden}
+.welcome-terminal:before{content:"";position:absolute;left:0;right:0;top:0;height:2px;background:linear-gradient(90deg,var(--welcome-cyan),var(--welcome-blue),var(--welcome-violet))}
+.terminal-top{height:48px;padding:0 17px;display:flex;align-items:center;justify-content:space-between;gap:10px;border-bottom:1px solid rgba(116,140,172,.16);font:10px "Space Mono","Geist Mono",monospace;letter-spacing:.07em;color:var(--welcome-subtle)}
+.terminal-dots{display:flex;gap:5px}.terminal-dots i{width:7px;height:7px;border-radius:50%;background:#40516b}.terminal-dots i:first-child{background:#ff8585}.terminal-dots i:nth-child(2){background:#ffd166}.terminal-dots i:nth-child(3){background:var(--welcome-lime)}
+.terminal-state{display:flex;align-items:center;gap:7px;color:var(--welcome-lime)}.terminal-state b,.welcome-status i{width:6px;height:6px;border-radius:50%;background:var(--welcome-lime);box-shadow:0 0 8px rgba(183,255,42,.65)}
+.terminal-body{padding:clamp(20px,3vw,32px)}
+.terminal-comment{font:10px "Space Mono","Geist Mono",monospace;letter-spacing:.08em;color:var(--welcome-subtle);margin:0 0 13px}
+.terminal-input{font:600 clamp(18px,2.1vw,24px) "Space Mono","Geist Mono",monospace;color:var(--welcome-lime);overflow-wrap:anywhere}
+.terminal-input span{color:var(--welcome-cyan);margin-right:8px}
+.terminal-rule{height:1px;background:rgba(116,140,172,.17);margin:24px 0}
+.terminal-rows{display:grid;gap:0}
+.terminal-row{display:flex;justify-content:space-between;align-items:flex-start;gap:18px;padding:13px 0;border-bottom:1px solid rgba(116,140,172,.12);font:10px "Space Mono","Geist Mono",monospace}
+.terminal-row span{color:var(--welcome-subtle);letter-spacing:.06em}
+.terminal-row strong{color:var(--welcome-white);font-size:11px;text-align:right;overflow-wrap:anywhere}
+.terminal-foot{display:flex;align-items:center;gap:8px;margin-top:20px;color:var(--welcome-lime);font:10px "Space Mono","Geist Mono",monospace;letter-spacing:.06em}
+.terminal-foot span{margin-left:auto;color:var(--welcome-subtle)}
+.welcome-features{max-width:1440px;margin:auto;padding:18px clamp(20px,5vw,76px) 96px}
+.welcome-section-heading{max-width:700px;margin-bottom:30px}
+.welcome-section-heading h2,.welcome-banner h2{font-size:clamp(28px,3vw,40px);line-height:1.12;letter-spacing:-.05em;margin:14px 0}
+.welcome-section-heading>p:last-child,.welcome-banner>div>p:last-child{color:var(--welcome-muted);font-size:14px;line-height:1.7;margin:0}
+.welcome-feature-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px}
+.welcome-feature{padding:25px;border-radius:12px;border:1px solid rgba(116,140,172,.2);background:var(--welcome-card);transition:background .2s ease,border-color .2s ease,transform .2s ease}
+.welcome-feature:hover{background:var(--welcome-hover);border-color:var(--welcome-cyan);transform:translateY(-3px)}
+.welcome-feature .welcome-kicker{font-size:10px}
+.welcome-feature-icon{width:42px;height:42px;display:grid;place-items:center;border-radius:10px;background:var(--welcome-raised);margin:23px 0 18px;color:var(--welcome-cyan)}
+.welcome-feature-icon.tone-2{color:var(--welcome-blue)}.welcome-feature-icon.tone-3{color:var(--welcome-violet)}
+.welcome-feature h3{font-size:19px;line-height:1.25;letter-spacing:-.035em;margin:0 0 10px}
+.welcome-feature>p:last-child{font-size:13px;line-height:1.7;color:var(--welcome-muted);margin:0}
+.welcome-banner{max-width:1288px;margin:0 auto 100px;padding:clamp(26px,4vw,42px);width:calc(100% - clamp(40px,10vw,152px));border:1px solid transparent;border-radius:16px;background:linear-gradient(var(--welcome-raised),var(--welcome-raised)) padding-box,linear-gradient(110deg,var(--welcome-blue),var(--welcome-violet)) border-box;display:flex;align-items:center;justify-content:space-between;gap:28px}
+.welcome-banner h2{font-size:clamp(24px,2.8vw,34px)}.welcome-banner .welcome-primary{flex:none}
+.welcome-footer{background:var(--welcome-black);border-top:1px solid var(--welcome-card);padding:54px clamp(20px,5vw,76px) 20px}
+.welcome-footer-grid{max-width:1288px;margin:auto;display:grid;grid-template-columns:1.5fr 1fr 1fr 1fr;gap:40px;padding-bottom:42px}
+.welcome-footer-grid>div:not(:first-child){display:flex;flex-direction:column;align-items:flex-start;gap:12px}
+.welcome-footer-grid h3{font:600 10px "Space Mono","Geist Mono",monospace;letter-spacing:.1em;color:var(--welcome-cyan);margin:0 0 6px}
+.welcome-footer-grid a:not(.brand){font-size:12px;color:var(--welcome-muted);display:inline-flex;align-items:center;gap:6px;transition:color .18s ease}
+.welcome-footer-grid a:not(.brand):hover{color:var(--welcome-cyan)}
+.welcome-footer-brand>p{max-width:260px;color:var(--welcome-muted);font-size:12px;line-height:1.7}
+.welcome-status{display:inline-flex;align-items:center;gap:8px;padding:8px 10px;border:1px solid rgba(183,255,42,.16);border-radius:999px;color:var(--welcome-lime);font:9px "Space Mono","Geist Mono",monospace;letter-spacing:.05em}
+.welcome-footer-bottom{max-width:1288px;margin:auto;padding-top:18px;border-top:1px solid rgba(12,32,66,.9);display:flex;justify-content:space-between;gap:20px;flex-wrap:wrap;color:var(--welcome-subtle);font:10px "Space Mono","Geist Mono",monospace}
+@media(max-width:980px){.welcome-nav-inner{gap:15px}.welcome-links{gap:14px}.welcome-hero{grid-template-columns:1fr;max-width:850px;padding-top:72px}.welcome-hero-copy{max-width:760px}.welcome-terminal{max-width:680px;width:100%}.welcome-feature-grid{grid-template-columns:1fr 1fr}.welcome-feature:last-child{grid-column:1/-1}}
+@media(max-width:680px){.welcome-nav{height:auto;min-height:68px}.welcome-nav-inner{min-height:68px;flex-wrap:wrap;padding-top:12px;padding-bottom:12px}.welcome-links{order:3;width:100%;overflow-x:auto;justify-content:flex-start;padding:4px 0 2px}.welcome-links a{white-space:nowrap;font-size:12px}.welcome-actions{margin-left:auto;gap:12px}.nav-cta{min-height:36px;padding:0 11px}.welcome-hero{padding-top:54px;padding-bottom:70px;gap:42px}.welcome-hero h1{font-size:clamp(42px,11vw,58px)}.welcome-eyebrow{font-size:9px}.welcome-proof{gap:14px}.welcome-feature-grid{grid-template-columns:1fr}.welcome-feature:last-child{grid-column:auto}.welcome-features{padding-bottom:68px}.welcome-banner{width:calc(100% - 32px);margin-bottom:68px;align-items:flex-start;flex-direction:column}.welcome-footer-grid{grid-template-columns:1fr 1fr;gap:32px 20px}.welcome-footer-brand{grid-column:1/-1}.welcome-footer-bottom{font-size:9px}.terminal-row{font-size:9px}}
+@media(prefers-reduced-motion:reduce){.welcome-page *{transition:none!important;scroll-behavior:auto!important}}
