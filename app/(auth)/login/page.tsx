@@ -1,1 +1,1 @@
-import AuthForm from "@/components/auth/AuthForm"; export default function Page({searchParams}:{searchParams:Promise<{next?:string}>}){return <AuthForm mode="login" searchParams={searchParams}/>;}
+import AuthForm from "@/components/auth/AuthForm"; export default function Page({searchParams}:{searchParams:Promise<{next?:string;error?:string;reason?:string}>}){return <AuthForm mode="login" searchParams={searchParams}/>;}
