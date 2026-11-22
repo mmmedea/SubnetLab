@@ -35,7 +35,6 @@ export default function AuthForm({mode,searchParams}:{mode:"login"|"signup";sear
    if(mode==="login"){
     const{error}=await supabase.auth.signInWithPassword({email:email.trim(),password});
     if(error)throw error;
-    void supabase.rpc("record_auth_audit_event",{p_event:"password_login"});
     router.replace("/verify-phone?next="+encodeURIComponent(nextPath));router.refresh();
    }else{
     const{data,error}=await supabase.auth.signUp({email:email.trim(),password,options:{emailRedirectTo:`${window.location.origin}/auth/callback?next=${encodeURIComponent(nextPath)}`,data:{username:username.trim().toLowerCase(),terms_accepted_at:new Date().toISOString()}}});
@@ -51,7 +50,6 @@ export default function AuthForm({mode,searchParams}:{mode:"login"|"signup";sear
   try{
    const{error}=await createClient().auth.verifyOtp({email:email.trim(),token:code,type:"signup"});
    if(error)throw error;
-   void createClient().rpc("record_auth_audit_event",{p_event:"signup_verified"});
    router.replace("/verify-phone?next="+encodeURIComponent(nextPath));router.refresh();
   }catch(err){setMessage(err instanceof Error?err.message:"The code could not be verified. Request a new code and try again.");}
   finally{setBusy(false);}
