@@ -30,7 +30,9 @@ export async function GET(request: NextRequest) {
     return NextResponse.redirect(new URL("/login?error=auth_unavailable", requestUrl.origin));
   }
 
-  const response = NextResponse.redirect(new URL(next, requestUrl.origin));
+  const googleDestination = new URL("/google-password", requestUrl.origin);
+  googleDestination.searchParams.set("next", next);
+  const response = NextResponse.redirect(googleDestination);
   const supabase = createServerClient(config.url, config.key, {
     cookies: {
       getAll: () => request.cookies.getAll(),
