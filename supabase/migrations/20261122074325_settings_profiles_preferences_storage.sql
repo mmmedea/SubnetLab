@@ -89,7 +89,91 @@ begin
     insert into public.profiles (id, username, display_name, avatar_url, terms_accepted_at, consented_at)
     values (
       new.id,
-      nullif(lower(coalesce(new.raw_user_meta_data->>'username', new.raw_user_meta_data->>'user_name')), ''),
+      case when coalesce(new.raw_user_meta_data->>'username', new.raw_user_meta_data->>'user_name') ~ '^[A-Za-z0-9_]{3,32},
+      nullif(coalesce(new.raw_user_meta_data->>'full_name', new.raw_user_meta_data->>'name'), ''),
+      nullif(new.raw_user_meta_data->>'avatar_url', ''),
+      case
+        when nullif(new.raw_user_meta_data->>'terms_accepted_at', '') is not null
+          then now()
+        else null
+      end,
+      case
+        when nullif(new.raw_user_meta_data->>'terms_accepted_at', '') is not null
+          then now()
+        else null
+      end
+    )
+    on conflict (id) do nothing;
+  exception when unique_violation then
+    -- A username collision must not abort Supabase Auth signup.
+    insert into public.profiles (id, display_name, avatar_url, terms_accepted_at, consented_at)
+    values (
+      new.id,
+      nullif(coalesce(new.raw_user_meta_data->>'full_name', new.raw_user_meta_data->>'name'), ''),
+      nullif(new.raw_user_meta_data->>'avatar_url', ''),
+      case
+        when nullif(new.raw_user_meta_data->>'terms_accepted_at', '') is not null
+          then now()
+        else null
+      end,
+      case
+        when nullif(new.raw_user_meta_data->>'terms_accepted_at', '') is not null
+          then now()
+        else null
+      end
+    )
+    on conflict (id) do nothing;
+  end;
+
+  insert into public.user_preferences (user_id)
+  values (new.id)
+  on conflict (user_id) do nothing;
+
+  return new;
+end;
+$$;
+
+drop trigger if exists on_auth_user_created_settings on auth.users;
+create trigger on_auth_user_created_settings
+  after insert on auth.users
+  for each row execute procedure public.handle_new_auth_user_settings();
+
+-- Public avatars are non-sensitive profile imagery. Upload/update/delete remain
+-- restricted to the authenticated user's own first-level folder.
+insert into storage.buckets (id, name, public, file_size_limit, allowed_mime_types)
+values ('avatars', 'avatars', true, 2097152, array['image/png','image/jpeg','image/webp'])
+on conflict (id) do update set
+  public = excluded.public,
+  file_size_limit = excluded.file_size_limit,
+  allowed_mime_types = excluded.allowed_mime_types;
+
+do $$
+begin
+  if not exists (select 1 from pg_policies where schemaname='storage' and tablename='objects' and policyname='avatars_read_public') then
+    create policy avatars_read_public on storage.objects for select using (bucket_id = 'avatars');
+  end if;
+  if not exists (select 1 from pg_policies where schemaname='storage' and tablename='objects' and policyname='avatars_insert_own_folder') then
+    create policy avatars_insert_own_folder on storage.objects for insert to authenticated with check (
+      bucket_id = 'avatars' and (storage.foldername(name))[1] = (select auth.uid())::text
+    );
+  end if;
+  if not exists (select 1 from pg_policies where schemaname='storage' and tablename='objects' and policyname='avatars_update_own_folder') then
+    create policy avatars_update_own_folder on storage.objects for update to authenticated using (
+      bucket_id = 'avatars' and (storage.foldername(name))[1] = (select auth.uid())::text
+    ) with check (
+      bucket_id = 'avatars' and (storage.foldername(name))[1] = (select auth.uid())::text
+    );
+  end if;
+  if not exists (select 1 from pg_policies where schemaname='storage' and tablename='objects' and policyname='avatars_delete_own_folder') then
+    create policy avatars_delete_own_folder on storage.objects for delete to authenticated using (
+      bucket_id = 'avatars' and (storage.foldername(name))[1] = (select auth.uid())::text
+    );
+  end if;
+end $$;
+
+-- Trigger functions are not intended as a callable public API.
+revoke all on function public.handle_new_auth_user_settings() from public, anon, authenticated;
+ then lower(coalesce(new.raw_user_meta_data->>'username', new.raw_user_meta_data->>'user_name')) else null end,
       nullif(coalesce(new.raw_user_meta_data->>'full_name', new.raw_user_meta_data->>'name'), ''),
       nullif(new.raw_user_meta_data->>'avatar_url', ''),
       case
