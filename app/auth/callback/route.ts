@@ -18,7 +18,7 @@ export async function GET(request: NextRequest) {
   if (providerError) {
     const failed = new URL("/login", requestUrl.origin);
     failed.searchParams.set("error", "oauth_callback");
-    if (providerDescription) failed.searchParams.set("reason", providerDescription.replace(/[\\u0000-\\u001f]/g, "").slice(0, 220));
+    if (providerDescription) failed.searchParams.set("reason", providerDescription.replace(/[\u0000-\u001f\u007f]/g, "").slice(0, 220));
     return NextResponse.redirect(failed);
   }
   if (!code) return NextResponse.redirect(new URL("/login?error=oauth_callback", requestUrl.origin));
@@ -50,7 +50,7 @@ export async function GET(request: NextRequest) {
   if (exchangeError) {
     const failedUrl = new URL("/login", requestUrl.origin);
     failedUrl.searchParams.set("error", "oauth_callback");
-    failedUrl.searchParams.set("reason", exchangeError.message.replace(/[\\u0000-\\u001f]/g, "").slice(0, 220));
+    failedUrl.searchParams.set("reason", exchangeError.message.replace(/[\u0000-\u001f\u007f]/g, "").slice(0, 220));
     const failed = NextResponse.redirect(failedUrl);
     response.cookies.getAll().forEach((cookie) => failed.cookies.set(cookie));
     return failed;
