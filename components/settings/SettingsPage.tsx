@@ -64,10 +64,10 @@ export default function SettingsPage(){
     </div>}
     {tab==="preferences"&&<div className="settings-stack">
      <Card title="Appearance" desc="Choose how the workspace looks on this device." footer={<span>Appearance changes save immediately to your account.</span>}>
-      <Field label="Theme"><select value={prefs.theme} onChange={e=>pref("theme",e.target.value)}><option value="dark">Dark</option><option value="light">Light</option><option value="system">Use system setting</option></select></Field><Toggle label="Compact mode" desc="Reduce spacing in tables and workspace panels." checked={prefs.compact} change={v=>pref("compact",v)}/>
+      <Field label="Theme"><select value={prefs.theme} onChange={e=>pref("theme",e.target.value as "dark"|"light"|"system")}><option value="dark">Dark</option><option value="light">Light</option><option value="system">Use system setting</option></select></Field><Toggle label="Compact mode" desc="Reduce spacing in tables and workspace panels." checked={prefs.compact} change={v=>pref("compact",v)}/>
      </Card>
      <Card title="Workspace defaults" desc="Set defaults for subnetting and address planning." footer={<span>Defaults are saved to your account and follow you across devices.</span>}>
-      <Field label="Default IP mode"><select value={prefs.defaultNetwork} onChange={e=>pref("defaultNetwork",e.target.value)}><option>IPv4</option><option>IPv6</option></select></Field><Field label="Monospace font size"><select value={prefs.fontSize} onChange={e=>pref("fontSize",e.target.value)}>{["12","13","14","15","16","17","18"].map(size=><option key={size}>{size}</option>)}</select></Field>
+      <Field label="Default IP mode"><select value={prefs.defaultNetwork} onChange={e=>pref("defaultNetwork",e.target.value as "IPv4"|"IPv6")}><option>IPv4</option><option>IPv6</option></select></Field><Field label="Monospace font size"><select value={prefs.fontSize} onChange={e=>pref("fontSize",e.target.value)}>{["12","13","14","15","16","17","18"].map(size=><option key={size}>{size}</option>)}</select></Field>
      </Card>
      <Card title="Notifications" desc="Choose which account updates you want to receive." footer={<span>Notification preferences save instantly.</span>}>
       <Toggle label="Email notifications" desc="Receive important account and security updates." checked={prefs.emailNotifications} change={v=>pref("emailNotifications",v)}/><Toggle label="In-app notifications" desc="Show updates and reminders inside SubnetLab." checked={prefs.inAppNotifications} change={v=>pref("inAppNotifications",v)}/>
