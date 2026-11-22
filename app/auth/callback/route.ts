@@ -55,11 +55,7 @@ export async function GET(request: NextRequest) {
       response.cookies.getAll().forEach((cookie) => failed.cookies.set(cookie));
       return failed;
     }
-    const { error: profileError } = await supabase.from("profiles").upsert({
-      id: userData.user.id,
-      terms_accepted_at: acceptedAt,
-      updated_at: acceptedAt,
-    });
+    const { error: profileError } = await supabase.rpc("record_user_consent");
     if (profileError) {
       const failed = NextResponse.redirect(new URL("/login?error=oauth_callback&reason=consent_record_failed", requestUrl.origin));
       response.cookies.getAll().forEach((cookie) => failed.cookies.set(cookie));
