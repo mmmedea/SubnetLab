@@ -71,7 +71,7 @@ export default function AuthForm({mode,searchParams}:{mode:"login"|"signup";sear
  }
  async function resendCode(){
   setBusy(true);setMessage("");
-  try{const{error}=await createClient().auth.resend({type:"signup",email:email.trim()});if(error)throw error;setCodeDigits(["","","","","",""]);setMessage("A new verification code has been sent.");setResendWait(true);window.setTimeout(()=>setResendWait(false),30000);}
+  try{const{error}=await createClient().auth.resend({type:"signup",email:email.trim()});if(error)throw error;setCodeDigits(["","","","","",""]);setMessage("A new verification code has been sent.");setResendWait(true);window.setTimeout(()=>setResendWait(false),60000);}
   catch(err){setMessage(err instanceof Error?err.message:"Unable to resend the code right now.");}
   finally{setBusy(false);}
  }
