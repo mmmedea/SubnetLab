@@ -56,23 +56,27 @@ begin
   end if;
 end $$;
 
--- Backfill existing Auth users. Consent remains NULL unless signup explicitly supplied it.
+-- Backfill existing Auth users. Invalid or duplicate usernames are left unset.
+with auth_profiles as (
+  select
+    u.id,
+    case
+      when coalesce(u.raw_user_meta_data->>'username', u.raw_user_meta_data->>'user_name') ~ '^[A-Za-z0-9_]{3,32}$'
+        then lower(coalesce(u.raw_user_meta_data->>'username', u.raw_user_meta_data->>'user_name'))
+      else null
+    end as username,
+    nullif(coalesce(u.raw_user_meta_data->>'full_name', u.raw_user_meta_data->>'name'), '') as display_name,
+    nullif(u.raw_user_meta_data->>'avatar_url', '') as avatar_url,
+    case when nullif(u.raw_user_meta_data->>'terms_accepted_at', '') is not null then now() else null end as terms_accepted_at
+  from auth.users u
+), ranked_profiles as (
+  select *, row_number() over (partition by username order by id) as username_rank
+  from auth_profiles
+)
 insert into public.profiles (id, username, display_name, avatar_url, terms_accepted_at, consented_at)
-select
-  u.id,
-  nullif(coalesce(u.raw_user_meta_data->>'username', u.raw_user_meta_data->>'user_name'), ''),
-  nullif(coalesce(u.raw_user_meta_data->>'full_name', u.raw_user_meta_data->>'name'), ''),
-  nullif(u.raw_user_meta_data->>'avatar_url', ''),
-  case
-    when nullif(u.raw_user_meta_data->>'terms_accepted_at', '') is not null
-      then (u.raw_user_meta_data->>'terms_accepted_at')::timestamptz
-    else null
-  end
-from auth.users u
-on conflict (id) do update set
-  username = coalesce(public.profiles.username, excluded.username),
-  display_name = coalesce(public.profiles.display_name, excluded.display_name),
-  avatar_url = coalesce(public.profiles.avatar_url, excluded.avatar_url);
+select id, case when username_rank=1 then username else null end, display_name, avatar_url, terms_accepted_at, terms_accepted_at
+from ranked_profiles
+on conflict (id) do nothing;
 
 insert into public.user_preferences (user_id)
 select id from auth.users
