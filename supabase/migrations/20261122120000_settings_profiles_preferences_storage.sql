@@ -99,7 +99,7 @@ begin
       end,
       case
         when nullif(new.raw_user_meta_data->>'terms_accepted_at', '') is not null
-          then (new.raw_user_meta_data->>'terms_accepted_at')::timestamptz
+          then now()
         else null
       end
     )
@@ -113,12 +113,12 @@ begin
       nullif(new.raw_user_meta_data->>'avatar_url', ''),
       case
         when nullif(new.raw_user_meta_data->>'terms_accepted_at', '') is not null
-          then (new.raw_user_meta_data->>'terms_accepted_at')::timestamptz
+          then now()
         else null
       end,
       case
         when nullif(new.raw_user_meta_data->>'terms_accepted_at', '') is not null
-          then (new.raw_user_meta_data->>'terms_accepted_at')::timestamptz
+          then now()
         else null
       end
     )
