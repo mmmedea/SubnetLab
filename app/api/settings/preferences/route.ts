@@ -9,6 +9,7 @@ export async function PATCH(request: Request) {
   if (authError || !user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   let body: Record<string, unknown>;
   try { body = await request.json(); } catch { return NextResponse.json({ error: "Invalid JSON" }, { status: 400 }); }
+  if (!body || typeof body !== "object" || Array.isArray(body)) return NextResponse.json({ error: "Invalid preferences payload." }, { status: 400 });
   const allowed = ["theme", "email_notifications", "in_app_notifications", "compact_mode", "default_ip_version", "monospace_font_size"];
   const update: Record<string, unknown> = {};
   for (const key of allowed) if (key in body) update[key] = body[key];
