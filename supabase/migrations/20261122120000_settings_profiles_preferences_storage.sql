@@ -35,6 +35,10 @@ create table if not exists public.user_preferences (
 alter table public.profiles enable row level security;
 alter table public.user_preferences enable row level security;
 
+revoke all on public.profiles, public.user_preferences from anon;
+grant select, insert, update, delete on public.profiles, public.user_preferences to authenticated;
+grant all on public.profiles, public.user_preferences to service_role;
+
 do $$
 begin
   if not exists (select 1 from pg_policies where schemaname='public' and tablename='profiles' and policyname='profiles_select_own') then
@@ -86,19 +90,35 @@ security definer
 set search_path = ''
 as $$
 begin
-  insert into public.profiles (id, username, display_name, avatar_url, terms_accepted_at)
-  values (
-    new.id,
-    nullif(coalesce(new.raw_user_meta_data->>'username', new.raw_user_meta_data->>'user_name'), ''),
-    nullif(coalesce(new.raw_user_meta_data->>'full_name', new.raw_user_meta_data->>'name'), ''),
-    nullif(new.raw_user_meta_data->>'avatar_url', ''),
-    case
-      when nullif(new.raw_user_meta_data->>'terms_accepted_at', '') is not null
-        then (new.raw_user_meta_data->>'terms_accepted_at')::timestamptz
-      else null
-    end
-  )
-  on conflict (id) do nothing;
+  begin
+    insert into public.profiles (id, username, display_name, avatar_url, terms_accepted_at)
+    values (
+      new.id,
+      nullif(lower(coalesce(new.raw_user_meta_data->>'username', new.raw_user_meta_data->>'user_name')), ''),
+      nullif(coalesce(new.raw_user_meta_data->>'full_name', new.raw_user_meta_data->>'name'), ''),
+      nullif(new.raw_user_meta_data->>'avatar_url', ''),
+      case
+        when nullif(new.raw_user_meta_data->>'terms_accepted_at', '') is not null
+          then (new.raw_user_meta_data->>'terms_accepted_at')::timestamptz
+        else null
+      end
+    )
+    on conflict (id) do nothing;
+  exception when unique_violation then
+    -- A username collision must not abort Supabase Auth signup.
+    insert into public.profiles (id, display_name, avatar_url, terms_accepted_at)
+    values (
+      new.id,
+      nullif(coalesce(new.raw_user_meta_data->>'full_name', new.raw_user_meta_data->>'name'), ''),
+      nullif(new.raw_user_meta_data->>'avatar_url', ''),
+      case
+        when nullif(new.raw_user_meta_data->>'terms_accepted_at', '') is not null
+          then (new.raw_user_meta_data->>'terms_accepted_at')::timestamptz
+        else null
+      end
+    )
+    on conflict (id) do nothing;
+  end;
 
   insert into public.user_preferences (user_id)
   values (new.id)
