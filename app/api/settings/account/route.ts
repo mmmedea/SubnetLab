@@ -7,6 +7,8 @@ export async function DELETE(request: Request) {
   const supabase = await createClient();
   const { data: { user }, error: authError } = await supabase.auth.getUser();
   if (authError || !user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  const { data: assurance, error: assuranceError } = await supabase.auth.mfa.getAuthenticatorAssuranceLevel();
+  if (assuranceError || assurance?.currentLevel !== "aal2") return NextResponse.json({ error: "Complete phone verification before deleting your account." }, { status: 403 });
   let body: { confirmation?: string };
   try { body = await request.json(); } catch { return NextResponse.json({ error: "Invalid confirmation." }, { status: 400 }); }
   if (!body || typeof body !== "object" || Array.isArray(body)) return NextResponse.json({ error: "Invalid confirmation." }, { status: 400 });
