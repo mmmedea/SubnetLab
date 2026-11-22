@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { ArrowRight, Binary, BookOpen, Calculator, Check, Network, ShieldCheck } from "lucide-react";
+import { ArrowRight, Binary, BookOpen, Calculator, Check } from "lucide-react";
 import { details } from "@/lib/subnet/ipv4";
 
 const sample = details("192.168.10.0/26");
