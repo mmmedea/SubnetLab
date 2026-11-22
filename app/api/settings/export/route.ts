@@ -23,7 +23,7 @@ export async function GET(request:Request){
  await supabase.rpc("record_auth_audit_event",{p_event:"account_exported"});
  if(new URL(request.url).searchParams.get("format")==="csv"){
   const rows:[string,unknown][]=[];
-  for(const [key,value] of Object.entries(payload))if(Array.isArray(value))for(const record of value)rows.push([key,record]);
+  for(const [key,value] of Object.entries(payload)){if(key==="exportedAt")continue;if(Array.isArray(value)){for(const record of value)rows.push([key,record]);}else rows.push([key,value]);}
   const csv=["record_type,record_json",...rows.map(([type,record])=>csvEscape(type)+","+csvEscape(record))].join("\r\n");
   return new NextResponse(csv,{headers:{"Content-Type":"text/csv; charset=utf-8","Content-Disposition":'attachment; filename="subnetlab-account-export.csv"',"Cache-Control":"private, no-store"}});
  }
