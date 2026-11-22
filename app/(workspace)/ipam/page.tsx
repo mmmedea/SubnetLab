@@ -37,8 +37,14 @@ export default function IpamPage() {
   async function add(event:React.FormEvent<HTMLFormElement>) {
     event.preventDefault(); setSaving(true); setError("");
     const value=address.trim();
-    const ipv4=/^(?:25[0-5]|2[0-4]\d|1?\d?\d)(?:\.(?:25[0-5]|2[0-4]\d|1?\d?\d)){3}$/.test(value);
-    const ipv6=value.includes(":") && /^[0-9a-fA-F:]+$/.test(value) && value.split(":").length>=3;
+    const ipv4=value.split(".").length===4 && value.split(".").every(part=>/^(0|[1-9]\\d{0,2})$/.test(part)&&Number(part)<=255);
+    const groups=value.split(":");
+    const compressed=(value.match(/::/g)||[]).length===1;
+    const validGroups=groups.filter(Boolean).every(part=>/^[0-9a-fA-F]{1,4}$/.test(part));
+    const ipv6=value.includes(":") && validGroups &&
+      !(value.startsWith(":")&&!value.startsWith("::")) &&
+      !(value.endsWith(":")&&!value.endsWith("::")) &&
+      (compressed ? groups.filter(Boolean).length<8 : groups.length===8 && groups.every(Boolean));
     if(!ipv4&&!ipv6){setError("Enter a valid IPv4 or IPv6 address.");setSaving(false);return;}
     const {data,error:insertError}=await supabase.from("ip_assignments").insert({user_id:profile.id,address:value,label:label.trim(),status,notes:notes.trim(),plan_id:planId||null}).select("id,address,label,status,notes,plan_id,created_at").single();
     if(insertError)setError(insertError.code==="23505"?"That address is already in your inventory.":insertError.message);
