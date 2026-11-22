@@ -1,6 +1,6 @@
 "use client";
 import Link from "next/link";
-import {useEffect,useState} from "react";
+import {useEffect,useRef,useState} from "react";
 import {useRouter} from "next/navigation";
 import {Eye,EyeOff} from "lucide-react";
 import {createClient} from "@/utils/supabase/client";
@@ -19,7 +19,9 @@ export default function AuthForm({mode,searchParams}:{mode:"login"|"signup";sear
  const[busy,setBusy]=useState(false);
  const[message,setMessage]=useState("");
  const[otp,setOtp]=useState(false);
- const[code,setCode]=useState("");
+ const[codeDigits,setCodeDigits]=useState<string[]>(["","","","","",""]);
+ const otpInputs=useRef<Array<HTMLInputElement|null>>([]);
+ const code=codeDigits.join("");
  const[nextPath,setNextPath]=useState("/dashboard");
  const[resendWait,setResendWait]=useState(false);
  const passwordRules={length:password.length>=10,upper:/[A-Z]/.test(password),lower:/[a-z]/.test(password),number:/[0-9]/.test(password),symbol:/[^A-Za-z0-9]/.test(password)};
@@ -39,7 +41,7 @@ export default function AuthForm({mode,searchParams}:{mode:"login"|"signup";sear
     const{data,error}=await supabase.auth.signUp({email:email.trim(),password,options:{emailRedirectTo:`${window.location.origin}/auth/callback?next=${encodeURIComponent(nextPath)}`,data:{username:username.trim().toLowerCase(),terms_accepted_at:new Date().toISOString()}}});
     if(error)throw error;
     if(data.session){router.replace("/verify-phone?next="+encodeURIComponent(nextPath));router.refresh();return;}
-    setOtp(true);setMessage("A verification code has been sent. Check your inbox, including spam.");
+    setCodeDigits(["","","","","",""]);setOtp(true);setMessage("A verification code has been sent. Check your inbox, including spam.");
    }
   }catch(err){setMessage(err instanceof Error?err.message:"Authentication failed. Please try again.");}
   finally{setBusy(false);}
@@ -56,7 +58,7 @@ export default function AuthForm({mode,searchParams}:{mode:"login"|"signup";sear
  }
  async function resendCode(){
   setBusy(true);setMessage("");
-  try{const{error}=await createClient().auth.resend({type:"signup",email:email.trim()});if(error)throw error;setMessage("A new verification code has been sent.");setResendWait(true);window.setTimeout(()=>setResendWait(false),30000);}
+  try{const{error}=await createClient().auth.resend({type:"signup",email:email.trim()});if(error)throw error;setCodeDigits(["","","","","",""]);setMessage("A new verification code has been sent.");setResendWait(true);window.setTimeout(()=>setResendWait(false),30000);}
   catch(err){setMessage(err instanceof Error?err.message:"Unable to resend the code right now.");}
   finally{setBusy(false);}
  }
@@ -83,9 +85,9 @@ export default function AuthForm({mode,searchParams}:{mode:"login"|"signup";sear
    {mode==="login"&&<div className="auth-forgot"><Link href="/forgot-password">Forgot password?</Link></div>}
    <button className="button primary auth-submit" disabled={busy||(mode==="signup"&&(!passwordValid||!termsAccepted||!/^[a-zA-Z0-9_]{3,32}$/.test(username.trim())))}>{busy?"Please wait…":mode==="login"?"Sign in":"Create account"}<span aria-hidden="true">→</span></button>
   </form>:<form onSubmit={verify}>
-   <label>6-digit verification code<input className="input mono" inputMode="numeric" autoComplete="one-time-code" pattern="[0-9]{6}" maxLength={6} required value={code} onChange={e=>setCode(e.target.value.replace(/\D/g,"").slice(0,6))}/></label>
+   <div><label className="field-label">6-DIGIT VERIFICATION CODE</label><div className="otp-inputs">{Array.from({length:6},(_,i)=><input key={i} ref={el=>{otpInputs.current[i]=el;}} className="input mono" aria-label={"Verification digit "+(i+1)} inputMode="numeric" autoComplete={i===0?"one-time-code":"off"} maxLength={1} required value={codeDigits[i]} onChange={e=>{const digit=e.target.value.replace(/\D/g,"").slice(-1);const next=[...codeDigits];next[i]=digit;setCodeDigits(next);if(digit&&i<5)otpInputs.current[i+1]?.focus();}} onKeyDown={e=>{if(e.key==="Backspace"&&!codeDigits[i]&&i>0)otpInputs.current[i-1]?.focus();}} onPaste={e=>{const digits=e.clipboardData.getData("text").replace(/\D/g,"").slice(0,6);if(!digits)return;e.preventDefault();setCodeDigits([...digits.split(""),..."".padEnd(6-digits.length).split("")]);otpInputs.current[Math.min(digits.length,5)]?.focus();}}/> )}</div></div>
    <button className="button primary auth-submit" disabled={busy||code.length!==6}>{busy?"Verifying…":"Verify email"}<span aria-hidden="true">→</span></button>
-   <button type="button" className="button secondary-action" disabled={busy} onClick={()=>{setOtp(false);setCode("");setMessage("");}}>Change email</button>
+   <button type="button" className="button secondary-action" disabled={busy} onClick={()=>{setOtp(false);setCodeDigits(["","","","","",""]);setMessage("");}}>Change email</button>
    <button type="button" className="auth-resend" disabled={busy||resendWait} onClick={resendCode}>{resendWait?"Please wait before resending":"Resend verification code"}</button>
   </form>}
   {!otp&&<><div className="auth-divider"><span>or continue with</span></div><button type="button" className="button google-button" onClick={google} disabled={busy||(mode==="signup"&&!termsAccepted)}>{googleMark}<span>Continue with Google</span></button></>}
