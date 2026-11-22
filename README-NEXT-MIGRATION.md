@@ -32,7 +32,7 @@ All new account/workspace tables have RLS enabled and owner-scoped policies. Ano
 - Email/password login and signup also require phone MFA. Phone verification uses Supabase Auth Phone MFA with six-digit SMS challenges, resend, paste, and auto-advance support.
 - Middleware, Settings APIs, Storage writes, and workspace RLS policies require AAL2 with a verified phone factor.
 - Password recovery request and password-reset completion.
-- Profile editing, avatar upload/removal, account email/password changes, preference persistence, data export, other-session sign-out, and server-side account deletion.
+- Profile editing, avatar upload/removal, email-change OTP confirmation, password re-authentication, phone MFA status/challenge, persistent preferences, full JSON/CSV export, other-session sign-out, recent security activity, and server-side account deletion.
 - Persisted IPv4 network plans and VLSM allocations.
 - IP address inventory CRUD with status updates and plan linking.
 - Persisted subnetting practice attempts and progress summaries.
@@ -42,7 +42,7 @@ All new account/workspace tables have RLS enabled and owner-scoped policies. Ano
 
 - Legacy custom-JWT users are not automatically mapped to Supabase Auth users. Existing legacy accounts and data remain intact.
 - Application-owned durable per-IP/per-email auth rate limiting and Turnstile server verification are not implemented. Configure Supabase Auth's own limits and CAPTCHA before public registration.
-- Auth audit table is created, but application audit writes are not yet wired.
+- Auth audit writes are wired for successful password/Google sign-in after MFA, profile/avatar changes, preferences, exports, other-session sign-out, and account deletion.
 - The current practice set is a small starter question bank; it is not yet an adaptive curriculum.
 - Full IPv6 calculation UI, network tree split/merge, plan sharing, and automated browser/RLS-isolation test coverage remain incomplete.
 - Test actual OTP email delivery, Google sign-in, password recovery, account deletion, and avatar operations against the deployed preview before merging or switching production traffic.
