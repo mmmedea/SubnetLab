@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { ArrowRight, Binary, BookOpen, Calculator, Check, Github, Network, ShieldCheck, Waypoints } from "lucide-react";
+import { ArrowRight, Binary, BookOpen, Calculator, Check, Network, ShieldCheck } from "lucide-react";
 import { details } from "@/lib/subnet/ipv4";
 
 const sample = details("192.168.10.0/26");
@@ -43,11 +43,9 @@ export default function Home() {
 
     <section className="welcome-hero">
       <div className="welcome-hero-copy">
-        <p className="welcome-eyebrow"><span /> v2.0 // INTERACTIVE IPv4 & CIDR WORKSPACE</p>
         <h1>Master <span>Subnetting</span><br/> & Network Architecture.</h1>
         <p className="welcome-lead">Calculate VLSM, visualize CIDR blocks in real time, and drill binary conversions in one fast, distraction-free lab.</p>
         <div className="welcome-cta-row"><Link className="welcome-primary" href="/planner">Start Free Lab <ArrowRight size={17}/></Link><Link className="welcome-secondary" href="/planner"><Calculator size={16}/> Try Live Calculator</Link></div>
-        <div className="welcome-proof"><span><ShieldCheck size={15}/> Built for hands-on learning</span><span><Waypoints size={15}/> IPv4 · CIDR · VLSM</span></div>
       </div>
       <TerminalPreview />
     </section>
@@ -63,8 +61,8 @@ export default function Home() {
       <div className="welcome-footer-grid">
         <div className="welcome-footer-brand"><Brand/><p>Practical tools for learning and planning computer networks.</p><span className="welcome-status"><i/> CALCULATOR ENGINE READY</span></div>
         <div><h3>WORKSPACE</h3><Link href="/planner">CIDR Calculator</Link><Link href="/planner">VLSM Planner</Link><Link href="/practice">Binary Trainer</Link><Link href="/ipam">IP Address Manager</Link></div>
-        <div><h3>RESOURCES</h3><a href="#tools">Subnetting Tools</a><Link href="/practice">Practice Drills</Link><a href="#resources">Learning Workspace</a></div>
-        <div><h3>ACCOUNT</h3><Link href="/login">Sign In</Link><Link href="/signup">Create Account</Link><a href="https://github.com/mmmedea/SubnetLab" target="_blank" rel="noreferrer">GitHub <Github size={13}/></a></div>
+        <div><h3>RESOURCES</h3><a href="#tools">Subnetting Tools</a><Link href="/practice">Practice Drills</Link><Link href="/signup?next=%2Fplanner">Learning Workspace</Link></div>
+        <div><h3>ACCOUNT</h3><Link href="/login">Sign In</Link><Link href="/signup">Create Account</Link></div>
       </div>
       <div className="welcome-footer-bottom"><span>© 2026 SubnetLab. Built for network engineers & students.</span><span>PLAN // ALLOCATE // UNDERSTAND</span></div>
     </footer>
