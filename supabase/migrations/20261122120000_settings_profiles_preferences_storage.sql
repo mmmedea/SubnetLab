@@ -145,3 +145,6 @@ begin
     );
   end if;
 end $$;
+
+-- Trigger functions are not intended as a callable public API.
+revoke all on function public.handle_new_auth_user_settings() from public, anon, authenticated;
