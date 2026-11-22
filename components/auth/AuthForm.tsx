@@ -20,7 +20,7 @@ export default function AuthForm({mode,searchParams}:{mode:"login"|"signup";sear
  const[code,setCode]=useState("");
  const[nextPath,setNextPath]=useState("/dashboard");
  const[resendWait,setResendWait]=useState(false);
- useEffect(()=>{let active=true;searchParams.then(p=>{if(!active)return;setNextPath(safeNext(p.next));if(p.error==="auth_unavailable")setMessage("Authentication is temporarily unavailable. Check the Supabase environment configuration.");});return()=>{active=false};},[searchParams]);
+ useEffect(()=>{let active=true;searchParams.then(p=>{if(!active)return;setNextPath(safeNext(p.next));if(p.error==="auth_unavailable")setMessage("Authentication is temporarily unavailable. Supabase configuration could not be loaded.");else if(p.error==="oauth_callback")setMessage("Google sign-in did not complete. Confirm Google is enabled in Supabase and the OAuth redirect URLs match this site.");});return()=>{active=false};},[searchParams]);
 
  async function submit(e:React.FormEvent){
   e.preventDefault();setBusy(true);setMessage("");
