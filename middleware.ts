@@ -55,13 +55,9 @@ export async function middleware(req: NextRequest) {
       }
     }
     if (isProtected && user) {
-      const [{ data: assurance, error: assuranceError }, { data: factors, error: factorsError }] = await Promise.all([
-        supabase.auth.mfa.getAuthenticatorAssuranceLevel(),
-        supabase.auth.mfa.listFactors(),
-      ]);
-      const hasVerifiedPhone = Boolean(factors?.phone?.some((factor) => factor.status === "verified"));
-      if (assuranceError || factorsError || !hasVerifiedPhone || assurance?.currentLevel !== "aal2") {
-        const target = new URL("/verify-phone", req.url);
+      const { data: emailOtpVerified, error: emailOtpError } = await supabase.rpc("is_email_otp_session_verified");
+      if (emailOtpError || !emailOtpVerified) {
+        const target = new URL("/verify-email", req.url);
         target.searchParams.set("next", path + req.nextUrl.search);
         const redirect = NextResponse.redirect(target);
         response.cookies.getAll().forEach((cookie) => redirect.cookies.set(cookie));
