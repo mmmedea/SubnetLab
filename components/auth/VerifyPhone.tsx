@@ -1,14 +1,14 @@
 "use client";
 
 import Link from "next/link";
-import {useEffect,useRef,useState} from "react";
+import {useEffect,useMemo,useRef,useState} from "react";
 import {useRouter} from "next/navigation";
 import {createClient} from "@/utils/supabase/client";
 
 type PhoneFactor={id:string;phone?:string;status:string};
 function safeNext(value:string){if(!value.startsWith("/")||value.startsWith("//")||value.includes("\\"))return "/dashboard";const path=value.split("?")[0];return ["/dashboard","/planner","/ipam","/practice","/progress","/settings"].some(p=>path===p||path.startsWith(p+"/"))?value:"/dashboard";}
 export default function VerifyPhone({next}:{next:string}){
- const router=useRouter(),supabase=createClient(),inputs=useRef<Array<HTMLInputElement|null>>([]);
+ const router=useRouter(),supabase=useMemo(()=>createClient(),[]),inputs=useRef<Array<HTMLInputElement|null>>([]);
  const[loading,setLoading]=useState(true),[phone,setPhone]=useState(""),[factor,setFactor]=useState<PhoneFactor|null>(null),[code,setCode]=useState(""),[challengeId,setChallengeId]=useState(""),[busy,setBusy]=useState(false),[error,setError]=useState(""),[notice,setNotice]=useState("");
  const target=safeNext(next);
  useEffect(()=>{let active=true;(async()=>{const{data:{user}}=await supabase.auth.getUser();if(!user){router.replace("/login");return;}const{data,error:listError}=await supabase.auth.mfa.listFactors();if(listError){if(active){setError(listError.message);setLoading(false);}return;}const verified=(data?.phone??[]).find((item:PhoneFactor)=>item.status==="verified") as PhoneFactor|undefined;if(active){setFactor(verified??null);if(verified?.phone)setPhone(verified.phone);setLoading(false);}})();return()=>{active=false};},[router,supabase]);
