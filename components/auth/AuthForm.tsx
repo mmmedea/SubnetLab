@@ -12,6 +12,8 @@ function safeNext(value?:string){if(!value||!value.startsWith("/")||value.starts
 export default function AuthForm({mode,searchParams}:{mode:"login"|"signup";searchParams:Promise<{next?:string;error?:string;reason?:string}>}){
  const router=useRouter();
  const[email,setEmail]=useState("");
+ const[username,setUsername]=useState("");
+ const[termsAccepted,setTermsAccepted]=useState(false);
  const[password,setPassword]=useState("");
  const[show,setShow]=useState(false);
  const[busy,setBusy]=useState(false);
@@ -33,7 +35,7 @@ export default function AuthForm({mode,searchParams}:{mode:"login"|"signup";sear
     if(error)throw error;
     router.replace(nextPath);router.refresh();
    }else{
-    const{data,error}=await supabase.auth.signUp({email:email.trim(),password,options:{emailRedirectTo:`${window.location.origin}/auth/callback?next=${encodeURIComponent(nextPath)}`}});
+    const{data,error}=await supabase.auth.signUp({email:email.trim(),password,options:{emailRedirectTo:`${window.location.origin}/auth/callback?next=${encodeURIComponent(nextPath)}`,data:{username:username.trim().toLowerCase(),terms_accepted_at:new Date().toISOString()}}});
     if(error)throw error;
     if(data.session){router.replace(nextPath);router.refresh();return;}
     setOtp(true);setMessage("A verification code has been sent. Check your inbox, including spam.");
@@ -59,7 +61,7 @@ export default function AuthForm({mode,searchParams}:{mode:"login"|"signup";sear
  async function google(){
   setBusy(true);setMessage("");
   try{
-   const{data,error}=await createClient().auth.signInWithOAuth({provider:"google",options:{redirectTo:`${window.location.origin}/auth/callback?next=${encodeURIComponent(nextPath)}`,queryParams:{prompt:"select_account"},skipBrowserRedirect:true}});
+   const{data,error}=await createClient().auth.signInWithOAuth({provider:"google",options:{redirectTo:`${window.location.origin}/auth/callback?next=${encodeURIComponent(nextPath)}&terms=1`,queryParams:{prompt:"select_account"},skipBrowserRedirect:true}});
    if(error)throw error;
    if(!data.url)throw new Error("Google did not return an authorization URL. Check that the Google provider is enabled in Supabase.");
    window.location.assign(data.url);
@@ -71,18 +73,20 @@ export default function AuthForm({mode,searchParams}:{mode:"login"|"signup";sear
   <h1>{otp?"Verify your email":mode==="login"?"Welcome back":"Create your account"}</h1>
   <p className="muted">{otp?"Enter the 6-digit code sent to "+email:mode==="login"?"Sign in to continue to your network workspace.":"Create an account to save and manage your network plans."}</p>
   {!otp?<form onSubmit={submit}>
+   {mode==="signup"&&<label>Username<input className="input" type="text" autoComplete="username" minLength={3} maxLength={32} pattern="[A-Za-z0-9_]{3,32}" required value={username} onChange={e=>setUsername(e.target.value)}/><small className="muted">3–32 characters. Letters, numbers, and underscores only.</small></label>}
    <label>Email address<input className="input" type="email" autoComplete="email" required maxLength={254} value={email} onChange={e=>setEmail(e.target.value)}/></label>
    <label>Password<div className="password-field"><input className="input" type={show?"text":"password"} autoComplete={mode==="login"?"current-password":"new-password"} minLength={8} maxLength={72} required value={password} onChange={e=>setPassword(e.target.value)}/><button type="button" className="password-toggle" onClick={()=>setShow(v=>!v)} aria-label={show?"Hide password":"Show password"} aria-pressed={show} title={show?"Hide password":"Show password"}>{show?<EyeOff size={18}/>:<Eye size={18}/>}</button></div></label>
    {mode==="signup"&&<ul className="password-checklist" aria-live="polite">{[[passwordRules.length,"At least 8 characters"],[passwordRules.upper,"One uppercase letter"],[passwordRules.lower,"One lowercase letter"],[passwordRules.symbol,"One symbol"]].map(([valid,label])=><li key={String(label)} data-valid={valid}>{valid?"✓":"○"} {label}</li>)}</ul>}
+   {mode==="signup"&&<label className="auth-consent"><input type="checkbox" required checked={termsAccepted} onChange={e=>setTermsAccepted(e.target.checked)}/> <span>I agree to the <Link href="/terms" target="_blank">Terms of Service</Link> and <Link href="/privacy" target="_blank">Privacy Policy</Link>.</span></label>}
    {mode==="login"&&<div className="auth-forgot"><Link href="/forgot-password">Forgot password?</Link></div>}
-   <button className="button primary auth-submit" disabled={busy||(mode==="signup"&&!passwordValid)}>{busy?"Please wait…":mode==="login"?"Sign in":"Create account"}<span aria-hidden="true">→</span></button>
+   <button className="button primary auth-submit" disabled={busy||(mode==="signup"&&(!passwordValid||!termsAccepted||!/^[a-zA-Z0-9_]{3,32}$/.test(username.trim())))}>{busy?"Please wait…":mode==="login"?"Sign in":"Create account"}<span aria-hidden="true">→</span></button>
   </form>:<form onSubmit={verify}>
    <label>6-digit verification code<input className="input mono" inputMode="numeric" autoComplete="one-time-code" pattern="[0-9]{6}" maxLength={6} required value={code} onChange={e=>setCode(e.target.value.replace(/\D/g,"").slice(0,6))}/></label>
    <button className="button primary auth-submit" disabled={busy||code.length!==6}>{busy?"Verifying…":"Verify email"}<span aria-hidden="true">→</span></button>
    <button type="button" className="button secondary-action" disabled={busy} onClick={()=>{setOtp(false);setCode("");setMessage("");}}>Change email</button>
    <button type="button" className="auth-resend" disabled={busy||resendWait} onClick={resendCode}>{resendWait?"Please wait before resending":"Resend verification code"}</button>
   </form>}
-  {!otp&&<><div className="auth-divider"><span>or continue with</span></div><button type="button" className="button google-button" onClick={google} disabled={busy}>{googleMark}<span>Continue with Google</span></button></>}
+  {!otp&&<><div className="auth-divider"><span>or continue with</span></div><button type="button" className="button google-button" onClick={google} disabled={busy||(mode==="signup"&&!termsAccepted)}>{googleMark}<span>Continue with Google</span></button></>}
   {message&&<p role="status" aria-live="polite" className={message.toLowerCase().includes("sent")?"auth-notice":"error"}>{message}</p>}
   <p className="auth-foot">{mode==="login"?"New to SubnetLab? ":"Already have an account? "}<Link className="auth-switch" href={mode==="login"?`/signup?next=${encodeURIComponent(nextPath)}`:`/login?next=${encodeURIComponent(nextPath)}`}>{mode==="login"?"Create account":"Sign in"}</Link></p>
  </section></main>;
