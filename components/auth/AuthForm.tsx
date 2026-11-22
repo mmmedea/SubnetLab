@@ -9,7 +9,7 @@ const googleMark = <svg aria-hidden="true" viewBox="0 0 48 48" width="20" height
 
 function safeNext(value?:string){if(!value||!value.startsWith("/")||value.startsWith("//")||value.includes("\\"))return "/dashboard";const path=value.split("?")[0];return ["/dashboard","/planner","/ipam","/practice","/progress","/settings"].some(p=>path===p||path.startsWith(p+"/"))?value:"/dashboard";}
 
-export default function AuthForm({mode,searchParams}:{mode:"login"|"signup";searchParams:Promise<{next?:string;error?:string;reason?:string}>}){
+export default function AuthForm({mode,searchParams}:{mode:"login"|"signup";searchParams:{next?:string;error?:string;reason?:string}}){
  const router=useRouter();
  const[email,setEmail]=useState("");
  const[username,setUsername]=useState("");
@@ -24,7 +24,7 @@ export default function AuthForm({mode,searchParams}:{mode:"login"|"signup";sear
  const[resendWait,setResendWait]=useState(false);
  const passwordRules={length:password.length>=10,upper:/[A-Z]/.test(password),lower:/[a-z]/.test(password),number:/[0-9]/.test(password),symbol:/[^A-Za-z0-9]/.test(password)};
  const passwordValid=Object.values(passwordRules).every(Boolean);
- useEffect(()=>{let active=true;searchParams.then(p=>{if(!active)return;setNextPath(safeNext(p.next));if(p.error==="auth_unavailable")setMessage("Authentication is temporarily unavailable. Supabase configuration could not be loaded.");else if(p.error==="oauth_callback")setMessage(p.reason?`Google sign-in could not finish: ${p.reason}`:"Google sign-in did not complete. Check the Google provider and allowed callback URLs in Supabase.");});return()=>{active=false};},[searchParams]);
+ useEffect(()=>{setNextPath(safeNext(searchParams.next));if(searchParams.error==="auth_unavailable")setMessage("Authentication is temporarily unavailable. Supabase configuration could not be loaded.");else if(searchParams.error==="oauth_callback")setMessage(searchParams.reason?`Google sign-in could not finish: ${searchParams.reason}`:"Google sign-in did not complete. Check the Google provider and allowed callback URLs in Supabase.");},[searchParams.next,searchParams.error,searchParams.reason]);
 
  async function submit(e:React.FormEvent){
   e.preventDefault();setBusy(true);setMessage("");
