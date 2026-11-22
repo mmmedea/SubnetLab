@@ -45,20 +45,11 @@ grant all on public.profiles, public.user_preferences to service_role;
 
 do $$
 begin
-  if not exists (select 1 from pg_policies where schemaname='public' and tablename='profiles' and policyname='profiles_select_own') then
-    create policy profiles_select_own on public.profiles for select to authenticated using (auth.uid() = id);
-  end if;
-  if not exists (select 1 from pg_policies where schemaname='public' and tablename='profiles' and policyname='profiles_insert_own') then
-    create policy profiles_insert_own on public.profiles for insert to authenticated with check (auth.uid() = id);
-  end if;
-  if not exists (select 1 from pg_policies where schemaname='public' and tablename='profiles' and policyname='profiles_update_own') then
-    create policy profiles_update_own on public.profiles for update to authenticated using (auth.uid() = id) with check (auth.uid() = id);
-  end if;
   if not exists (select 1 from pg_policies where schemaname='public' and tablename='user_preferences' and policyname='preferences_select_own') then
-    create policy preferences_select_own on public.user_preferences for select to authenticated using (auth.uid() = user_id);
+    create policy preferences_select_own on public.user_preferences for select to authenticated using ((select auth.uid()) = user_id);
   end if;
   if not exists (select 1 from pg_policies where schemaname='public' and tablename='user_preferences' and policyname='preferences_insert_own') then
-    create policy preferences_insert_own on public.user_preferences for insert to authenticated with check (auth.uid() = user_id);
+    create policy preferences_insert_own on public.user_preferences for insert to authenticated with check ((select auth.uid()) = user_id);
   end if;
   if not exists (select 1 from pg_policies where schemaname='public' and tablename='user_preferences' and policyname='preferences_update_own') then
     create policy preferences_update_own on public.user_preferences for update to authenticated using (auth.uid() = user_id) with check (auth.uid() = user_id);
@@ -103,7 +94,7 @@ begin
       nullif(new.raw_user_meta_data->>'avatar_url', ''),
       case
         when nullif(new.raw_user_meta_data->>'terms_accepted_at', '') is not null
-          then (new.raw_user_meta_data->>'terms_accepted_at')::timestamptz
+          then now()
         else null
       end,
       case
