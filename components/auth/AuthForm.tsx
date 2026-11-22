@@ -9,7 +9,7 @@ const googleMark = <svg aria-hidden="true" viewBox="0 0 48 48" width="20" height
 
 function safeNext(value?:string){if(!value||!value.startsWith("/")||value.startsWith("//")||value.includes("\\"))return "/dashboard";const path=value.split("?")[0];return ["/dashboard","/planner","/ipam","/practice","/progress","/settings"].some(p=>path===p||path.startsWith(p+"/"))?value:"/dashboard";}
 
-export default function AuthForm({mode,searchParams}:{mode:"login"|"signup";searchParams:Promise<{next?:string;error?:string}>}){
+export default function AuthForm({mode,searchParams}:{mode:"login"|"signup";searchParams:Promise<{next?:string;error?:string;reason?:string}>}){
  const router=useRouter();
  const[email,setEmail]=useState("");
  const[password,setPassword]=useState("");
@@ -84,6 +84,6 @@ export default function AuthForm({mode,searchParams}:{mode:"login"|"signup";sear
   </form>}
   {!otp&&<><div className="auth-divider"><span>or continue with</span></div><button type="button" className="button google-button" onClick={google} disabled={busy}>{googleMark}<span>Continue with Google</span></button></>}
   {message&&<p role="status" aria-live="polite" className={message.toLowerCase().includes("sent")?"auth-notice":"error"}>{message}</p>}
-  <p className="auth-foot">{mode==="login"?"New to SubnetLab? ":"Already have an account? "}<Link className="auth-switch" href={mode==="login"?"/signup":"/login"}>{mode==="login"?"Create account":"Sign in"}</Link></p>
+  <p className="auth-foot">{mode==="login"?"New to SubnetLab? ":"Already have an account? "}<Link className="auth-switch" href={mode==="login"?`/signup?next=${encodeURIComponent(nextPath)}`:`/login?next=${encodeURIComponent(nextPath)}`}>{mode==="login"?"Create account":"Sign in"}</Link></p>
  </section></main>;
 }
