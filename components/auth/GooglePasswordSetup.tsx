@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import {useEffect,useState} from "react";
+import {useEffect,useMemo,useState} from "react";
 import {useRouter} from "next/navigation";
 import {createClient} from "@/utils/supabase/client";
 
@@ -9,7 +9,7 @@ function safeNext(value:string){if(!value.startsWith("/")||value.startsWith("//"
 const validPassword=(p:string)=>p.length>=10&&/[A-Z]/.test(p)&&/[a-z]/.test(p)&&/[0-9]/.test(p)&&/[^A-Za-z0-9]/.test(p);
 
 export default function GooglePasswordSetup({next}:{next:string}){
- const router=useRouter(),supabase=createClient();
+ const router=useRouter(),supabase=useMemo(()=>createClient(),[]);
  const[email,setEmail]=useState(""),[needsSetup,setNeedsSetup]=useState(false),[loading,setLoading]=useState(true),[password,setPassword]=useState(""),[confirm,setConfirm]=useState(""),[busy,setBusy]=useState(false),[error,setError]=useState("");
  useEffect(()=>{let active=true;(async()=>{const{data:{user},error:userError}=await supabase.auth.getUser();if(userError||!user){router.replace("/login");return;}const{data:profile,error:profileError}=await supabase.from("profiles").select("password_configured_at").eq("id",user.id).maybeSingle();if(profileError){if(active){setError("Could not load your account security status. Please retry.");setLoading(false);}return;}if(active){setEmail(user.email??"");setNeedsSetup(!profile?.password_configured_at);setLoading(false);}})();return()=>{active=false};},[router,supabase]);
  async function submit(e:React.FormEvent){e.preventDefault();setError("");if(!validPassword(password)){setError("Use at least 10 characters with uppercase, lowercase, a number, and a symbol.");return;}if(password!==confirm){setError("Passwords do not match.");return;}setBusy(true);try{if(needsSetup){const{error:updateError}=await supabase.auth.updateUser({password});if(updateError)throw updateError;}else{const{error:loginError}=await supabase.auth.signInWithPassword({email,password});if(loginError)throw new Error("The password is incorrect. Try again or use password recovery.");}router.replace("/verify-phone?next="+encodeURIComponent(safeNext(next)));router.refresh();}catch(err){setError(err instanceof Error?err.message:"Could not verify your SubnetLab password.");}finally{setBusy(false);}}
