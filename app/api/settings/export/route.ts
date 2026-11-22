@@ -6,6 +6,8 @@ export async function GET(request:Request){
  const supabase=await createClient();
  const{data:{user},error:authError}=await supabase.auth.getUser();
  if(authError||!user)return NextResponse.json({error:"Unauthorized"},{status:401});
+ const{data:assurance,error:assuranceError}=await supabase.auth.mfa.getAuthenticatorAssuranceLevel();
+ if(assuranceError||assurance?.currentLevel!=="aal2")return NextResponse.json({error:"Complete phone verification before exporting account data."},{status:403});
  const [profile,prefs,plans,allocations,assignments,attempts,audit]=await Promise.all([
   supabase.from("profiles").select("*").eq("id",user.id).maybeSingle(),
   supabase.from("user_preferences").select("*").eq("user_id",user.id).maybeSingle(),
