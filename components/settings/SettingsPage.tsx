@@ -1,5 +1,5 @@
 "use client";
-import {useMemo,useState} from "react";
+import {useEffect,useMemo,useState} from "react";
 import {createClient} from "@/utils/supabase/client";
 import {useWorkspaceProfile} from "@/components/workspace/UserProfileProvider";
 import {Check,Download,Eye,EyeOff,LoaderCircle,ShieldCheck,Trash2,UserRound,Settings2,CloudUpload} from "lucide-react";
@@ -8,7 +8,7 @@ type Tab="profile"|"security"|"preferences"|"danger";
 const tabs:{id:Tab;label:string;icon:typeof UserRound}[]=[{id:"profile",label:"Profile",icon:UserRound},{id:"security",label:"Account & Security",icon:ShieldCheck},{id:"preferences",label:"Preferences",icon:Settings2},{id:"danger",label:"Danger Zone",icon:Trash2}];
 const defaults={theme:"dark",emailNotifications:true,inAppNotifications:true,defaultNetwork:"IPv4",fontSize:"14",compact:false};
 export default function SettingsPage(){
- const profile=useWorkspaceProfile(),supabase=useMemo(()=>createClient(),[]);
+ const profile=useWorkspaceProfile(),supabase=useMemo(()=>createClient(),[]);\n useEffect(()=>{try{const raw=localStorage.getItem("subnetlab-preferences");if(raw){const parsed=JSON.parse(raw);setPrefs({...defaults,...parsed});}}catch{}},[]);
  const [tab,setTab]=useState<Tab>("profile"),[username,setUsername]=useState(profile.username||""),[displayName,setDisplayName]=useState(profile.displayName||""),[bio,setBio]=useState("");
  const [email,setEmail]=useState(profile.email),[password,setPassword]=useState(""),[confirm,setConfirm]=useState(""),[visible,setVisible]=useState(false);
  const [saving,setSaving]=useState(false),[error,setError]=useState(""),[message,setMessage]=useState(""),[toast,setToast]=useState("");
@@ -21,7 +21,7 @@ export default function SettingsPage(){
  async function updateEmail(){setSaving(true);setError("");const {error}=await supabase.auth.updateUser({email:email.trim()},{emailRedirectTo:location.origin+"/auth/callback?next=%2Fsettings"});setSaving(false);if(error)setError(error.message);else setMessage("Pending verification. Check your new email to confirm the change.");}
  async function updatePassword(){setSaving(true);setError("");const {error}=await supabase.auth.updateUser({password});setSaving(false);if(error)setError(error.message);else{setPassword("");setConfirm("");setMessage("Password updated.");}}
  async function signOutOthers(){setSaving(true);const {error}=await supabase.auth.signOut({scope:"others"});setSaving(false);if(error)setError(error.message);else setMessage("Other sessions signed out.");}
- function pref<K extends keyof typeof defaults>(key:K,value:(typeof defaults)[K]){const next={...prefs,[key]:value};setPrefs(next);try{localStorage.setItem("subnetlab-preferences",JSON.stringify(next));}catch{}notify();}
+ function pref<K extends keyof typeof defaults>(key:K,value:(typeof defaults)[K]){const next={...prefs,[key]:value};setPrefs(next);try{localStorage.setItem("subnetlab-preferences",JSON.stringify(next));document.documentElement.dataset.compact=String(next.compact);document.documentElement.style.setProperty("--settings-mono-size",next.fontSize+"px");}catch{}notify();}
  function exportData(){const blob=new Blob([JSON.stringify({exportedAt:new Date().toISOString(),account:{id:profile.id,email:profile.email,username,displayName,bio},preferences:prefs},null,2)],{type:"application/json"});const url=URL.createObjectURL(blob);const a=document.createElement("a");a.href=url;a.download="subnetlab-account-export.json";a.click();URL.revokeObjectURL(url);}
  return <div className="settings-page">
   <header className="settings-heading"><p className="eyebrow">WORKSPACE / ACCOUNT</p><h1>Settings</h1><p className="lead">Manage your profile, security, and workspace preferences.</p></header>
@@ -33,7 +33,7 @@ export default function SettingsPage(){
      </Card></div>}
     {tab==="security"&&<div className="settings-stack">
      <Card title="Account email" desc="Your email is used for sign-in and account notifications." footer={<><span>Supabase sends a confirmation link to the new address.</span><button className="button primary settings-save" disabled={saving||!email.trim()||email.trim()===profile.email} onClick={updateEmail}>Update Email</button></>}>
-      <Field label="Primary email"><div className="settings-email"><input value={profile.email} readOnly/><span className="settings-pill"><Check size={12}/> Account email</span></div></Field><Field label="Change email"><input type="email" value={email} onChange={e=>setEmail(e.target.value)} placeholder="new@email.com"/></Field>
+      <Field label="Primary email"><div className="settings-email"><input value={profile.email} readOnly/><span className="settings-pill"><Check size={12}/> {(profile as any).emailConfirmed?"Verified":"Unverified"}</span></div></Field><Field label="Change email"><input type="email" value={email} onChange={e=>setEmail(e.target.value)} placeholder="new@email.com"/></Field>
      </Card>
      <Card title="Change password" desc="Use a unique password that you do not use elsewhere." footer={<><span>Meet all five requirements to continue.</span><button className="button primary settings-save" disabled={saving||!rules.every(Boolean)||password!==confirm} onClick={updatePassword}>{saving?"Saving...":"Update Password"}</button></>}>
       <Field label="New password"><div className="settings-password"><input type={visible?"text":"password"} value={password} onChange={e=>setPassword(e.target.value)} placeholder="Enter a strong password"/><button onClick={()=>setVisible(v=>!v)} aria-label="Toggle password visibility">{visible?<EyeOff/>:<Eye/>}</button></div></Field><ul className="settings-rules">{["At least 10 characters","One uppercase letter","One lowercase letter","One number","One special character"].map((s,i)=><li className={rules[i]?"valid":""} key={s}><Check size={13}/>{s}</li>)}</ul><Field label="Confirm new password"><input type="password" value={confirm} onChange={e=>setConfirm(e.target.value)} placeholder="Re-enter new password"/></Field>
@@ -44,7 +44,7 @@ export default function SettingsPage(){
     </div>}
     {tab==="preferences"&&<div className="settings-stack">
      <Card title="Appearance" desc="Choose how the workspace looks on this device." footer={<span>Appearance changes save immediately on this device.</span>}>
-      <Field label="Theme"><select value={prefs.theme} onChange={e=>pref("theme",e.target.value as "dark"|"system"|"light")}><option value="dark">Dark</option><option value="system">Use system setting</option><option value="light">Light (preview)</option></select></Field><Toggle label="Compact mode" desc="Reduce spacing in tables and workspace panels." checked={prefs.compact} change={v=>pref("compact",v)}/>
+      <Field label="Theme"><select value={prefs.theme} onChange={e=>pref("theme",e.target.value as "dark"|"system"|"light")}><option value="dark">Dark</option><option value="system">Use system setting</option></select></Field><Toggle label="Compact mode" desc="Reduce spacing in tables and workspace panels." checked={prefs.compact} change={v=>pref("compact",v)}/>
      </Card>
      <Card title="Workspace defaults" desc="Set defaults for subnetting and address planning." footer={<span>Defaults are stored locally in this browser.</span>}>
       <Field label="Default IP mode"><select value={prefs.defaultNetwork} onChange={e=>pref("defaultNetwork",e.target.value as "IPv4"|"IPv6")}><option>IPv4</option><option>IPv6</option></select></Field><Field label="Monospace font size"><select value={prefs.fontSize} onChange={e=>pref("fontSize",e.target.value as "12"|"13"|"14"|"15"|"16")}><option>12</option><option>13</option><option>14</option><option>15</option><option>16</option></select></Field>
