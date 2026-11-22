@@ -44,8 +44,14 @@ export default function AuthForm({mode,searchParams}:{mode:"login"|"signup";sear
     if(error)throw error;
     await startEmailOtp(supabase);
    }else{
-    const{error}=await supabase.auth.signUp({email:email.trim(),password,options:{emailRedirectTo:`${window.location.origin}/auth/callback?next=${encodeURIComponent(nextPath)}`,data:{username:username.trim().toLowerCase(),terms_accepted_at:new Date().toISOString()}}});
+    const{data,error}=await supabase.auth.signUp({email:email.trim(),password,options:{emailRedirectTo:`${window.location.origin}/auth/callback?next=${encodeURIComponent(nextPath)}`,data:{username:username.trim().toLowerCase(),terms_accepted_at:new Date().toISOString()}}});
     if(error)throw error;
+    if(data.session){
+     const{error:passwordError}=await supabase.auth.signInWithPassword({email:email.trim(),password});
+     if(passwordError)throw passwordError;
+     await startEmailOtp(supabase);
+     return;
+    }
     setCodeDigits(["","","","","",""]);setOtp(true);setMessage("A signup confirmation code has been sent. Check your inbox, including spam.");
    }
   }catch(err){setMessage(err instanceof Error?err.message:"Authentication failed. Please try again.");}
