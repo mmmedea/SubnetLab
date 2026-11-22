@@ -7,7 +7,7 @@ export async function PATCH(request: Request) {
   if (authError || !user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   let body: unknown;
   try { body = await request.json(); } catch { return NextResponse.json({ error: "Invalid JSON" }, { status: 400 }); }
-  if (!body || typeof body !== "object") return NextResponse.json({ error: "Invalid profile" }, { status: 400 });
+  if (!body || typeof body !== "object" || Array.isArray(body)) return NextResponse.json({ error: "Invalid profile" }, { status: 400 });
   const value = body as Record<string, unknown>;
   const username = typeof value.username === "string" ? value.username.trim().toLowerCase() : "";
   const display_name = typeof value.displayName === "string" ? value.displayName.trim() : "";
