@@ -1,19 +1,27 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 410 347" role="img" aria-labelledby="title">
-<title id="title">SubnetLab circuit logo</title>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 520 420" role="img" aria-labelledby="title">
+<title id="title">SubnetLab S circuit logo</title>
 <defs>
- <linearGradient id="ribbon" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#071A49"/><stop offset=".42" stop-color="#2563EB"/><stop offset=".72" stop-color="#00FFFF"/><stop offset="1" stop-color="#2563EB"/></linearGradient>
- <linearGradient id="lower" x1="0" y1="1" x2="1" y2="0"><stop stop-color="#071A49"/><stop offset=".5" stop-color="#2563EB"/><stop offset="1" stop-color="#00FFFF"/></linearGradient>
- <filter id="glow"><feGaussianBlur stdDeviation="5" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+ <linearGradient id="top" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#07183f"/><stop offset=".48" stop-color="#0757c7"/><stop offset="1" stop-color="#16c8f2"/></linearGradient>
+ <linearGradient id="sweep" x1="0" y1="0" x2="1" y2="0"><stop stop-color="#0755d5"/><stop offset=".48" stop-color="#087ee9"/><stop offset=".82" stop-color="#20e5e6"/><stop offset="1" stop-color="#16a9f1"/></linearGradient>
+ <linearGradient id="lower" x1="0" y1="1" x2="1" y2="0"><stop stop-color="#07183f"/><stop offset=".52" stop-color="#0757c7"/><stop offset="1" stop-color="#16c8f2"/></linearGradient>
+ <filter id="glow" x="-100%" y="-100%" width="300%" height="300%"><feGaussianBlur stdDeviation="8" result="blur"/><feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
 </defs>
+<!-- Upper angular circuit stroke -->
+<path d="M344 42H174c-63 0-106 42-106 99s43 95 106 95h185c38 0 62 20 62 53s-25 55-63 55h-76" fill="none" stroke="url(#top)" stroke-width="66" stroke-linecap="butt"/>
+<path d="M344 42H174c-63 0-106 42-106 99s43 95 106 95h185c38 0 62 20 62 53s-25 55-63 55h-76" fill="none" stroke="url(#sweep)" stroke-width="7" stroke-linecap="round" opacity=".9"/>
+<!-- Diagonal upper terminal and lower terminal -->
+<path d="M305 42h113l-79 111H226z" fill="url(#top)"/>
+<path d="M191 276h112l-76 107H113z" fill="#07183f"/>
+<path d="M191 276h112l-76 107H113z" fill="url(#lower)" opacity=".58"/>
+<!-- Inner circuit traces -->
 <g fill="none" stroke-linecap="round" stroke-linejoin="round">
- <path d="M250 24H104C57 24 25 57 25 101s31 74 78 74h195c35 0 57 20 57 49 0 30-23 52-58 52h-73" stroke="url(#ribbon)" stroke-width="61"/>
- <path d="M251 24H104C57 24 25 57 25 101s31 74 78 74h195c35 0 57 20 57 49 0 30-23 52-58 52h-73" stroke="#00FFFF" stroke-width="6" opacity=".65"/>
- <path d="M158 322h45l55-75h-53l-34 46h-30z" fill="#071A49" stroke="#071A49" stroke-width="2"/>
- <path d="M252 24h91l-54 76h-91z" fill="#071A49" stroke="#071A49" stroke-width="2"/>
- <path d="M251 24h91l-54 76h-91z" fill="url(#ribbon)" opacity=".75"/>
- <path d="M111 55h72m-72 0a45 45 0 0 0-45 45m45-45h90m-90 120h55m-55 0a47 47 0 0 1-47-47m244 65a47 47 0 0 1 24 43m-24-43h-68" stroke="#00FFFF" stroke-width="5"/>
- <path d="M265 98l30-42m-17 54 35-49m-56 67 27-38m-96 155-30 42m48-55-30 42m-32-26-18 25" stroke="#2563EB" stroke-width="2" opacity=".8"/>
- <path d="M282 72l-9 13m-9 13-9 13m-84 140-9 12m-9 12-9 12" stroke="#00FFFF" stroke-width="2"/>
+ <path d="M112 82h125a17 17 0 0 1 0 34H161c-31 0-53 22-53 51 0 28 22 49 53 49h65" stroke="#12a9ff" stroke-width="7"/>
+ <path d="M406 262c-3 29-26 48-58 48h-34" stroke="#21e6e8" stroke-width="7"/>
+ <path d="M325 131l43-61m-23 78 42-60m-66 75 37-53m-151 208-36 49m54-64-34 47m-13-23-26 36" stroke="#20b9f4" stroke-width="3" opacity=".8"/>
+ <path d="M341 115l-12 17m-15 5-12 17m-99 130-11 15m-10 12-11 15" stroke="#42e8fa" stroke-width="2"/>
 </g>
-<g fill="#00FFFF" filter="url(#glow)"><circle cx="183" cy="55" r="11"/><circle cx="145" cy="175" r="11"/><circle cx="295" cy="55" r="11"/><circle cx="183" cy="292" r="11"/><circle cx="274" cy="292" r="11"/></g>
+<g fill="#24e9ee" filter="url(#glow)">
+ <circle cx="237" cy="99" r="13"/><circle cx="173" cy="235" r="12"/>
+ <circle cx="360" cy="68" r="14"/><circle cx="238" cy="351" r="13"/><circle cx="337" cy="351" r="13"/>
+</g>
 </svg>
