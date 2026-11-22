@@ -33,11 +33,11 @@ export default function AuthForm({mode,searchParams}:{mode:"login"|"signup";sear
    if(mode==="login"){
     const{error}=await supabase.auth.signInWithPassword({email:email.trim(),password});
     if(error)throw error;
-    router.replace(nextPath);router.refresh();
+    router.replace("/verify-phone?next="+encodeURIComponent(nextPath));router.refresh();
    }else{
     const{data,error}=await supabase.auth.signUp({email:email.trim(),password,options:{emailRedirectTo:`${window.location.origin}/auth/callback?next=${encodeURIComponent(nextPath)}`,data:{username:username.trim().toLowerCase(),terms_accepted_at:new Date().toISOString()}}});
     if(error)throw error;
-    if(data.session){router.replace(nextPath);router.refresh();return;}
+    if(data.session){router.replace("/verify-phone?next="+encodeURIComponent(nextPath));router.refresh();return;}
     setOtp(true);setMessage("A verification code has been sent. Check your inbox, including spam.");
    }
   }catch(err){setMessage(err instanceof Error?err.message:"Authentication failed. Please try again.");}
@@ -48,7 +48,7 @@ export default function AuthForm({mode,searchParams}:{mode:"login"|"signup";sear
   try{
    const{error}=await createClient().auth.verifyOtp({email:email.trim(),token:code,type:"signup"});
    if(error)throw error;
-   router.replace(nextPath);router.refresh();
+   router.replace("/verify-phone?next="+encodeURIComponent(nextPath));router.refresh();
   }catch(err){setMessage(err instanceof Error?err.message:"The code could not be verified. Request a new code and try again.");}
   finally{setBusy(false);}
  }
@@ -61,7 +61,7 @@ export default function AuthForm({mode,searchParams}:{mode:"login"|"signup";sear
  async function google(){
   setBusy(true);setMessage("");
   try{
-   const{data,error}=await createClient().auth.signInWithOAuth({provider:"google",options:{redirectTo:`${window.location.origin}/auth/callback?next=${encodeURIComponent(nextPath)}&terms=1`,queryParams:{prompt:"select_account"},skipBrowserRedirect:true}});
+   const{data,error}=await createClient().auth.signInWithOAuth({provider:"google",options:{redirectTo:`${window.location.origin}/auth/callback?next=${encodeURIComponent(nextPath)}${mode==="signup"?"&terms=1":""}`,queryParams:{prompt:"select_account"},skipBrowserRedirect:true}});
    if(error)throw error;
    if(!data.url)throw new Error("Google did not return an authorization URL. Check that the Google provider is enabled in Supabase.");
    window.location.assign(data.url);
