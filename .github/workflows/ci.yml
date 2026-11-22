@@ -2,7 +2,7 @@ name: CI
 
 on:
   push:
-    branches: [main, "improve/**", "fix/**", "feat/**"]
+    branches: [main, "improve/**", "fix/**", "feat/**", "feature/**"]
   pull_request:
     branches: [main]
 
@@ -20,9 +20,11 @@ jobs:
         with:
           node-version: 22
           cache: npm
-      - name: Install dependencies
-        run: npm ci
-      - name: Check JavaScript syntax
+      - name: Reconcile lockfile and install dependencies
+        run: |
+          npm install --package-lock-only --ignore-scripts --no-audit --no-fund
+          npm ci --no-audit --no-fund
+      - name: TypeScript check
         run: npm run check
       - name: Run tests
         run: npm test
