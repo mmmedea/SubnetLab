@@ -66,7 +66,7 @@ begin
 end $$;
 
 -- Backfill existing Auth users. Consent remains NULL unless signup explicitly supplied it.
-insert into public.profiles (id, username, display_name, avatar_url, terms_accepted_at)
+insert into public.profiles (id, username, display_name, avatar_url, terms_accepted_at, consented_at)
 select
   u.id,
   nullif(coalesce(u.raw_user_meta_data->>'username', u.raw_user_meta_data->>'user_name'), ''),
@@ -105,16 +105,26 @@ begin
         when nullif(new.raw_user_meta_data->>'terms_accepted_at', '') is not null
           then (new.raw_user_meta_data->>'terms_accepted_at')::timestamptz
         else null
+      end,
+      case
+        when nullif(new.raw_user_meta_data->>'terms_accepted_at', '') is not null
+          then (new.raw_user_meta_data->>'terms_accepted_at')::timestamptz
+        else null
       end
     )
     on conflict (id) do nothing;
   exception when unique_violation then
     -- A username collision must not abort Supabase Auth signup.
-    insert into public.profiles (id, display_name, avatar_url, terms_accepted_at)
+    insert into public.profiles (id, display_name, avatar_url, terms_accepted_at, consented_at)
     values (
       new.id,
       nullif(coalesce(new.raw_user_meta_data->>'full_name', new.raw_user_meta_data->>'name'), ''),
       nullif(new.raw_user_meta_data->>'avatar_url', ''),
+      case
+        when nullif(new.raw_user_meta_data->>'terms_accepted_at', '') is not null
+          then (new.raw_user_meta_data->>'terms_accepted_at')::timestamptz
+        else null
+      end,
       case
         when nullif(new.raw_user_meta_data->>'terms_accepted_at', '') is not null
           then (new.raw_user_meta_data->>'terms_accepted_at')::timestamptz
