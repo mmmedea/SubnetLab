@@ -43,7 +43,7 @@ export default function AuthForm({mode,searchParams}:{mode:"login"|"signup";sear
   try{
    const supabase=createClient();
    if(!email.trim()||!password){setMessage("Please enter your email and password.");return;}
-   if(!/^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$/.test(email.trim())){setMessage("Please enter a valid email address.");return;}
+   if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim())){setMessage("Please enter a valid email address.");return;}
    if(mode==="login"){
     const{error}=await supabase.auth.signInWithPassword({email:email.trim(),password});
     if(error)throw error;
