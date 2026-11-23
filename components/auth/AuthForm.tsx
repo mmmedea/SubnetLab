@@ -15,6 +15,7 @@ export default function AuthForm({mode,searchParams}:{mode:"login"|"signup";sear
  const[username,setUsername]=useState("");
  const[termsAccepted,setTermsAccepted]=useState(false);
  const[legalModal,setLegalModal]=useState<"terms"|"privacy"|null>(null);
+ useEffect(()=>{if(!legalModal)return;const onKeyDown=(event:KeyboardEvent)=>{if(event.key==="Escape")setLegalModal(null);};window.addEventListener("keydown",onKeyDown);return()=>window.removeEventListener("keydown",onKeyDown);},[legalModal]);
  const[password,setPassword]=useState("");
  const[confirmPassword,setConfirmPassword]=useState("");
  const[show,setShow]=useState(false);
@@ -71,7 +72,8 @@ export default function AuthForm({mode,searchParams}:{mode:"login"|"signup";sear
     const{error:resendError}=await createClient().auth.resend({type:"signup",email:email.trim()});
     if(!resendError){setOtp(true);setResendSeconds(60);setMessage("Please verify your email before signing in. We have sent a new 6-digit code.");return;}
    }
-   if(raw.includes("invalid login credentials"))setMessage("Invalid email or password.");
+   if(raw.includes("smtp")||raw.includes("email provider")||raw.includes("error sending")||raw.includes("535")||raw.includes("mail send"))setMessage("We could not send your verification code. The email provider rejected delivery. Please contact support or try again later.");
+   else if(raw.includes("invalid login credentials"))setMessage("Invalid email or password.");
    else if(raw.includes("user already registered")||raw.includes("already been registered")||value.code==="user_already_exists")setMessage("An account with this email already exists. Try signing in instead.");
    else if(raw.includes("username")&&(raw.includes("duplicate")||raw.includes("unique")))setMessage("That username is already taken. Try another one.");
    else if(raw.includes("weak password"))setMessage("Password does not meet all security requirements.");
