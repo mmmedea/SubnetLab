@@ -320,3 +320,13 @@ html{--settings-mono-size:14px}.mono,.table td{font-size:var(--settings-mono-siz
 .settings-modal>p{margin:0;color:#a4b6d0;font-size:13px;line-height:1.6}
 .settings-modal-actions{display:flex;justify-content:flex-end;gap:10px;flex-wrap:wrap}
 html[data-theme="light"] .settings-modal{background:#fff}html[data-theme="light"] .settings-modal h2{color:#10213a}html[data-theme="light"] .settings-modal>p{color:#526783}
+
+
+/* Auth form consent and inline validation alignment */
+.auth-card form label.auth-consent{display:flex;align-items:center;justify-content:flex-start;gap:10px;width:100%;margin:0;padding:2px 0;color:#d7e5f8;font-size:12px;font-weight:500;line-height:1.5;text-align:left}
+.auth-card form label.auth-consent input[type="checkbox"]{appearance:auto;-webkit-appearance:checkbox;display:inline-block;flex:0 0 16px;width:16px;height:16px;margin:0;align-self:center;accent-color:#b7ff2a;cursor:pointer}
+.auth-card form label.auth-consent span{display:inline;flex:1;min-width:0;line-height:1.5}
+.auth-card form label.auth-consent a{color:#35e7ff;text-decoration:underline;text-underline-offset:3px}
+.auth-card form label.auth-consent a:focus-visible,.auth-card form label.auth-consent input:focus-visible{outline:2px solid #35e7ff;outline-offset:3px}
+.auth-card .error{display:block;margin:8px 0 0;color:#ff8585;font-size:12px;line-height:1.5}
+.auth-card input[aria-invalid="true"]{border-color:#ff8585}
