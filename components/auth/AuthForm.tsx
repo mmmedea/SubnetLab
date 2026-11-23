@@ -42,7 +42,7 @@ export default function AuthForm({mode,searchParams}:{mode:"login"|"signup";sear
   e.preventDefault();setBusy(true);setMessage("");
   try{
    const supabase=createClient();
-   if(!email.trim()||!password){setMessage("Please enter your email and password.");return;}
+   if(!email.trim()||!password||(mode==="signup"&&(!username.trim()||!confirmPassword))){setMessage("Please enter all required fields.");return;}
    if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim())){setMessage("Please enter a valid email address.");return;}
    if(mode==="login"){
     const{error}=await supabase.auth.signInWithPassword({email:email.trim(),password});
@@ -112,7 +112,7 @@ export default function AuthForm({mode,searchParams}:{mode:"login"|"signup";sear
   <p className="eyebrow">PRIVATE NETWORK WORKSPACE</p>
   <h1>{otp?"Verify your email":mode==="login"?"Welcome back":"Create your account"}</h1>
   <p className="muted">{otp?"Enter the 6-digit code sent to "+email:mode==="login"?"Sign in to continue to your network workspace.":"Create an account to save and manage your network plans."}</p>{otp&&<p className="auth-notice" role="note">If you don’t see the email, check Spam, Junk, Promotions, and All Mail. Confirm that your email address is correct. Delivery may take a few minutes.</p>}
-  {!otp?<form onSubmit={submit}>
+  {!otp?<form noValidate onSubmit={submit}>
    {mode==="signup"&&<label>Username<input className="input" type="text" autoComplete="username" minLength={3} maxLength={20} pattern="[A-Za-z0-9_]{3,20}" required value={username} onChange={e=>setUsername(e.target.value)}/><small className="muted">3–20 characters. Letters, numbers, and underscores only.</small></label>}
    <label>Email address<input className="input" type="email" autoComplete="email" required maxLength={254} value={email} onChange={e=>setEmail(e.target.value)}/></label>
    <label>Password<div className="password-field"><input className="input" type={show?"text":"password"} autoComplete={mode==="login"?"current-password":"new-password"} minLength={mode==="signup"?10:1} maxLength={72} required value={password} onChange={e=>setPassword(e.target.value)}/><button type="button" className="password-toggle" onClick={()=>setShow(v=>!v)} aria-label={show?"Hide password":"Show password"} aria-pressed={show} title={show?"Hide password":"Show password"}>{show?<EyeOff size={18}/>:<Eye size={18}/>}</button></div></label>
