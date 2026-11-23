@@ -15,6 +15,7 @@ export default function AuthForm({mode,searchParams}:{mode:"login"|"signup";sear
  const[username,setUsername]=useState("");
  const[termsAccepted,setTermsAccepted]=useState(false);
  const[password,setPassword]=useState("");
+ const[confirmPassword,setConfirmPassword]=useState("");
  const[show,setShow]=useState(false);
  const[busy,setBusy]=useState(false);
  const[message,setMessage]=useState("");
@@ -27,6 +28,7 @@ export default function AuthForm({mode,searchParams}:{mode:"login"|"signup";sear
   useEffect(()=>{if(resendSeconds<=0)return;const timer=window.setInterval(()=>setResendSeconds(s=>Math.max(0,s-1)),1000);return()=>window.clearInterval(timer);},[resendSeconds]);
  const passwordRules={length:password.length>=10,upper:/[A-Z]/.test(password),lower:/[a-z]/.test(password),number:/[0-9]/.test(password),symbol:/[^A-Za-z0-9]/.test(password)};
  const passwordValid=Object.values(passwordRules).every(Boolean);
+ const usernameValid=/^[A-Za-z0-9_]{3,20}$/.test(username.trim());
  useEffect(()=>{setNextPath(safeNext(searchParams.next));if(searchParams.error==="auth_unavailable")setMessage("Authentication is temporarily unavailable. Supabase configuration could not be loaded.");else if(searchParams.error==="oauth_callback")setMessage(searchParams.reason?`Google sign-in could not finish: ${searchParams.reason}`:"Google sign-in did not complete. Check the Google provider and allowed callback URLs in Supabase.");},[searchParams.next,searchParams.error,searchParams.reason]);
 
  async function startEmailOtp(supabase:ReturnType<typeof createClient>){
@@ -40,11 +42,17 @@ export default function AuthForm({mode,searchParams}:{mode:"login"|"signup";sear
   e.preventDefault();setBusy(true);setMessage("");
   try{
    const supabase=createClient();
+   if(!email.trim()||!password){setMessage("Please enter your email and password.");return;}
+   if(!/^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$/.test(email.trim())){setMessage("Please enter a valid email address.");return;}
    if(mode==="login"){
     const{error}=await supabase.auth.signInWithPassword({email:email.trim(),password});
     if(error)throw error;
     await startEmailOtp(supabase);
    }else{
+    if(!usernameValid){setMessage("Username must be 3–20 characters and use only letters, numbers, or underscores.");return;}
+    if(!passwordValid){setMessage("Password does not meet all security requirements.");return;}
+    if(password!==confirmPassword){setMessage("Passwords do not match.");return;}
+    if(!termsAccepted){setMessage("You must agree to the Terms of Service and Privacy Policy to continue.");return;}
     const{data,error}=await supabase.auth.signUp({email:email.trim(),password,options:{emailRedirectTo:`${window.location.origin}/auth/callback?next=${encodeURIComponent(nextPath)}`,data:{username:username.trim().toLowerCase(),terms_accepted_at:new Date().toISOString()}}});
     if(error)throw error;
     if(data.session){
@@ -91,13 +99,14 @@ export default function AuthForm({mode,searchParams}:{mode:"login"|"signup";sear
   <h1>{otp?"Verify your email":mode==="login"?"Welcome back":"Create your account"}</h1>
   <p className="muted">{otp?"Enter the 6-digit code sent to "+email:mode==="login"?"Sign in to continue to your network workspace.":"Create an account to save and manage your network plans."}</p>{otp&&<p className="auth-notice" role="note">If you don’t see the email, check Spam, Junk, Promotions, and All Mail. Confirm that your email address is correct. Delivery may take a few minutes.</p>}
   {!otp?<form onSubmit={submit}>
-   {mode==="signup"&&<label>Username<input className="input" type="text" autoComplete="username" minLength={3} maxLength={32} pattern="[A-Za-z0-9_]{3,32}" required value={username} onChange={e=>setUsername(e.target.value)}/><small className="muted">3–32 characters. Letters, numbers, and underscores only.</small></label>}
+   {mode==="signup"&&<label>Username<input className="input" type="text" autoComplete="username" minLength={3} maxLength={20} pattern="[A-Za-z0-9_]{3,20}" required value={username} onChange={e=>setUsername(e.target.value)}/><small className="muted">3–20 characters. Letters, numbers, and underscores only.</small></label>}
    <label>Email address<input className="input" type="email" autoComplete="email" required maxLength={254} value={email} onChange={e=>setEmail(e.target.value)}/></label>
    <label>Password<div className="password-field"><input className="input" type={show?"text":"password"} autoComplete={mode==="login"?"current-password":"new-password"} minLength={mode==="signup"?10:1} maxLength={72} required value={password} onChange={e=>setPassword(e.target.value)}/><button type="button" className="password-toggle" onClick={()=>setShow(v=>!v)} aria-label={show?"Hide password":"Show password"} aria-pressed={show} title={show?"Hide password":"Show password"}>{show?<EyeOff size={18}/>:<Eye size={18}/>}</button></div></label>
+   {mode==="signup"&&<label>Confirm password<input className="input" type={show?"text":"password"} autoComplete="new-password" minLength={10} maxLength={72} required value={confirmPassword} onChange={e=>setConfirmPassword(e.target.value)} aria-invalid={confirmPassword.length>0&&confirmPassword!==password}/>{confirmPassword.length>0&&confirmPassword!==password&&<small className="error">Passwords do not match.</small>}</label>}
    {mode==="signup"&&<ul className="password-checklist" aria-live="polite">{[[passwordRules.length,"At least 10 characters"],[passwordRules.upper,"One uppercase letter"],[passwordRules.lower,"One lowercase letter"],[passwordRules.number,"One number"],[passwordRules.symbol,"One symbol"]].map(([valid,label])=><li key={String(label)} data-valid={valid}>{valid?"✓":"○"} {label}</li>)}</ul>}
    {mode==="signup"&&<label className="auth-consent"><input type="checkbox" required checked={termsAccepted} onChange={e=>setTermsAccepted(e.target.checked)}/> <span>I agree to the <Link href="/terms" target="_blank">Terms of Service</Link> and <Link href="/privacy" target="_blank">Privacy Policy</Link>.</span></label>}
    {mode==="login"&&<div className="auth-forgot"><Link href="/forgot-password">Forgot password?</Link></div>}
-   <button className="button primary auth-submit" disabled={busy||(mode==="signup"&&(!passwordValid||!termsAccepted||!/^[a-zA-Z0-9_]{3,32}$/.test(username.trim())))}>{busy?"Please wait…":mode==="login"?"Sign in":"Create account"}<span aria-hidden="true">→</span></button>
+   <button className="button primary auth-submit" disabled={busy||(mode==="signup"&&(!passwordValid||!termsAccepted||!usernameValid))}>{busy?"Please wait…":mode==="login"?"Sign in":"Create account"}<span aria-hidden="true">→</span></button>
   </form>:<form onSubmit={verify}>
    <div><label className="field-label">6-DIGIT VERIFICATION CODE</label><div className="otp-inputs">{Array.from({length:6},(_,i)=><input key={i} ref={el=>{otpInputs.current[i]=el;}} className="input mono" aria-label={"Verification digit "+(i+1)} inputMode="numeric" autoComplete={i===0?"one-time-code":"off"} maxLength={1} required value={codeDigits[i]} onChange={e=>{const digit=e.target.value.replace(/\D/g,"").slice(-1);const next=[...codeDigits];next[i]=digit;setCodeDigits(next);if(digit&&i<5)otpInputs.current[i+1]?.focus();}} onKeyDown={e=>{if(e.key==="Backspace"&&!codeDigits[i]&&i>0)otpInputs.current[i-1]?.focus();}} onPaste={e=>{const digits=e.clipboardData.getData("text").replace(/\D/g,"").slice(0,6);if(!digits)return;e.preventDefault();setCodeDigits([...digits.split(""),..."".padEnd(6-digits.length).split("")]);otpInputs.current[Math.min(digits.length,5)]?.focus();}}/> )}</div></div>
    <button className="button primary auth-submit" disabled={busy||code.length!==6}>{busy?"Verifying…":"Verify email"}<span aria-hidden="true">→</span></button>
