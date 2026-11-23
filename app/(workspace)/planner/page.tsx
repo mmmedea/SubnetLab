@@ -1,0 +1,1 @@
+import Planner from "@/components/planner/Planner";export default function Page(){return <><p className="eyebrow">ADDRESS PLANNING / VLSM</p><h1>Subnet planner</h1><p className="lead">Calculate a network block, allocate segments, and inspect the address boundary.</p><Planner/></>}
