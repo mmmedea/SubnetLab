@@ -312,3 +312,11 @@ html[data-theme="light"] .settings-nav{background:#fff;border-color:#d7e2f0}html
 @media(prefers-color-scheme:light){html[data-theme="system"]{color-scheme:light}html[data-theme="system"] body{background-color:#edf3fb;color:#10213a}html[data-theme="system"] .settings-card{background:#fff;border-color:#d7e2f0}html[data-theme="system"] .settings-card>header h2,html[data-theme="system"] .settings-field,html[data-theme="system"] .settings-toggle-row b{color:#10213a}html[data-theme="system"] .settings-field input,html[data-theme="system"] .settings-field select,html[data-theme="system"] .settings-field textarea{background:#f5f8fd;color:#10213a}}
 
 html{--settings-mono-size:14px}.mono,.table td{font-size:var(--settings-mono-size,14px)}
+
+
+.settings-modal-backdrop{position:fixed;inset:0;z-index:100;display:grid;place-items:center;padding:20px;background:rgba(1,7,18,.76);backdrop-filter:blur(8px)}
+.settings-modal{width:min(100%,480px);display:grid;gap:18px;padding:26px;border:1px solid rgba(255,133,133,.35);border-radius:14px;background:#0c2042;box-shadow:0 24px 80px rgba(0,0,0,.45)}
+.settings-modal h2{margin:0;color:#f4f8ff;font:600 21px/1.25 "Space Grotesk",sans-serif}
+.settings-modal>p{margin:0;color:#a4b6d0;font-size:13px;line-height:1.6}
+.settings-modal-actions{display:flex;justify-content:flex-end;gap:10px;flex-wrap:wrap}
+html[data-theme="light"] .settings-modal{background:#fff}html[data-theme="light"] .settings-modal h2{color:#10213a}html[data-theme="light"] .settings-modal>p{color:#526783}
