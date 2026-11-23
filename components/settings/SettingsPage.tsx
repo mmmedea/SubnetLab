@@ -7,7 +7,7 @@ import {createClient} from "@/utils/supabase/client";
 import {useWorkspaceProfile,useUpdateWorkspaceProfile} from "@/components/workspace/UserProfileProvider";
 import {Check,Download,Eye,EyeOff,ShieldCheck,Trash2,UserRound,Settings2,FileDown,LockKeyhole,History} from "lucide-react";
 
-type Tab="profile"|"security"|"preferences"|"danger";
+type Tab="profile"|"security"|"preferences";
 type AuditEvent={event:string;created_at:string};
 const tabs:{id:Tab;label:string;icon:typeof UserRound}[]=[{id:"profile",label:"Profile",icon:UserRound},{id:"security",label:"Account & Security",icon:ShieldCheck},{id:"preferences",label:"Preferences",icon:Settings2},{id:"danger",label:"Danger Zone",icon:Trash2}];
 
@@ -19,7 +19,7 @@ export default function SettingsPage(){
  const [saving,setSaving]=useState(false),[error,setError]=useState(""),[message,setMessage]=useState(""),[toast,setToast]=useState("");
  const [emailOtpVerified,setEmailOtpVerified]=useState(false),[activity,setActivity]=useState<AuditEvent[]>([]);
  const [prefs,setPrefs]=useState({theme:profile.preferences.theme,emailNotifications:profile.preferences.email_notifications,inAppNotifications:profile.preferences.in_app_notifications,defaultNetwork:profile.preferences.default_ip_version.toUpperCase() as "IPv4"|"IPv6",fontSize:String(profile.preferences.monospace_font_size),compact:profile.preferences.compact_mode});
- const [avatar,setAvatar]=useState(profile.avatarUrl||""),[deleteText,setDeleteText]=useState("");
+ const [avatar,setAvatar]=useState(profile.avatarUrl||""),[deleteText,setDeleteText]=useState(""),[showDeleteModal,setShowDeleteModal]=useState(false);
  const dirty=username!==(profile.username||"")||displayName!==(profile.displayName||"")||bio!==(profile.bio||"");
  const rules=[password.length>=10,/[A-Z]/.test(password),/[a-z]/.test(password),/[0-9]/.test(password),/[^A-Za-z0-9]/.test(password)];
  useEffect(()=>{let active=true;(async()=>{const[{data:verified},{data:events}]=await Promise.all([supabase.rpc("is_email_otp_session_verified"),supabase.from("auth_audit_log").select("event,created_at").eq("user_id",profile.id).order("created_at",{ascending:false}).limit(8)]);if(!active)return;setEmailOtpVerified(Boolean(verified));setActivity(events??[]);})();return()=>{active=false};},[profile.id,supabase]);
@@ -62,6 +62,14 @@ export default function SettingsPage(){
      <Card title="Recent security activity" desc="Recent account events recorded by SubnetLab.">
       {activity.length?activity.map((event,i)=><div className="settings-provider" key={event.created_at+i}><div><b>{event.event.replaceAll("_"," ")}</b><p>{new Date(event.created_at).toLocaleString()}</p></div><History size={16}/></div>):<p className="settings-note">No recent security events have been recorded yet.</p>}
      </Card>
+
+      <Card title="Export account data" desc="Download your profile, preferences, network plans, allocations, IP assignments, practice history, and available security activity." footer={<div className="settings-export-actions"><button className="button settings-button" onClick={()=>void exportData("json")}><Download size={15}/> Export JSON</button><button className="button settings-button" onClick={()=>void exportData("csv")}><FileDown size={15}/> Export CSV</button></div>}>
+       <p className="settings-note">Exports are generated from your authenticated account and only include records your account is allowed to access.</p>
+      </Card>
+      <Card danger title="Delete account" desc="Account deletion is permanent and cannot be undone.">
+       <p className="settings-note">This permanently deletes your Supabase Auth account, profile, preferences, workspace records, and avatar files. You will be asked to confirm this action before deletion.</p><button className="button settings-danger" disabled={saving} onClick={()=>{setDeleteText("");setShowDeleteModal(true);}}><Trash2 size={15}/> Delete account permanently</button>
+      </Card>
+     </d
     </div>}
     {tab==="preferences"&&<div className="settings-stack">
      <Card title="Appearance" desc="Choose how the workspace looks on this device." footer={<span>Appearance changes save immediately to your account.</span>}>
@@ -84,7 +92,7 @@ export default function SettingsPage(){
     </div>}
     {error&&<p className="settings-alert error" role="alert">{error}</p>}{message&&<p className="settings-alert" role="status">{message}</p>}
    </main>
-  </div>{toast&&<div className="settings-toast" role="status">{toast}</div>}
+  </div>{showDeleteModal&&<div className="settings-modal-backdrop" role="presentation" onMouseDown={e=>{if(e.target===e.currentTarget)setShowDeleteModal(false);}}><section className="settings-modal" role="dialog" aria-modal="true" aria-labelledby="delete-account-title"><h2 id="delete-account-title">Delete your account?</h2><p>This action is permanent. Your profile, preferences, workspace records, and avatar files will be deleted. Make sure your email OTP verification is current.</p><Field label="Type DELETE to confirm"><input autoFocus value={deleteText} onChange={e=>setDeleteText(e.target.value)} placeholder="DELETE"/></Field><div className="settings-modal-actions"><button className="button settings-button" disabled={saving} onClick={()=>setShowDeleteModal(false)}>Cancel</button><button className="button settings-danger" disabled={saving||deleteText!=="DELETE"} onClick={()=>void deleteAccount()}>{saving?"Deleting...":"Confirm deletion"}</button></div></section></div>}{toast&&<div className="settings-toast" role="status">{toast}</div>}
  </div>;
 }
 function Card({title,desc,footer,children,danger=false}:{title:string;desc:string;footer?:React.ReactNode;children:React.ReactNode;danger?:boolean}){return <section className={"settings-card"+(danger?" danger-card":"")}><header><h2>{title}</h2><p>{desc}</p></header><div className="settings-card-body">{children}</div>{footer&&<footer>{footer}</footer>}</section>}
