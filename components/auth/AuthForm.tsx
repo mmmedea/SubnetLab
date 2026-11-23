@@ -63,7 +63,21 @@ export default function AuthForm({mode,searchParams}:{mode:"login"|"signup";sear
     }
     setCodeDigits(["","","","","",""]);setOtp(true);setResendSeconds(60);setMessage("A signup confirmation code has been sent. Check your inbox, Spam, Junk, Promotions, and All Mail folders.");
    }
-  }catch(err){setMessage(err instanceof Error?err.message:"Authentication failed. Please try again.");}
+  }catch(err){
+   const value=err as {message?:string;code?:string;status?:number};
+   const raw=(value.message||"").toLowerCase();
+   if(mode==="login"&&(raw.includes("email not confirmed")||value.code==="email_not_confirmed")){
+    const{error:resendError}=await createClient().auth.resend({type:"signup",email:email.trim()});
+    if(!resendError){setOtp(true);setResendSeconds(60);setMessage("Please verify your email before signing in. We have sent a new 6-digit code.");return;}
+   }
+   if(raw.includes("invalid login credentials"))setMessage("Invalid email or password.");
+   else if(raw.includes("user already registered")||raw.includes("already been registered")||value.code==="user_already_exists")setMessage("An account with this email already exists. Try signing in instead.");
+   else if(raw.includes("username")&&(raw.includes("duplicate")||raw.includes("unique")))setMessage("That username is already taken. Try another one.");
+   else if(raw.includes("weak password"))setMessage("Password does not meet all security requirements.");
+   else if(raw.includes("rate limit")||raw.includes("too many requests")||value.status===429)setMessage("Too many sign-in attempts. Please wait a few minutes and try again.");
+   else if(raw.includes("network")||raw.includes("fetch failed"))setMessage("Unable to connect. Please check your internet connection and try again.");
+   else setMessage("Something went wrong on our end. Please try again in a moment.");
+  }
   finally{setBusy(false);}
  }
  async function verify(e:React.FormEvent){
@@ -75,7 +89,7 @@ export default function AuthForm({mode,searchParams}:{mode:"login"|"signup";sear
    const{error:passwordError}=await supabase.auth.signInWithPassword({email:email.trim(),password});
    if(passwordError)throw new Error("Email confirmed, but password sign-in failed. Please return to sign in.");
    await startEmailOtp(supabase);
-  }catch(err){setMessage(err instanceof Error?err.message:"The code could not be verified. Request a new code and try again.");}
+  }catch(err){const raw=(err as {message?:string})?.message?.toLowerCase()||"";setMessage(raw.includes("expired")?"This code has expired. Request a new code to continue.":"Invalid verification code. Please check your email and try again.");}
   finally{setBusy(false);}
  }
  async function resendCode(){
@@ -91,7 +105,7 @@ export default function AuthForm({mode,searchParams}:{mode:"login"|"signup";sear
    if(error)throw error;
    if(!data.url)throw new Error("Google did not return an authorization URL. Check that the Google provider is enabled in Supabase.");
    window.location.assign(data.url);
-  }catch(err){setMessage(err instanceof Error?err.message:"Google sign-in is unavailable. Check the Google provider configuration in Supabase.");setBusy(false);}
+  }catch{setMessage("Google sign-in was canceled or failed. Please try again.");setBusy(false);}
  }
  return <main className="auth-wrap"><section className="auth-card">
   <Link className="brand" href="/" aria-label="SubnetLab home"><img className="brand-mark" src="/logo.svg" alt="" width="36" height="32"/><span className="brand-word">Subnet<span>Lab</span></span></Link>
@@ -114,7 +128,7 @@ export default function AuthForm({mode,searchParams}:{mode:"login"|"signup";sear
    <button type="button" className="auth-resend" disabled={busy||resendSeconds>0} onClick={resendCode}>{resendSeconds>0?`Resend code in 00:${String(resendSeconds).padStart(2,"0")}`:"Resend verification code"}</button>
   </form>}
   {!otp&&<><div className="auth-divider"><span>or continue with</span></div><button type="button" className="button google-button" onClick={google} disabled={busy||(mode==="signup"&&!termsAccepted)}>{googleMark}<span>Continue with Google</span></button></>}
-  {message&&<p role="status" aria-live="polite" className={message.toLowerCase().includes("sent")?"auth-notice":"error"}>{message}</p>}
+  {message&&<p role="status" aria-live="polite" className={message.toLowerCase().includes("sent")?"auth-notice":"error"}>{message}{message==="An account with this email already exists. Try signing in instead."&&<> <Link className="auth-switch" href={`/login?next=${encodeURIComponent(nextPath)}`}>Sign in</Link></>}</p>}
   <p className="auth-foot">{mode==="login"?"New to SubnetLab? ":"Already have an account? "}<Link className="auth-switch" href={mode==="login"?`/signup?next=${encodeURIComponent(nextPath)}`:`/login?next=${encodeURIComponent(nextPath)}`}>{mode==="login"?"Create account":"Sign in"}</Link></p>
  </section></main>;
 }
