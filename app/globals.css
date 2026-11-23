@@ -330,3 +330,14 @@ html[data-theme="light"] .settings-modal{background:#fff}html[data-theme="light"
 .auth-card form label.auth-consent a:focus-visible,.auth-card form label.auth-consent input:focus-visible{outline:2px solid #35e7ff;outline-offset:3px}
 .auth-card .error{display:block;margin:8px 0 0;color:#ff8585;font-size:12px;line-height:1.5}
 .auth-card input[aria-invalid="true"]{border-color:#ff8585}
+
+/* Compact legal document modal on authentication forms */
+.auth-legal-link{display:inline;padding:0;border:0;background:transparent;color:#35e7ff;font:inherit;text-decoration:underline;text-underline-offset:3px;cursor:pointer}
+.auth-legal-link:focus-visible{outline:2px solid #35e7ff;outline-offset:3px;border-radius:3px}
+.auth-legal-backdrop{position:fixed;inset:0;z-index:1000;display:flex;align-items:center;justify-content:center;padding:20px;background:rgba(3,8,18,.78);backdrop-filter:blur(5px)}
+.auth-legal-dialog{display:flex;flex-direction:column;width:min(620px,100%);height:min( min(720px,82dvh), 720px);min-height:300px;overflow:hidden;border:1px solid rgba(148,163,184,.28);border-radius:16px;background:#0b1423;box-shadow:0 24px 80px rgba(0,0,0,.55)}
+.auth-legal-header{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:14px 18px;border-bottom:1px solid rgba(148,163,184,.2)}
+.auth-legal-header h2{margin:0;color:#f1f5f9;font-size:16px;font-weight:700}
+.auth-legal-close{display:grid;place-items:center;width:34px;height:34px;border:1px solid rgba(148,163,184,.3);border-radius:9px;background:transparent;color:#f1f5f9;font-size:24px;line-height:1;cursor:pointer}
+.auth-legal-frame{display:block;flex:1;width:100%;min-height:0;border:0;background:#0b1423}
+@media(max-width:520px){.auth-legal-backdrop{padding:10px}.auth-legal-dialog{height:86dvh;border-radius:12px}}
