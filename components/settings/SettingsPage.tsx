@@ -69,7 +69,6 @@ export default function SettingsPage(){
       <Card danger title="Delete account" desc="Account deletion is permanent and cannot be undone.">
        <p className="settings-note">This permanently deletes your Supabase Auth account, profile, preferences, workspace records, and avatar files. You will be asked to confirm this action before deletion.</p><button className="button settings-danger" disabled={saving} onClick={()=>{setDeleteText("");setShowDeleteModal(true);}}><Trash2 size={15}/> Delete account permanently</button>
       </Card>
-     </d
     </div>}
     {tab==="preferences"&&<div className="settings-stack">
      <Card title="Appearance" desc="Choose how the workspace looks on this device." footer={<span>Appearance changes save immediately to your account.</span>}>
