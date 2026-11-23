@@ -26,7 +26,7 @@ export default function ForgotPasswordPage() {
     setBusy(true);
     setError("");
     setNotice("");
-    if (!/^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$/.test(email.trim())) { setError("Please enter a valid email address."); setBusy(false); return; }
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim())) { setError("Please enter a valid email address."); setBusy(false); return; }
     try {
       const { error: requestError } = await createClient().auth.resetPasswordForEmail(email.trim());
       if (requestError) throw requestError;
