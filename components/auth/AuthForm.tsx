@@ -14,6 +14,7 @@ export default function AuthForm({mode,searchParams}:{mode:"login"|"signup";sear
  const[email,setEmail]=useState("");
  const[username,setUsername]=useState("");
  const[termsAccepted,setTermsAccepted]=useState(false);
+ const[legalModal,setLegalModal]=useState<"terms"|"privacy"|null>(null);
  const[password,setPassword]=useState("");
  const[confirmPassword,setConfirmPassword]=useState("");
  const[show,setShow]=useState(false);
@@ -118,7 +119,7 @@ export default function AuthForm({mode,searchParams}:{mode:"login"|"signup";sear
    <label>Password<div className="password-field"><input className="input" type={show?"text":"password"} autoComplete={mode==="login"?"current-password":"new-password"} minLength={mode==="signup"?10:1} maxLength={72} required value={password} onChange={e=>setPassword(e.target.value)}/><button type="button" className="password-toggle" onClick={()=>setShow(v=>!v)} aria-label={show?"Hide password":"Show password"} aria-pressed={show} title={show?"Hide password":"Show password"}>{show?<EyeOff size={18}/>:<Eye size={18}/>}</button></div></label>
    {mode==="signup"&&<label>Confirm password<input className="input" type={show?"text":"password"} autoComplete="new-password" minLength={10} maxLength={72} required value={confirmPassword} onChange={e=>setConfirmPassword(e.target.value)} aria-invalid={confirmPassword.length>0&&confirmPassword!==password}/>{confirmPassword.length>0&&confirmPassword!==password&&<small className="error">Passwords do not match.</small>}</label>}
    {mode==="signup"&&<ul className="password-checklist" aria-live="polite">{[[passwordRules.length,"At least 10 characters"],[passwordRules.upper,"One uppercase letter"],[passwordRules.lower,"One lowercase letter"],[passwordRules.number,"One number"],[passwordRules.symbol,"One symbol"]].map(([valid,label])=><li key={String(label)} data-valid={valid}>{valid?"✓":"○"} {label}</li>)}</ul>}
-   {mode==="signup"&&<label className="auth-consent"><input type="checkbox" required checked={termsAccepted} onChange={e=>setTermsAccepted(e.target.checked)}/> <span>I agree to the <Link href="/terms" target="_blank">Terms of Service</Link> and <Link href="/privacy" target="_blank">Privacy Policy</Link>.</span></label>}
+   {mode==="signup"&&<label className="auth-consent"><input type="checkbox" required checked={termsAccepted} onChange={e=>setTermsAccepted(e.target.checked)}/> <span>I agree to the <button type="button" className="auth-legal-link" onClick={()=>setLegalModal("terms")}>Terms of Service</button> and <button type="button" className="auth-legal-link" onClick={()=>setLegalModal("privacy")}>Privacy Policy</button>.</span></label>}
    {mode==="login"&&<div className="auth-forgot"><Link href="/forgot-password">Forgot password?</Link></div>}
    <button className="button primary auth-submit" disabled={busy||(mode==="signup"&&(!passwordValid||!termsAccepted||!usernameValid))}>{busy?"Please wait…":mode==="login"?"Sign in":"Create account"}<span aria-hidden="true">→</span></button>
   </form>:<form onSubmit={verify}>
@@ -130,5 +131,6 @@ export default function AuthForm({mode,searchParams}:{mode:"login"|"signup";sear
   {!otp&&<><div className="auth-divider"><span>or continue with</span></div><button type="button" className="button google-button" onClick={google} disabled={busy||(mode==="signup"&&!termsAccepted)}>{googleMark}<span>Continue with Google</span></button></>}
   {message&&<p role="status" aria-live="polite" className={message.toLowerCase().includes("sent")?"auth-notice":"error"}>{message}{message==="An account with this email already exists. Try signing in instead."&&<> <Link className="auth-switch" href={`/login?next=${encodeURIComponent(nextPath)}`}>Sign in</Link></>}</p>}
   <p className="auth-foot">{mode==="login"?"New to SubnetLab? ":"Already have an account? "}<Link className="auth-switch" href={mode==="login"?`/signup?next=${encodeURIComponent(nextPath)}`:`/login?next=${encodeURIComponent(nextPath)}`}>{mode==="login"?"Create account":"Sign in"}</Link></p>
+  {legalModal&&<div className="auth-legal-backdrop" role="presentation" onMouseDown={e=>{if(e.target===e.currentTarget)setLegalModal(null);}}><section className="auth-legal-dialog" role="dialog" aria-modal="true" aria-labelledby="auth-legal-title"><header className="auth-legal-header"><h2 id="auth-legal-title">{legalModal==="terms"?"Terms of Service":"Privacy Policy"}</h2><button type="button" className="auth-legal-close" onClick={()=>setLegalModal(null)} aria-label="Close legal information">×</button></header><iframe className="auth-legal-frame" src={legalModal==="terms"?"/terms":"/privacy"} title={legalModal==="terms"?"Terms of Service":"Privacy Policy"}/></section></div>}
  </section></main>;
 }
