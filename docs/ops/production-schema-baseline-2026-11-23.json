@@ -1,0 +1,1498 @@
+{
+  "columns": [
+    {
+      "type": "uuid",
+      "table": "allocations",
+      "column": "id",
+      "default": "gen_random_uuid()",
+      "nullable": "NO",
+      "position": 1
+    },
+    {
+      "type": "uuid",
+      "table": "allocations",
+      "column": "plan_id",
+      "default": null,
+      "nullable": "NO",
+      "position": 2
+    },
+    {
+      "type": "uuid",
+      "table": "allocations",
+      "column": "user_id",
+      "default": null,
+      "nullable": "NO",
+      "position": 3
+    },
+    {
+      "type": "text",
+      "table": "allocations",
+      "column": "segment",
+      "default": null,
+      "nullable": "NO",
+      "position": 4
+    },
+    {
+      "type": "text",
+      "table": "allocations",
+      "column": "network",
+      "default": null,
+      "nullable": "NO",
+      "position": 5
+    },
+    {
+      "type": "smallint",
+      "table": "allocations",
+      "column": "prefix",
+      "default": null,
+      "nullable": "NO",
+      "position": 6
+    },
+    {
+      "type": "numeric",
+      "table": "allocations",
+      "column": "hosts",
+      "default": null,
+      "nullable": "NO",
+      "position": 7
+    },
+    {
+      "type": "numeric",
+      "table": "allocations",
+      "column": "start_num",
+      "default": null,
+      "nullable": "NO",
+      "position": 8
+    },
+    {
+      "type": "numeric",
+      "table": "allocations",
+      "column": "end_num",
+      "default": null,
+      "nullable": "NO",
+      "position": 9
+    },
+    {
+      "type": "text",
+      "table": "allocations",
+      "column": "notes",
+      "default": "''::text",
+      "nullable": "NO",
+      "position": 10
+    },
+    {
+      "type": "text",
+      "table": "api_rate_limits",
+      "column": "key_hash",
+      "default": null,
+      "nullable": "NO",
+      "position": 1
+    },
+    {
+      "type": "timestamp with time zone",
+      "table": "api_rate_limits",
+      "column": "window_started_at",
+      "default": null,
+      "nullable": "NO",
+      "position": 2
+    },
+    {
+      "type": "integer",
+      "table": "api_rate_limits",
+      "column": "request_count",
+      "default": null,
+      "nullable": "NO",
+      "position": 3
+    },
+    {
+      "type": "timestamp with time zone",
+      "table": "api_rate_limits",
+      "column": "expires_at",
+      "default": null,
+      "nullable": "NO",
+      "position": 4
+    },
+    {
+      "type": "bigint",
+      "table": "attempts",
+      "column": "id",
+      "default": null,
+      "nullable": "NO",
+      "position": 1
+    },
+    {
+      "type": "bigint",
+      "table": "attempts",
+      "column": "user_id",
+      "default": null,
+      "nullable": "NO",
+      "position": 2
+    },
+    {
+      "type": "uuid",
+      "table": "attempts",
+      "column": "question_id",
+      "default": null,
+      "nullable": "NO",
+      "position": 3
+    },
+    {
+      "type": "text",
+      "table": "attempts",
+      "column": "topic",
+      "default": null,
+      "nullable": "NO",
+      "position": 4
+    },
+    {
+      "type": "text",
+      "table": "attempts",
+      "column": "difficulty",
+      "default": null,
+      "nullable": "NO",
+      "position": 5
+    },
+    {
+      "type": "boolean",
+      "table": "attempts",
+      "column": "correct",
+      "default": null,
+      "nullable": "NO",
+      "position": 6
+    },
+    {
+      "type": "timestamp with time zone",
+      "table": "attempts",
+      "column": "created_at",
+      "default": "now()",
+      "nullable": "NO",
+      "position": 7
+    },
+    {
+      "type": "bigint",
+      "table": "auth_audit_log",
+      "column": "id",
+      "default": null,
+      "nullable": "NO",
+      "position": 1
+    },
+    {
+      "type": "text",
+      "table": "auth_audit_log",
+      "column": "event",
+      "default": null,
+      "nullable": "NO",
+      "position": 2
+    },
+    {
+      "type": "uuid",
+      "table": "auth_audit_log",
+      "column": "user_id",
+      "default": null,
+      "nullable": "YES",
+      "position": 3
+    },
+    {
+      "type": "text",
+      "table": "auth_audit_log",
+      "column": "ip_hash",
+      "default": null,
+      "nullable": "YES",
+      "position": 4
+    },
+    {
+      "type": "timestamp with time zone",
+      "table": "auth_audit_log",
+      "column": "created_at",
+      "default": "now()",
+      "nullable": "NO",
+      "position": 5
+    },
+    {
+      "type": "uuid",
+      "table": "email_otp_challenges",
+      "column": "id",
+      "default": "gen_random_uuid()",
+      "nullable": "NO",
+      "position": 1
+    },
+    {
+      "type": "uuid",
+      "table": "email_otp_challenges",
+      "column": "user_id",
+      "default": null,
+      "nullable": "NO",
+      "position": 2
+    },
+    {
+      "type": "uuid",
+      "table": "email_otp_challenges",
+      "column": "password_session_id",
+      "default": null,
+      "nullable": "NO",
+      "position": 3
+    },
+    {
+      "type": "timestamp with time zone",
+      "table": "email_otp_challenges",
+      "column": "created_at",
+      "default": "now()",
+      "nullable": "NO",
+      "position": 4
+    },
+    {
+      "type": "timestamp with time zone",
+      "table": "email_otp_challenges",
+      "column": "expires_at",
+      "default": "(now() + '01:00:00'::interval)",
+      "nullable": "NO",
+      "position": 5
+    },
+    {
+      "type": "timestamp with time zone",
+      "table": "email_otp_challenges",
+      "column": "consumed_at",
+      "default": null,
+      "nullable": "YES",
+      "position": 6
+    },
+    {
+      "type": "uuid",
+      "table": "email_otp_verified_sessions",
+      "column": "user_id",
+      "default": null,
+      "nullable": "NO",
+      "position": 1
+    },
+    {
+      "type": "uuid",
+      "table": "email_otp_verified_sessions",
+      "column": "session_id",
+      "default": null,
+      "nullable": "NO",
+      "position": 2
+    },
+    {
+      "type": "timestamp with time zone",
+      "table": "email_otp_verified_sessions",
+      "column": "verified_at",
+      "default": "now()",
+      "nullable": "NO",
+      "position": 3
+    },
+    {
+      "type": "timestamp with time zone",
+      "table": "email_otp_verified_sessions",
+      "column": "expires_at",
+      "default": "(now() + '12:00:00'::interval)",
+      "nullable": "NO",
+      "position": 4
+    },
+    {
+      "type": "uuid",
+      "table": "ip_assignments",
+      "column": "id",
+      "default": "gen_random_uuid()",
+      "nullable": "NO",
+      "position": 1
+    },
+    {
+      "type": "uuid",
+      "table": "ip_assignments",
+      "column": "user_id",
+      "default": null,
+      "nullable": "NO",
+      "position": 2
+    },
+    {
+      "type": "uuid",
+      "table": "ip_assignments",
+      "column": "plan_id",
+      "default": null,
+      "nullable": "YES",
+      "position": 3
+    },
+    {
+      "type": "text",
+      "table": "ip_assignments",
+      "column": "address",
+      "default": null,
+      "nullable": "NO",
+      "position": 4
+    },
+    {
+      "type": "text",
+      "table": "ip_assignments",
+      "column": "label",
+      "default": null,
+      "nullable": "NO",
+      "position": 5
+    },
+    {
+      "type": "text",
+      "table": "ip_assignments",
+      "column": "status",
+      "default": null,
+      "nullable": "NO",
+      "position": 6
+    },
+    {
+      "type": "text",
+      "table": "ip_assignments",
+      "column": "notes",
+      "default": "''::text",
+      "nullable": "NO",
+      "position": 7
+    },
+    {
+      "type": "timestamp with time zone",
+      "table": "ip_assignments",
+      "column": "created_at",
+      "default": "now()",
+      "nullable": "NO",
+      "position": 8
+    },
+    {
+      "type": "bigint",
+      "table": "ip_records",
+      "column": "id",
+      "default": null,
+      "nullable": "NO",
+      "position": 1
+    },
+    {
+      "type": "bigint",
+      "table": "ip_records",
+      "column": "user_id",
+      "default": null,
+      "nullable": "NO",
+      "position": 2
+    },
+    {
+      "type": "bigint",
+      "table": "ip_records",
+      "column": "plan_id",
+      "default": null,
+      "nullable": "NO",
+      "position": 3
+    },
+    {
+      "type": "text",
+      "table": "ip_records",
+      "column": "network_cidr",
+      "default": null,
+      "nullable": "NO",
+      "position": 4
+    },
+    {
+      "type": "smallint",
+      "table": "ip_records",
+      "column": "family",
+      "default": null,
+      "nullable": "NO",
+      "position": 5
+    },
+    {
+      "type": "text",
+      "table": "ip_records",
+      "column": "address",
+      "default": null,
+      "nullable": "NO",
+      "position": 6
+    },
+    {
+      "type": "numeric",
+      "table": "ip_records",
+      "column": "address_int",
+      "default": null,
+      "nullable": "NO",
+      "position": 7
+    },
+    {
+      "type": "text",
+      "table": "ip_records",
+      "column": "label",
+      "default": null,
+      "nullable": "NO",
+      "position": 8
+    },
+    {
+      "type": "text",
+      "table": "ip_records",
+      "column": "status",
+      "default": "'active'::text",
+      "nullable": "NO",
+      "position": 9
+    },
+    {
+      "type": "timestamp with time zone",
+      "table": "ip_records",
+      "column": "created_at",
+      "default": "now()",
+      "nullable": "NO",
+      "position": 10
+    },
+    {
+      "type": "timestamp with time zone",
+      "table": "ip_records",
+      "column": "updated_at",
+      "default": "now()",
+      "nullable": "NO",
+      "position": 11
+    },
+    {
+      "type": "uuid",
+      "table": "network_plans",
+      "column": "id",
+      "default": "gen_random_uuid()",
+      "nullable": "NO",
+      "position": 1
+    },
+    {
+      "type": "uuid",
+      "table": "network_plans",
+      "column": "user_id",
+      "default": null,
+      "nullable": "NO",
+      "position": 2
+    },
+    {
+      "type": "text",
+      "table": "network_plans",
+      "column": "name",
+      "default": null,
+      "nullable": "NO",
+      "position": 3
+    },
+    {
+      "type": "text",
+      "table": "network_plans",
+      "column": "cidr",
+      "default": null,
+      "nullable": "NO",
+      "position": 4
+    },
+    {
+      "type": "smallint",
+      "table": "network_plans",
+      "column": "ip_version",
+      "default": null,
+      "nullable": "NO",
+      "position": 5
+    },
+    {
+      "type": "timestamp with time zone",
+      "table": "network_plans",
+      "column": "created_at",
+      "default": "now()",
+      "nullable": "NO",
+      "position": 6
+    },
+    {
+      "type": "timestamp with time zone",
+      "table": "network_plans",
+      "column": "updated_at",
+      "default": "now()",
+      "nullable": "NO",
+      "position": 7
+    },
+    {
+      "type": "bigint",
+      "table": "plans",
+      "column": "id",
+      "default": null,
+      "nullable": "NO",
+      "position": 1
+    },
+    {
+      "type": "bigint",
+      "table": "plans",
+      "column": "user_id",
+      "default": null,
+      "nullable": "NO",
+      "position": 2
+    },
+    {
+      "type": "text",
+      "table": "plans",
+      "column": "name",
+      "default": null,
+      "nullable": "NO",
+      "position": 3
+    },
+    {
+      "type": "smallint",
+      "table": "plans",
+      "column": "family",
+      "default": null,
+      "nullable": "NO",
+      "position": 4
+    },
+    {
+      "type": "text",
+      "table": "plans",
+      "column": "base",
+      "default": null,
+      "nullable": "NO",
+      "position": 5
+    },
+    {
+      "type": "text",
+      "table": "plans",
+      "column": "data_json",
+      "default": null,
+      "nullable": "NO",
+      "position": 6
+    },
+    {
+      "type": "timestamp with time zone",
+      "table": "plans",
+      "column": "created_at",
+      "default": "now()",
+      "nullable": "NO",
+      "position": 7
+    },
+    {
+      "type": "timestamp with time zone",
+      "table": "plans",
+      "column": "updated_at",
+      "default": "now()",
+      "nullable": "NO",
+      "position": 8
+    },
+    {
+      "type": "uuid",
+      "table": "practice_attempts",
+      "column": "id",
+      "default": "gen_random_uuid()",
+      "nullable": "NO",
+      "position": 1
+    },
+    {
+      "type": "uuid",
+      "table": "practice_attempts",
+      "column": "user_id",
+      "default": null,
+      "nullable": "NO",
+      "position": 2
+    },
+    {
+      "type": "text",
+      "table": "practice_attempts",
+      "column": "topic",
+      "default": null,
+      "nullable": "NO",
+      "position": 3
+    },
+    {
+      "type": "jsonb",
+      "table": "practice_attempts",
+      "column": "question",
+      "default": null,
+      "nullable": "NO",
+      "position": 4
+    },
+    {
+      "type": "boolean",
+      "table": "practice_attempts",
+      "column": "correct",
+      "default": null,
+      "nullable": "NO",
+      "position": 5
+    },
+    {
+      "type": "integer",
+      "table": "practice_attempts",
+      "column": "time_ms",
+      "default": null,
+      "nullable": "NO",
+      "position": 6
+    },
+    {
+      "type": "timestamp with time zone",
+      "table": "practice_attempts",
+      "column": "created_at",
+      "default": "now()",
+      "nullable": "NO",
+      "position": 7
+    },
+    {
+      "type": "uuid",
+      "table": "practice_questions",
+      "column": "id",
+      "default": null,
+      "nullable": "NO",
+      "position": 1
+    },
+    {
+      "type": "bigint",
+      "table": "practice_questions",
+      "column": "user_id",
+      "default": null,
+      "nullable": "NO",
+      "position": 2
+    },
+    {
+      "type": "text",
+      "table": "practice_questions",
+      "column": "topic",
+      "default": null,
+      "nullable": "NO",
+      "position": 3
+    },
+    {
+      "type": "text",
+      "table": "practice_questions",
+      "column": "difficulty",
+      "default": null,
+      "nullable": "NO",
+      "position": 4
+    },
+    {
+      "type": "text",
+      "table": "practice_questions",
+      "column": "prompt",
+      "default": null,
+      "nullable": "NO",
+      "position": 5
+    },
+    {
+      "type": "text",
+      "table": "practice_questions",
+      "column": "answer",
+      "default": null,
+      "nullable": "NO",
+      "position": 6
+    },
+    {
+      "type": "text",
+      "table": "practice_questions",
+      "column": "explanation",
+      "default": null,
+      "nullable": "NO",
+      "position": 7
+    },
+    {
+      "type": "timestamp with time zone",
+      "table": "practice_questions",
+      "column": "created_at",
+      "default": "now()",
+      "nullable": "NO",
+      "position": 8
+    },
+    {
+      "type": "uuid",
+      "table": "profiles",
+      "column": "id",
+      "default": null,
+      "nullable": "NO",
+      "position": 1
+    },
+    {
+      "type": "text",
+      "table": "profiles",
+      "column": "username",
+      "default": null,
+      "nullable": "YES",
+      "position": 2
+    },
+    {
+      "type": "text",
+      "table": "profiles",
+      "column": "display_name",
+      "default": null,
+      "nullable": "YES",
+      "position": 3
+    },
+    {
+      "type": "text",
+      "table": "profiles",
+      "column": "role",
+      "default": "'student'::text",
+      "nullable": "NO",
+      "position": 4
+    },
+    {
+      "type": "text",
+      "table": "profiles",
+      "column": "terms_version",
+      "default": "'v1'::text",
+      "nullable": "NO",
+      "position": 5
+    },
+    {
+      "type": "text",
+      "table": "profiles",
+      "column": "privacy_version",
+      "default": "'v1'::text",
+      "nullable": "NO",
+      "position": 6
+    },
+    {
+      "type": "timestamp with time zone",
+      "table": "profiles",
+      "column": "consented_at",
+      "default": null,
+      "nullable": "YES",
+      "position": 7
+    },
+    {
+      "type": "text",
+      "table": "profiles",
+      "column": "bio",
+      "default": null,
+      "nullable": "YES",
+      "position": 8
+    },
+    {
+      "type": "text",
+      "table": "profiles",
+      "column": "avatar_url",
+      "default": null,
+      "nullable": "YES",
+      "position": 9
+    },
+    {
+      "type": "timestamp with time zone",
+      "table": "profiles",
+      "column": "terms_accepted_at",
+      "default": null,
+      "nullable": "YES",
+      "position": 10
+    },
+    {
+      "type": "timestamp with time zone",
+      "table": "profiles",
+      "column": "created_at",
+      "default": "now()",
+      "nullable": "NO",
+      "position": 11
+    },
+    {
+      "type": "timestamp with time zone",
+      "table": "profiles",
+      "column": "updated_at",
+      "default": "now()",
+      "nullable": "NO",
+      "position": 12
+    },
+    {
+      "type": "timestamp with time zone",
+      "table": "profiles",
+      "column": "password_configured_at",
+      "default": null,
+      "nullable": "YES",
+      "position": 13
+    },
+    {
+      "type": "bigint",
+      "table": "reservations",
+      "column": "id",
+      "default": null,
+      "nullable": "NO",
+      "position": 1
+    },
+    {
+      "type": "bigint",
+      "table": "reservations",
+      "column": "user_id",
+      "default": null,
+      "nullable": "NO",
+      "position": 2
+    },
+    {
+      "type": "bigint",
+      "table": "reservations",
+      "column": "plan_id",
+      "default": null,
+      "nullable": "NO",
+      "position": 3
+    },
+    {
+      "type": "text",
+      "table": "reservations",
+      "column": "network_cidr",
+      "default": null,
+      "nullable": "NO",
+      "position": 4
+    },
+    {
+      "type": "smallint",
+      "table": "reservations",
+      "column": "family",
+      "default": null,
+      "nullable": "NO",
+      "position": 5
+    },
+    {
+      "type": "text",
+      "table": "reservations",
+      "column": "address",
+      "default": null,
+      "nullable": "NO",
+      "position": 6
+    },
+    {
+      "type": "numeric",
+      "table": "reservations",
+      "column": "address_int",
+      "default": null,
+      "nullable": "NO",
+      "position": 7
+    },
+    {
+      "type": "text",
+      "table": "reservations",
+      "column": "label",
+      "default": null,
+      "nullable": "NO",
+      "position": 8
+    },
+    {
+      "type": "text",
+      "table": "reservations",
+      "column": "mac",
+      "default": null,
+      "nullable": "NO",
+      "position": 9
+    },
+    {
+      "type": "timestamp with time zone",
+      "table": "reservations",
+      "column": "created_at",
+      "default": "now()",
+      "nullable": "NO",
+      "position": 10
+    },
+    {
+      "type": "uuid",
+      "table": "user_preferences",
+      "column": "user_id",
+      "default": null,
+      "nullable": "NO",
+      "position": 1
+    },
+    {
+      "type": "text",
+      "table": "user_preferences",
+      "column": "theme",
+      "default": "'dark'::text",
+      "nullable": "NO",
+      "position": 2
+    },
+    {
+      "type": "boolean",
+      "table": "user_preferences",
+      "column": "email_notifications",
+      "default": "true",
+      "nullable": "NO",
+      "position": 3
+    },
+    {
+      "type": "boolean",
+      "table": "user_preferences",
+      "column": "in_app_notifications",
+      "default": "true",
+      "nullable": "NO",
+      "position": 4
+    },
+    {
+      "type": "boolean",
+      "table": "user_preferences",
+      "column": "compact_mode",
+      "default": "false",
+      "nullable": "NO",
+      "position": 5
+    },
+    {
+      "type": "text",
+      "table": "user_preferences",
+      "column": "default_ip_version",
+      "default": "'ipv4'::text",
+      "nullable": "NO",
+      "position": 6
+    },
+    {
+      "type": "smallint",
+      "table": "user_preferences",
+      "column": "monospace_font_size",
+      "default": "14",
+      "nullable": "NO",
+      "position": 7
+    },
+    {
+      "type": "timestamp with time zone",
+      "table": "user_preferences",
+      "column": "updated_at",
+      "default": "now()",
+      "nullable": "NO",
+      "position": 8
+    },
+    {
+      "type": "bigint",
+      "table": "users",
+      "column": "id",
+      "default": null,
+      "nullable": "NO",
+      "position": 1
+    },
+    {
+      "type": "text",
+      "table": "users",
+      "column": "email",
+      "default": null,
+      "nullable": "NO",
+      "position": 2
+    },
+    {
+      "type": "text",
+      "table": "users",
+      "column": "password_hash",
+      "default": null,
+      "nullable": "NO",
+      "position": 3
+    },
+    {
+      "type": "timestamp with time zone",
+      "table": "users",
+      "column": "created_at",
+      "default": "now()",
+      "nullable": "NO",
+      "position": 4
+    }
+  ],
+  "policies": [
+    {
+      "name": "allocations owner",
+      "check": "((( SELECT auth.uid() AS uid) = user_id) AND ( SELECT is_email_otp_session_verified() AS is_email_otp_session_verified) AND (EXISTS ( SELECT 1\n   FROM profiles p\n  WHERE ((p.id = ( SELECT auth.uid() AS uid)) AND (p.password_configured_at IS NOT NULL)))))",
+      "roles": [
+        "authenticated"
+      ],
+      "table": "allocations",
+      "using": "((( SELECT auth.uid() AS uid) = user_id) AND ( SELECT is_email_otp_session_verified() AS is_email_otp_session_verified) AND (EXISTS ( SELECT 1\n   FROM profiles p\n  WHERE ((p.id = ( SELECT auth.uid() AS uid)) AND (p.password_configured_at IS NOT NULL)))))",
+      "command": "ALL"
+    },
+    {
+      "name": "audit owner insert",
+      "check": "((( SELECT auth.uid() AS uid) = user_id) AND ( SELECT is_email_otp_session_verified() AS is_email_otp_session_verified) AND (EXISTS ( SELECT 1\n   FROM profiles p\n  WHERE ((p.id = ( SELECT auth.uid() AS uid)) AND (p.password_configured_at IS NOT NULL)))))",
+      "roles": [
+        "authenticated"
+      ],
+      "table": "auth_audit_log",
+      "using": null,
+      "command": "INSERT"
+    },
+    {
+      "name": "audit owner read",
+      "check": null,
+      "roles": [
+        "authenticated"
+      ],
+      "table": "auth_audit_log",
+      "using": "((( SELECT auth.uid() AS uid) = user_id) AND ( SELECT is_email_otp_session_verified() AS is_email_otp_session_verified) AND (EXISTS ( SELECT 1\n   FROM profiles p\n  WHERE ((p.id = ( SELECT auth.uid() AS uid)) AND (p.password_configured_at IS NOT NULL)))))",
+      "command": "SELECT"
+    },
+    {
+      "name": "email_otp_challenges_delete_password",
+      "check": null,
+      "roles": [
+        "authenticated"
+      ],
+      "table": "email_otp_challenges",
+      "using": "((user_id = ( SELECT auth.uid() AS uid)) AND (EXISTS ( SELECT 1\n   FROM jsonb_array_elements(COALESCE((( SELECT auth.jwt() AS jwt) -> 'amr'::text), '[]'::jsonb)) a(value)\n  WHERE ((a.value ->> 'method'::text) = 'password'::text))))",
+      "command": "DELETE"
+    },
+    {
+      "name": "email_otp_challenges_insert_password",
+      "check": "((user_id = ( SELECT auth.uid() AS uid)) AND (password_session_id = (NULLIF((( SELECT auth.jwt() AS jwt) ->> 'session_id'::text), ''::text))::uuid) AND (EXISTS ( SELECT 1\n   FROM jsonb_array_elements(COALESCE((( SELECT auth.jwt() AS jwt) -> 'amr'::text), '[]'::jsonb)) a(value)\n  WHERE ((a.value ->> 'method'::text) = 'password'::text))) AND (EXISTS ( SELECT 1\n   FROM profiles p\n  WHERE ((p.id = ( SELECT auth.uid() AS uid)) AND (p.password_configured_at IS NOT NULL)))))",
+      "roles": [
+        "authenticated"
+      ],
+      "table": "email_otp_challenges",
+      "using": null,
+      "command": "INSERT"
+    },
+    {
+      "name": "email_otp_challenges_select_own",
+      "check": null,
+      "roles": [
+        "authenticated"
+      ],
+      "table": "email_otp_challenges",
+      "using": "((user_id = ( SELECT auth.uid() AS uid)) AND (EXISTS ( SELECT 1\n   FROM jsonb_array_elements(COALESCE((( SELECT auth.jwt() AS jwt) -> 'amr'::text), '[]'::jsonb)) a(value)\n  WHERE ((a.value ->> 'method'::text) = ANY (ARRAY['password'::text, 'otp'::text, 'magiclink'::text, 'email/signup'::text])))))",
+      "command": "SELECT"
+    },
+    {
+      "name": "email_otp_challenges_update_otp",
+      "check": "((user_id = ( SELECT auth.uid() AS uid)) AND (consumed_at IS NOT NULL))",
+      "roles": [
+        "authenticated"
+      ],
+      "table": "email_otp_challenges",
+      "using": "((user_id = ( SELECT auth.uid() AS uid)) AND (consumed_at IS NULL) AND (EXISTS ( SELECT 1\n   FROM jsonb_array_elements(COALESCE((( SELECT auth.jwt() AS jwt) -> 'amr'::text), '[]'::jsonb)) a(value)\n  WHERE ((a.value ->> 'method'::text) = ANY (ARRAY['otp'::text, 'magiclink'::text, 'email/signup'::text])))))",
+      "command": "UPDATE"
+    },
+    {
+      "name": "email_otp_verified_sessions_insert_after_challenge",
+      "check": "((user_id = ( SELECT auth.uid() AS uid)) AND (session_id = (NULLIF((( SELECT auth.jwt() AS jwt) ->> 'session_id'::text), ''::text))::uuid) AND (expires_at <= (now() + '12:00:00'::interval)) AND (expires_at > now()) AND (EXISTS ( SELECT 1\n   FROM jsonb_array_elements(COALESCE((( SELECT auth.jwt() AS jwt) -> 'amr'::text), '[]'::jsonb)) a(value)\n  WHERE ((a.value ->> 'method'::text) = ANY (ARRAY['otp'::text, 'magiclink'::text, 'email/signup'::text])))) AND (EXISTS ( SELECT 1\n   FROM email_otp_challenges c\n  WHERE ((c.user_id = ( SELECT auth.uid() AS uid)) AND (c.consumed_at IS NULL) AND (c.expires_at > now()) AND (c.password_session_id <> (NULLIF((( SELECT auth.jwt() AS jwt) ->> 'session_id'::text), ''::text))::uuid)))))",
+      "roles": [
+        "authenticated"
+      ],
+      "table": "email_otp_verified_sessions",
+      "using": null,
+      "command": "INSERT"
+    },
+    {
+      "name": "email_otp_verified_sessions_select_current",
+      "check": null,
+      "roles": [
+        "authenticated"
+      ],
+      "table": "email_otp_verified_sessions",
+      "using": "((user_id = ( SELECT auth.uid() AS uid)) AND (session_id = (NULLIF((( SELECT auth.jwt() AS jwt) ->> 'session_id'::text), ''::text))::uuid) AND (expires_at > now()))",
+      "command": "SELECT"
+    },
+    {
+      "name": "assignments owner",
+      "check": "((( SELECT auth.uid() AS uid) = user_id) AND ( SELECT is_email_otp_session_verified() AS is_email_otp_session_verified) AND (EXISTS ( SELECT 1\n   FROM profiles p\n  WHERE ((p.id = ( SELECT auth.uid() AS uid)) AND (p.password_configured_at IS NOT NULL)))))",
+      "roles": [
+        "authenticated"
+      ],
+      "table": "ip_assignments",
+      "using": "((( SELECT auth.uid() AS uid) = user_id) AND ( SELECT is_email_otp_session_verified() AS is_email_otp_session_verified) AND (EXISTS ( SELECT 1\n   FROM profiles p\n  WHERE ((p.id = ( SELECT auth.uid() AS uid)) AND (p.password_configured_at IS NOT NULL)))))",
+      "command": "ALL"
+    },
+    {
+      "name": "network plans owner",
+      "check": "((( SELECT auth.uid() AS uid) = user_id) AND ( SELECT is_email_otp_session_verified() AS is_email_otp_session_verified) AND (EXISTS ( SELECT 1\n   FROM profiles p\n  WHERE ((p.id = ( SELECT auth.uid() AS uid)) AND (p.password_configured_at IS NOT NULL)))))",
+      "roles": [
+        "authenticated"
+      ],
+      "table": "network_plans",
+      "using": "((( SELECT auth.uid() AS uid) = user_id) AND ( SELECT is_email_otp_session_verified() AS is_email_otp_session_verified) AND (EXISTS ( SELECT 1\n   FROM profiles p\n  WHERE ((p.id = ( SELECT auth.uid() AS uid)) AND (p.password_configured_at IS NOT NULL)))))",
+      "command": "ALL"
+    },
+    {
+      "name": "attempts owner",
+      "check": "((( SELECT auth.uid() AS uid) = user_id) AND ( SELECT is_email_otp_session_verified() AS is_email_otp_session_verified) AND (EXISTS ( SELECT 1\n   FROM profiles p\n  WHERE ((p.id = ( SELECT auth.uid() AS uid)) AND (p.password_configured_at IS NOT NULL)))))",
+      "roles": [
+        "authenticated"
+      ],
+      "table": "practice_attempts",
+      "using": "((( SELECT auth.uid() AS uid) = user_id) AND ( SELECT is_email_otp_session_verified() AS is_email_otp_session_verified) AND (EXISTS ( SELECT 1\n   FROM profiles p\n  WHERE ((p.id = ( SELECT auth.uid() AS uid)) AND (p.password_configured_at IS NOT NULL)))))",
+      "command": "ALL"
+    },
+    {
+      "name": "profiles_insert_own",
+      "check": "(( SELECT auth.uid() AS uid) = id)",
+      "roles": [
+        "authenticated"
+      ],
+      "table": "profiles",
+      "using": null,
+      "command": "INSERT"
+    },
+    {
+      "name": "profiles_select_own",
+      "check": null,
+      "roles": [
+        "authenticated"
+      ],
+      "table": "profiles",
+      "using": "(( SELECT auth.uid() AS uid) = id)",
+      "command": "SELECT"
+    },
+    {
+      "name": "profiles_update_own",
+      "check": "(( SELECT auth.uid() AS uid) = id)",
+      "roles": [
+        "authenticated"
+      ],
+      "table": "profiles",
+      "using": "(( SELECT auth.uid() AS uid) = id)",
+      "command": "UPDATE"
+    },
+    {
+      "name": "preferences_insert_own",
+      "check": "(( SELECT auth.uid() AS uid) = user_id)",
+      "roles": [
+        "authenticated"
+      ],
+      "table": "user_preferences",
+      "using": null,
+      "command": "INSERT"
+    },
+    {
+      "name": "preferences_select_own",
+      "check": null,
+      "roles": [
+        "authenticated"
+      ],
+      "table": "user_preferences",
+      "using": "(( SELECT auth.uid() AS uid) = user_id)",
+      "command": "SELECT"
+    },
+    {
+      "name": "preferences_update_own",
+      "check": "(( SELECT auth.uid() AS uid) = user_id)",
+      "roles": [
+        "authenticated"
+      ],
+      "table": "user_preferences",
+      "using": "(( SELECT auth.uid() AS uid) = user_id)",
+      "command": "UPDATE"
+    }
+  ],
+  "triggers": [
+    {
+      "name": "allocations_plan_owner",
+      "table": "allocations",
+      "definition": "CREATE TRIGGER allocations_plan_owner BEFORE INSERT OR UPDATE ON public.allocations FOR EACH ROW EXECUTE FUNCTION enforce_allocation_plan_owner()"
+    },
+    {
+      "name": "ip_assignments_plan_owner",
+      "table": "ip_assignments",
+      "definition": "CREATE TRIGGER ip_assignments_plan_owner BEFORE INSERT OR UPDATE ON public.ip_assignments FOR EACH ROW EXECUTE FUNCTION enforce_ip_assignment_plan_owner()"
+    }
+  ],
+  "functions": [
+    {
+      "args": "",
+      "name": "begin_email_otp_challenge",
+      "definition": "CREATE OR REPLACE FUNCTION public.begin_email_otp_challenge()\n RETURNS uuid\n LANGUAGE plpgsql\n SET search_path TO ''\nAS $function$\ndeclare v_id uuid;\nbegin\n if (select auth.uid()) is null or nullif((select auth.jwt()->>'session_id'),'') is null then\n  raise exception 'Sign in with your password first.' using errcode='42501';\n end if;\n if not exists(select 1 from jsonb_array_elements(coalesce((select auth.jwt()->'amr'),'[]'::jsonb)) a where a->>'method'='password') then\n  raise exception 'A password sign-in is required before email verification.' using errcode='42501';\n end if;\n if not exists(select 1 from public.profiles p where p.id=(select auth.uid()) and p.password_configured_at is not null) then\n  raise exception 'Set your SubnetLab password first.' using errcode='42501';\n end if;\n delete from public.email_otp_challenges where user_id=(select auth.uid()) and (expires_at<now() or consumed_at is not null);\n insert into public.email_otp_challenges(user_id,password_session_id)\n values((select auth.uid()),nullif((select auth.jwt()->>'session_id'),'')::uuid) returning id into v_id;\n return v_id;\nend;\n$function$\n"
+    },
+    {
+      "args": "p_challenge_id uuid",
+      "name": "complete_email_otp_challenge",
+      "definition": "CREATE OR REPLACE FUNCTION public.complete_email_otp_challenge(p_challenge_id uuid)\n RETURNS boolean\n LANGUAGE plpgsql\n SET search_path TO ''\nAS $function$\ndeclare v_challenge public.email_otp_challenges%rowtype; v_session uuid:=nullif((select auth.jwt()->>'session_id'),'')::uuid;\nbegin\n if (select auth.uid()) is null or v_session is null then raise exception 'Sign in again to verify your email.' using errcode='42501'; end if;\n if not exists(select 1 from jsonb_array_elements(coalesce((select auth.jwt()->'amr'),'[]'::jsonb)) a where a->>'method' in ('otp','magiclink','email/signup')) then\n  raise exception 'The session was not created by an email OTP.' using errcode='42501';\n end if;\n select * into v_challenge from public.email_otp_challenges\n  where id=p_challenge_id and user_id=(select auth.uid()) and consumed_at is null and expires_at>now()\n  for update;\n if not found then raise exception 'This email verification request expired. Send a new code.' using errcode='22023'; end if;\n if v_challenge.password_session_id=v_session then raise exception 'A fresh email verification session is required.' using errcode='42501'; end if;\n insert into public.email_otp_verified_sessions(user_id,session_id,expires_at)\n values((select auth.uid()),v_session,now()+interval '12 hours')\n on conflict(user_id,session_id) do nothing;\n update public.email_otp_challenges set consumed_at=now() where id=p_challenge_id;\n return true;\nend;\n$function$\n"
+    },
+    {
+      "args": "p_key_hash text, p_limit integer, p_window_seconds integer",
+      "name": "consume_api_rate_limit",
+      "definition": "CREATE OR REPLACE FUNCTION public.consume_api_rate_limit(p_key_hash text, p_limit integer, p_window_seconds integer)\n RETURNS jsonb\n LANGUAGE plpgsql\n SECURITY DEFINER\n SET search_path TO ''\nAS $function$\ndeclare\n  v_now timestamptz := pg_catalog.clock_timestamp();\n  v_count integer;\n  v_expires timestamptz;\nbegin\n  if p_key_hash is null or length(p_key_hash) <> 64\n     or p_limit < 1 or p_limit > 100000\n     or p_window_seconds < 1 or p_window_seconds > 86400 then\n    raise exception using errcode = '22023', message = 'Invalid rate limit parameters';\n  end if;\n\n  insert into public.api_rate_limits(key_hash, window_started_at, request_count, expires_at)\n  values (p_key_hash, v_now, 1, v_now + pg_catalog.make_interval(secs => p_window_seconds))\n  on conflict (key_hash) do update\n  set window_started_at = case\n        when public.api_rate_limits.expires_at <= v_now then v_now\n        else public.api_rate_limits.window_started_at end,\n      request_count = case\n        when public.api_rate_limits.expires_at <= v_now then 1\n        else public.api_rate_limits.request_count + 1 end,\n      expires_at = case\n        when public.api_rate_limits.expires_at <= v_now then v_now + pg_catalog.make_interval(secs => p_window_seconds)\n        else public.api_rate_limits.expires_at end\n  returning request_count, expires_at into v_count, v_expires;\n\n  -- Opportunistic bounded cleanup prevents expired keys from accumulating.\n  if mod(extract(epoch from v_now)::bigint, 100) = 0 then\n    delete from public.api_rate_limits\n    where key_hash in (\n      select key_hash from public.api_rate_limits\n      where expires_at < v_now - interval '1 day'\n      order by expires_at\n      limit 500\n    );\n  end if;\n\n  return pg_catalog.jsonb_build_object(\n    'allowed', v_count <= p_limit,\n    'limit', p_limit,\n    'remaining', greatest(p_limit - v_count, 0),\n    'retry_after', case when v_count <= p_limit then 0\n      else greatest(1, ceil(extract(epoch from (v_expires - v_now)))) end,\n    'reset_at', ceil(extract(epoch from v_expires))\n  );\nend;\n$function$\n"
+    },
+    {
+      "args": "",
+      "name": "enforce_allocation_plan_owner",
+      "definition": "CREATE OR REPLACE FUNCTION public.enforce_allocation_plan_owner()\n RETURNS trigger\n LANGUAGE plpgsql\n SET search_path TO ''\nAS $function$\nbegin\n  if not exists (select 1 from public.network_plans p where p.id=new.plan_id and p.user_id=new.user_id) then\n    raise exception 'Allocation plan ownership mismatch' using errcode='42501';\n  end if;\n  return new;\nend;\n$function$\n"
+    },
+    {
+      "args": "",
+      "name": "enforce_ip_assignment_plan_owner",
+      "definition": "CREATE OR REPLACE FUNCTION public.enforce_ip_assignment_plan_owner()\n RETURNS trigger\n LANGUAGE plpgsql\n SET search_path TO ''\nAS $function$\nbegin\n  if new.plan_id is not null and not exists (\n    select 1 from public.network_plans p\n    where p.id=new.plan_id and p.user_id=new.user_id\n  ) then\n    raise exception 'IP assignment plan ownership mismatch' using errcode='42501';\n  end if;\n  return new;\nend;\n$function$\n"
+    },
+    {
+      "args": "",
+      "name": "handle_new_auth_user_settings",
+      "definition": "CREATE OR REPLACE FUNCTION public.handle_new_auth_user_settings()\n RETURNS trigger\n LANGUAGE plpgsql\n SECURITY DEFINER\n SET search_path TO ''\nAS $function$\nbegin\n  insert into public.profiles (id, username, display_name, role, avatar_url)\n  values (\n    new.id,\n    case\n      when coalesce(new.raw_user_meta_data->>'username', new.raw_user_meta_data->>'user_name')\n        ~ '^[A-Za-z0-9_]{3,32}$'\n      then lower(coalesce(new.raw_user_meta_data->>'username', new.raw_user_meta_data->>'user_name'))\n      else null\n    end,\n    nullif(coalesce(new.raw_user_meta_data->>'full_name', new.raw_user_meta_data->>'name'), ''),\n    'student',\n    nullif(new.raw_user_meta_data->>'avatar_url', '')\n  )\n  on conflict (id) do nothing;\n\n  insert into public.user_preferences (user_id)\n  values (new.id)\n  on conflict (user_id) do nothing;\n\n  return new;\nexception\n  when unique_violation then\n    insert into public.profiles (id, display_name, role, avatar_url)\n    values (\n      new.id,\n      nullif(coalesce(new.raw_user_meta_data->>'full_name', new.raw_user_meta_data->>'name'), ''),\n      'student',\n      nullif(new.raw_user_meta_data->>'avatar_url', '')\n    )\n    on conflict (id) do nothing;\n\n    insert into public.user_preferences (user_id)\n    values (new.id)\n    on conflict (user_id) do nothing;\n    return new;\nend;\n$function$\n"
+    },
+    {
+      "args": "",
+      "name": "is_email_otp_session_verified",
+      "definition": "CREATE OR REPLACE FUNCTION public.is_email_otp_session_verified()\n RETURNS boolean\n LANGUAGE sql\n STABLE\n SET search_path TO ''\nAS $function$\n select exists(select 1 from public.email_otp_verified_sessions s\n  where s.user_id=(select auth.uid())\n   and s.session_id=nullif((select auth.jwt()->>'session_id'),'')::uuid\n   and s.expires_at>now());\n$function$\n"
+    },
+    {
+      "args": "p_event text",
+      "name": "record_auth_audit_event",
+      "definition": "CREATE OR REPLACE FUNCTION public.record_auth_audit_event(p_event text)\n RETURNS void\n LANGUAGE plpgsql\n SET search_path TO ''\nAS $function$\ndeclare current_user_id uuid := (select auth.uid());\nbegin\n if current_user_id is null then raise exception 'Authentication required' using errcode='42501'; end if;\n if not (select public.is_email_otp_session_verified()) then raise exception 'Email OTP verification required' using errcode='42501'; end if;\n insert into public.auth_audit_log(event,user_id) values(p_event,current_user_id);\nend;\n$function$\n"
+    },
+    {
+      "args": "p_kind text, p_user_id bigint, p_plan_id bigint, p_network_cidr text, p_family smallint, p_address text, p_address_int numeric, p_label text, p_mac text",
+      "name": "record_ipam",
+      "definition": "CREATE OR REPLACE FUNCTION public.record_ipam(p_kind text, p_user_id bigint, p_plan_id bigint, p_network_cidr text, p_family smallint, p_address text, p_address_int numeric, p_label text, p_mac text DEFAULT NULL::text)\n RETURNS jsonb\n LANGUAGE plpgsql\n SET search_path TO ''\nAS $function$\ndeclare\n  result_row jsonb;\nbegin\n  if p_kind not in ('record','reservation') then\n    raise exception using errcode = '22023', message = 'Invalid IPAM record type';\n  end if;\n  if not exists (select 1 from public.plans where id = p_plan_id and user_id = p_user_id) then\n    raise exception using errcode = '42501', message = 'Plan ownership check failed';\n  end if;\n  perform pg_catalog.pg_advisory_xact_lock(\n    pg_catalog.hashtextextended(p_user_id::text || ':' || p_family::text || ':' || p_address_int::text, 0)\n  );\n  if exists (\n    select 1 from public.ip_records\n    where user_id = p_user_id and family = p_family and address_int = p_address_int and status = 'active'\n    union all\n    select 1 from public.reservations\n    where user_id = p_user_id and family = p_family and address_int = p_address_int\n  ) then\n    raise exception using errcode = '23505', message = 'Address already assigned or reserved';\n  end if;\n  if p_kind = 'record' then\n    insert into public.ip_records(user_id,plan_id,network_cidr,family,address,address_int,label,status)\n    values(p_user_id,p_plan_id,p_network_cidr,p_family,p_address,p_address_int,p_label,'active')\n    returning pg_catalog.to_jsonb(ip_records.*) into result_row;\n  else\n    if p_mac is null or p_mac !~ '^([0-9a-f]{2}:){5}[0-9a-f]{2}$' then\n      raise exception using errcode = '22023', message = 'Invalid MAC address';\n    end if;\n    insert into public.reservations(user_id,plan_id,network_cidr,family,address,address_int,label,mac)\n    values(p_user_id,p_plan_id,p_network_cidr,p_family,p_address,p_address_int,p_label,p_mac)\n    returning pg_catalog.to_jsonb(reservations.*) into result_row;\n  end if;\n  return result_row;\nend;\n$function$\n"
+    },
+    {
+      "args": "p_user_id bigint, p_question_id uuid, p_topic text, p_difficulty text, p_correct boolean",
+      "name": "record_practice_attempt",
+      "definition": "CREATE OR REPLACE FUNCTION public.record_practice_attempt(p_user_id bigint, p_question_id uuid, p_topic text, p_difficulty text, p_correct boolean)\n RETURNS boolean\n LANGUAGE plpgsql\n SET search_path TO ''\nAS $function$\ndeclare\n  question_row public.practice_questions%rowtype;\nbegin\n  select * into question_row from public.practice_questions\n  where id = p_question_id and user_id = p_user_id for update;\n  if not found then\n    raise exception using errcode = 'P0002', message = 'Question not found';\n  end if;\n  if question_row.topic <> p_topic or question_row.difficulty <> p_difficulty then\n    raise exception using errcode = '22023', message = 'Question metadata mismatch';\n  end if;\n  insert into public.attempts(user_id,question_id,topic,difficulty,correct)\n  values(p_user_id,p_question_id,p_topic,p_difficulty,p_correct);\n  delete from public.practice_questions where id = p_question_id and user_id = p_user_id;\n  return true;\nend;\n$function$\n"
+    },
+    {
+      "args": "",
+      "name": "sync_auth_user_consent",
+      "definition": "CREATE OR REPLACE FUNCTION public.sync_auth_user_consent()\n RETURNS trigger\n LANGUAGE plpgsql\n SECURITY DEFINER\n SET search_path TO ''\nAS $function$\nbegin\n  if nullif(new.raw_user_meta_data->>'terms_accepted_at','') is not null\n     and new.raw_user_meta_data->>'terms_accepted_at' is distinct from old.raw_user_meta_data->>'terms_accepted_at' then\n    update public.profiles\n    set terms_accepted_at=now(), consented_at=now(),\n        terms_version='v1', privacy_version='v1', updated_at=now()\n    where id=new.id;\n  end if;\n  return new;\nend;\n$function$\n"
+    },
+    {
+      "args": "",
+      "name": "sync_profile_password_configured",
+      "definition": "CREATE OR REPLACE FUNCTION public.sync_profile_password_configured()\n RETURNS trigger\n LANGUAGE plpgsql\n SECURITY DEFINER\n SET search_path TO ''\nAS $function$\nbegin\n  if coalesce(new.encrypted_password, '') <> '' then\n    update public.profiles\n    set password_configured_at = coalesce(password_configured_at, now())\n    where id = new.id;\n  end if;\n  return new;\nend;\n$function$\n"
+    },
+    {
+      "args": "p_user_id bigint, p_plan_id bigint, p_name text, p_family smallint, p_base text, p_data_json text",
+      "name": "update_plan_guarded",
+      "definition": "CREATE OR REPLACE FUNCTION public.update_plan_guarded(p_user_id bigint, p_plan_id bigint, p_name text, p_family smallint, p_base text, p_data_json text)\n RETURNS jsonb\n LANGUAGE plpgsql\n SET search_path TO ''\nAS $function$\ndeclare\n  plan_row public.plans%rowtype;\nbegin\n  select * into plan_row from public.plans\n  where id = p_plan_id and user_id = p_user_id\n  for update;\n  if not found then\n    raise exception using errcode = 'P0002', message = 'Plan not found';\n  end if;\n  if exists (select 1 from public.ip_records where user_id=p_user_id and plan_id=p_plan_id)\n     or exists (select 1 from public.reservations where user_id=p_user_id and plan_id=p_plan_id) then\n    if plan_row.family <> p_family\n       or (plan_row.data_json::jsonb -> 'allocations') is distinct from (p_data_json::jsonb -> 'allocations') then\n      raise exception using errcode = '23514', message = 'Plan changes would invalidate existing IPAM allocations';\n    end if;\n  end if;\n  update public.plans\n  set name=p_name, family=p_family, base=p_base, data_json=p_data_json, updated_at=pg_catalog.now()\n  where id=p_plan_id and user_id=p_user_id\n  returning * into plan_row;\n  return pg_catalog.to_jsonb(plan_row);\nend;\n$function$\n"
+    }
+  ],
+  "captured_at": "2026-11-23T11:56:53.328949+00:00",
+  "constraints": [
+    {
+      "name": "allocations_check",
+      "table": "allocations",
+      "definition": "CHECK ((start_num <= end_num))"
+    },
+    {
+      "name": "allocations_hosts_check",
+      "table": "allocations",
+      "definition": "CHECK ((hosts >= (0)::numeric))"
+    },
+    {
+      "name": "allocations_pkey",
+      "table": "allocations",
+      "definition": "PRIMARY KEY (id)"
+    },
+    {
+      "name": "allocations_plan_id_fkey",
+      "table": "allocations",
+      "definition": "FOREIGN KEY (plan_id) REFERENCES network_plans(id) ON DELETE CASCADE"
+    },
+    {
+      "name": "allocations_plan_id_numrange_excl",
+      "table": "allocations",
+      "definition": "EXCLUDE USING gist (plan_id WITH =, numrange(start_num, end_num, '[]'::text) WITH &&)"
+    },
+    {
+      "name": "allocations_prefix_check",
+      "table": "allocations",
+      "definition": "CHECK (((prefix >= 0) AND (prefix <= 128)))"
+    },
+    {
+      "name": "allocations_user_id_fkey",
+      "table": "allocations",
+      "definition": "FOREIGN KEY (user_id) REFERENCES auth.users(id) ON DELETE CASCADE"
+    },
+    {
+      "name": "api_rate_limits_pkey",
+      "table": "api_rate_limits",
+      "definition": "PRIMARY KEY (key_hash)"
+    },
+    {
+      "name": "api_rate_limits_request_count_check",
+      "table": "api_rate_limits",
+      "definition": "CHECK ((request_count > 0))"
+    },
+    {
+      "name": "attempts_pkey",
+      "table": "attempts",
+      "definition": "PRIMARY KEY (id)"
+    },
+    {
+      "name": "attempts_user_id_fkey",
+      "table": "attempts",
+      "definition": "FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE"
+    },
+    {
+      "name": "auth_audit_log_event_check",
+      "table": "auth_audit_log",
+      "definition": "CHECK ((event = ANY (ARRAY['password_login'::text, 'google_oauth_login'::text, 'signup_verified'::text, 'phone_mfa_verified'::text, 'email_otp_verified'::text, 'profile_updated'::text, 'avatar_updated'::text, 'preferences_updated'::text, 'password_changed'::text, 'email_change_requested'::text, 'email_changed'::text, 'other_sessions_signed_out'::text, 'account_exported'::text, 'account_deletion_requested'::text])))"
+    },
+    {
+      "name": "auth_audit_log_pkey",
+      "table": "auth_audit_log",
+      "definition": "PRIMARY KEY (id)"
+    },
+    {
+      "name": "auth_audit_log_user_id_fkey",
+      "table": "auth_audit_log",
+      "definition": "FOREIGN KEY (user_id) REFERENCES auth.users(id) ON DELETE SET NULL"
+    },
+    {
+      "name": "email_otp_challenges_pkey",
+      "table": "email_otp_challenges",
+      "definition": "PRIMARY KEY (id)"
+    },
+    {
+      "name": "email_otp_challenges_user_id_fkey",
+      "table": "email_otp_challenges",
+      "definition": "FOREIGN KEY (user_id) REFERENCES auth.users(id) ON DELETE CASCADE"
+    },
+    {
+      "name": "email_otp_verified_sessions_pkey",
+      "table": "email_otp_verified_sessions",
+      "definition": "PRIMARY KEY (user_id, session_id)"
+    },
+    {
+      "name": "email_otp_verified_sessions_user_id_fkey",
+      "table": "email_otp_verified_sessions",
+      "definition": "FOREIGN KEY (user_id) REFERENCES auth.users(id) ON DELETE CASCADE"
+    },
+    {
+      "name": "ip_assignments_pkey",
+      "table": "ip_assignments",
+      "definition": "PRIMARY KEY (id)"
+    },
+    {
+      "name": "ip_assignments_plan_id_fkey",
+      "table": "ip_assignments",
+      "definition": "FOREIGN KEY (plan_id) REFERENCES network_plans(id) ON DELETE SET NULL"
+    },
+    {
+      "name": "ip_assignments_status_check",
+      "table": "ip_assignments",
+      "definition": "CHECK ((status = ANY (ARRAY['assigned'::text, 'reserved'::text, 'available'::text, 'retired'::text])))"
+    },
+    {
+      "name": "ip_assignments_user_id_fkey",
+      "table": "ip_assignments",
+      "definition": "FOREIGN KEY (user_id) REFERENCES auth.users(id) ON DELETE CASCADE"
+    },
+    {
+      "name": "ip_records_family_check",
+      "table": "ip_records",
+      "definition": "CHECK ((family = ANY (ARRAY[4, 6])))"
+    },
+    {
+      "name": "ip_records_pkey",
+      "table": "ip_records",
+      "definition": "PRIMARY KEY (id)"
+    },
+    {
+      "name": "ip_records_plan_id_fkey",
+      "table": "ip_records",
+      "definition": "FOREIGN KEY (plan_id) REFERENCES plans(id) ON DELETE CASCADE"
+    },
+    {
+      "name": "ip_records_status_check",
+      "table": "ip_records",
+      "definition": "CHECK ((status = ANY (ARRAY['active'::text, 'released'::text])))"
+    },
+    {
+      "name": "ip_records_user_id_fkey",
+      "table": "ip_records",
+      "definition": "FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE"
+    },
+    {
+      "name": "network_plans_ip_version_check",
+      "table": "network_plans",
+      "definition": "CHECK ((ip_version = ANY (ARRAY[4, 6])))"
+    },
+    {
+      "name": "network_plans_name_check",
+      "table": "network_plans",
+      "definition": "CHECK (((char_length(name) >= 1) AND (char_length(name) <= 100)))"
+    },
+    {
+      "name": "network_plans_pkey",
+      "table": "network_plans",
+      "definition": "PRIMARY KEY (id)"
+    },
+    {
+      "name": "network_plans_user_id_fkey",
+      "table": "network_plans",
+      "definition": "FOREIGN KEY (user_id) REFERENCES auth.users(id) ON DELETE CASCADE"
+    },
+    {
+      "name": "plans_family_check",
+      "table": "plans",
+      "definition": "CHECK ((family = ANY (ARRAY[4, 6])))"
+    },
+    {
+      "name": "plans_pkey",
+      "table": "plans",
+      "definition": "PRIMARY KEY (id)"
+    },
+    {
+      "name": "plans_user_id_fkey",
+      "table": "plans",
+      "definition": "FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE"
+    },
+    {
+      "name": "practice_attempts_pkey",
+      "table": "practice_attempts",
+      "definition": "PRIMARY KEY (id)"
+    },
+    {
+      "name": "practice_attempts_time_ms_check",
+      "table": "practice_attempts",
+      "definition": "CHECK ((time_ms >= 0))"
+    },
+    {
+      "name": "practice_attempts_user_id_fkey",
+      "table": "practice_attempts",
+      "definition": "FOREIGN KEY (user_id) REFERENCES auth.users(id) ON DELETE CASCADE"
+    },
+    {
+      "name": "practice_questions_pkey",
+      "table": "practice_questions",
+      "definition": "PRIMARY KEY (id)"
+    },
+    {
+      "name": "practice_questions_user_id_fkey",
+      "table": "practice_questions",
+      "definition": "FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE"
+    },
+    {
+      "name": "profiles_id_fkey",
+      "table": "profiles",
+      "definition": "FOREIGN KEY (id) REFERENCES auth.users(id) ON DELETE CASCADE"
+    },
+    {
+      "name": "profiles_pkey",
+      "table": "profiles",
+      "definition": "PRIMARY KEY (id)"
+    },
+    {
+      "name": "profiles_role_check",
+      "table": "profiles",
+      "definition": "CHECK ((role = ANY (ARRAY['student'::text, 'network_admin'::text, 'instructor'::text])))"
+    },
+    {
+      "name": "profiles_username_check",
+      "table": "profiles",
+      "definition": "CHECK (((username IS NULL) OR (username ~ '^[A-Za-z0-9_]{3,32}$'::text)))"
+    },
+    {
+      "name": "profiles_username_key",
+      "table": "profiles",
+      "definition": "UNIQUE (username)"
+    },
+    {
+      "name": "reservations_family_check",
+      "table": "reservations",
+      "definition": "CHECK ((family = ANY (ARRAY[4, 6])))"
+    },
+    {
+      "name": "reservations_pkey",
+      "table": "reservations",
+      "definition": "PRIMARY KEY (id)"
+    },
+    {
+      "name": "reservations_plan_id_fkey",
+      "table": "reservations",
+      "definition": "FOREIGN KEY (plan_id) REFERENCES plans(id) ON DELETE CASCADE"
+    },
+    {
+      "name": "reservations_user_id_fkey",
+      "table": "reservations",
+      "definition": "FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE"
+    },
+    {
+      "name": "user_preferences_default_ip_version_check",
+      "table": "user_preferences",
+      "definition": "CHECK ((default_ip_version = ANY (ARRAY['ipv4'::text, 'ipv6'::text])))"
+    },
+    {
+      "name": "user_preferences_monospace_font_size_check",
+      "table": "user_preferences",
+      "definition": "CHECK (((monospace_font_size >= 12) AND (monospace_font_size <= 18)))"
+    },
+    {
+      "name": "user_preferences_pkey",
+      "table": "user_preferences",
+      "definition": "PRIMARY KEY (user_id)"
+    },
+    {
+      "name": "user_preferences_theme_check",
+      "table": "user_preferences",
+      "definition": "CHECK ((theme = ANY (ARRAY['dark'::text, 'light'::text, 'system'::text])))"
+    },
+    {
+      "name": "user_preferences_user_id_fkey",
+      "table": "user_preferences",
+      "definition": "FOREIGN KEY (user_id) REFERENCES auth.users(id) ON DELETE CASCADE"
+    },
+    {
+      "name": "users_pkey",
+      "table": "users",
+      "definition": "PRIMARY KEY (id)"
+    }
+  ]
+}
