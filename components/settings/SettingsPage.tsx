@@ -7,7 +7,7 @@ import {createClient} from "@/utils/supabase/client";
 import {useWorkspaceProfile,useUpdateWorkspaceProfile} from "@/components/workspace/UserProfileProvider";
 import {Check,Download,Eye,EyeOff,ShieldCheck,Trash2,UserRound,Settings2,FileDown,LockKeyhole,History} from "lucide-react";
 
-type Tab="profile"|"security"|"preferences";
+type Tab="profile"|"security"|"preferences"|"danger";
 type AuditEvent={event:string;created_at:string};
 const tabs:{id:Tab;label:string;icon:typeof UserRound}[]=[{id:"profile",label:"Profile",icon:UserRound},{id:"security",label:"Account & Security",icon:ShieldCheck},{id:"preferences",label:"Preferences",icon:Settings2},{id:"danger",label:"Danger Zone",icon:Trash2}];
 
