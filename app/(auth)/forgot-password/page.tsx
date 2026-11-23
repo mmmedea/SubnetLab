@@ -1,27 +1,79 @@
 "use client";
 
 import Link from "next/link";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 import { createClient } from "@/utils/supabase/client";
 
 export default function ForgotPasswordPage() {
+  const router = useRouter();
   const [email, setEmail] = useState("");
+  const [code, setCode] = useState("");
+  const [step, setStep] = useState<"request" | "verify">("request");
   const [busy, setBusy] = useState(false);
-  const [sent, setSent] = useState(false);
+  const [resendSeconds, setResendSeconds] = useState(0);
   const [error, setError] = useState("");
+  const [notice, setNotice] = useState("");
 
-  async function submit(event: React.FormEvent<HTMLFormElement>) {
+  useEffect(() => {
+    if (resendSeconds <= 0) return;
+    const timer = window.setInterval(() => setResendSeconds(value => Math.max(0, value - 1)), 1000);
+    return () => window.clearInterval(timer);
+  }, [resendSeconds]);
+
+  async function requestCode(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
     setBusy(true);
     setError("");
+    setNotice("");
     try {
-      const { error: requestError } = await createClient().auth.resetPasswordForEmail(email.trim(), {
-        redirectTo: location.origin + "/auth/callback?next=%2Freset-password",
-      });
+      const { error: requestError } = await createClient().auth.resetPasswordForEmail(email.trim());
       if (requestError) throw requestError;
-      setSent(true);
+      setStep("verify");
+      setCode("");
+      setResendSeconds(60);
+      setNotice("If this address is registered, a six-digit password reset code has been sent. Check your inbox and spam folder.");
     } catch (err) {
       setError(err instanceof Error ? err.message : "Could not request a password reset. Please try again.");
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  async function verifyCode(event: React.FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    if (!/^\\d{6}$/.test(code)) return;
+    setBusy(true);
+    setError("");
+    setNotice("");
+    try {
+      const { error: verifyError } = await createClient().auth.verifyOtp({
+        email: email.trim(),
+        token: code,
+        type: "recovery",
+      });
+      if (verifyError) throw verifyError;
+      router.replace("/reset-password");
+      router.refresh();
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "That code could not be verified. Request a new code and try again.");
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  async function resendCode() {
+    setBusy(true);
+    setError("");
+    setNotice("");
+    try {
+      const { error: resendError } = await createClient().auth.resetPasswordForEmail(email.trim());
+      if (resendError) throw resendError;
+      setCode("");
+      setResendSeconds(60);
+      setNotice("A new six-digit password reset code has been sent, if the account exists.");
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Could not resend the reset code.");
     } finally {
       setBusy(false);
     }
@@ -32,18 +84,30 @@ export default function ForgotPasswordPage() {
       <section className="auth-card">
         <Link className="brand" href="/">Subnet<span>Lab</span></Link>
         <p className="eyebrow">ACCOUNT RECOVERY</p>
-        <h1>Reset password</h1>
-        {sent ? (
-          <p className="muted" role="status">If that email is registered, a recovery link has been sent. Check your inbox and spam folder.</p>
-        ) : (
-          <form onSubmit={submit}>
+        <h1>{step === "request" ? "Reset password" : "Enter your reset code"}</h1>
+        <p className="muted">{step === "request"
+          ? "Enter your account email. We’ll send a six-digit code, not a password reset link."
+          : <>Enter the six-digit code sent to <b>{email}</b>. After verification, you can choose a new password.</>}</p>
+        {step === "request" ? (
+          <form onSubmit={requestCode}>
             <label>Email address
               <input className="input" type="email" required autoComplete="email" maxLength={254} value={email} onChange={event => setEmail(event.target.value)} />
             </label>
-            {error && <p className="error" role="alert">{error}</p>}
-            <button className="button primary" disabled={busy}>{busy ? "Sending…" : "Send recovery link"}</button>
+            <button className="button primary" disabled={busy || !email.trim()}>{busy ? "Sending…" : "Send reset code"}</button>
+          </form>
+        ) : (
+          <form onSubmit={verifyCode}>
+            <label>6-digit reset code
+              <input className="input mono" inputMode="numeric" autoComplete="one-time-code" pattern="[0-9]{6}" maxLength={6} required value={code} onChange={event => setCode(event.target.value.replace(/\\D/g, "").slice(0, 6))} />
+            </label>
+            <button className="button primary" disabled={busy || !/^\\d{6}$/.test(code)}>{busy ? "Verifying…" : "Verify code"}</button>
+            <button type="button" className="button secondary-action" disabled={busy || resendSeconds > 0} onClick={() => void resendCode()}>
+              {resendSeconds > 0 ? `Resend code in 00:${String(resendSeconds).padStart(2, "0")}` : "Resend code"}
+            </button>
           </form>
         )}
+        {error && <p className="error" role="alert">{error}</p>}
+        {notice && <p className="auth-notice" role="status">{notice}</p>}
         <p className="auth-foot"><Link className="link" href="/login">Return to sign in</Link></p>
       </section>
     </main>
