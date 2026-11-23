@@ -42,7 +42,7 @@ export default function ForgotPasswordPage() {
 
   async function verifyCode(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    if (!/^\\d{6}$/.test(code)) return;
+    if (!/^\d{6}$/.test(code)) return;
     setBusy(true);
     setError("");
     setNotice("");
@@ -98,9 +98,9 @@ export default function ForgotPasswordPage() {
         ) : (
           <form onSubmit={verifyCode}>
             <label>6-digit reset code
-              <input className="input mono" inputMode="numeric" autoComplete="one-time-code" pattern="[0-9]{6}" maxLength={6} required value={code} onChange={event => setCode(event.target.value.replace(/\\D/g, "").slice(0, 6))} />
+              <input className="input mono" inputMode="numeric" autoComplete="one-time-code" pattern="[0-9]{6}" maxLength={6} required value={code} onChange={event => setCode(event.target.value.replace(/\D/g, "").slice(0, 6))} />
             </label>
-            <button className="button primary" disabled={busy || !/^\\d{6}$/.test(code)}>{busy ? "Verifying…" : "Verify code"}</button>
+            <button className="button primary" disabled={busy || !/^\d{6}$/.test(code)}>{busy ? "Verifying…" : "Verify code"}</button>
             <button type="button" className="button secondary-action" disabled={busy || resendSeconds > 0} onClick={() => void resendCode()}>
               {resendSeconds > 0 ? `Resend code in 00:${String(resendSeconds).padStart(2, "0")}` : "Resend code"}
             </button>
