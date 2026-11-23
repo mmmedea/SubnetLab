@@ -9,11 +9,11 @@ import {Check,Download,Eye,EyeOff,ShieldCheck,Trash2,UserRound,Settings2,FileDow
 
 type Tab="profile"|"security"|"preferences"|"danger";
 type AuditEvent={event:string;created_at:string};
-const tabs:{id:Tab;label:string;icon:typeof UserRound}[]=[{id:"profile",label:"Profile",icon:UserRound},{id:"security",label:"Account & Security",icon:ShieldCheck},{id:"preferences",label:"Preferences",icon:Settings2},{id:"danger",label:"Danger Zone",icon:Trash2}];
+const tabs:{id:Exclude<Tab,"danger">;label:string;icon:typeof UserRound}[]=[{id:"profile",label:"Profile",icon:UserRound},{id:"security",label:"Account & Security",icon:ShieldCheck},{id:"preferences",label:"Preferences",icon:Settings2}];
 
 export default function SettingsPage(){
  const profile=useWorkspaceProfile(),updateWorkspaceProfile=useUpdateWorkspaceProfile(),supabase=useMemo(()=>createClient(),[]),router=useRouter();
- const [tab,setTab]=useState<Tab>("profile"),[username,setUsername]=useState(profile.username||""),[displayName,setDisplayName]=useState(profile.displayName||""),[bio,setBio]=useState(profile.bio||"");
+ const [tab,setTab]=useState<Exclude<Tab,"danger">>("profile"),[username,setUsername]=useState(profile.username||""),[displayName,setDisplayName]=useState(profile.displayName||""),[bio,setBio]=useState(profile.bio||"");
  const [email,setEmail]=useState(profile.email),[emailOtp,setEmailOtp]=useState(""),[emailPending,setEmailPending]=useState(false);
  const [currentPassword,setCurrentPassword]=useState(""),[password,setPassword]=useState(""),[confirm,setConfirm]=useState(""),[visible,setVisible]=useState(false);
  const [saving,setSaving]=useState(false),[error,setError]=useState(""),[message,setMessage]=useState(""),[toast,setToast]=useState("");
@@ -37,7 +37,7 @@ export default function SettingsPage(){
  async function removeAvatar(){setSaving(true);setError("");try{const old=profile.avatarUrl?.split("/avatars/")[1]?.split("?")[0];const{error}=await supabase.from("profiles").upsert({id:profile.id,avatar_url:null,updated_at:new Date().toISOString()});if(error)throw error;if(old)await supabase.storage.from("avatars").remove([decodeURIComponent(old)]);setAvatar("");updateWorkspaceProfile({avatarUrl:null});setMessage("Profile photo removed.");}catch(err){setError(err instanceof Error?err.message:"Could not remove avatar.");}finally{setSaving(false);}}
  async function deleteAccount(){if(deleteText!=="DELETE")return;setSaving(true);setError("");try{const response=await fetch("/api/settings/account",{method:"DELETE",headers:{"Content-Type":"application/json"},body:JSON.stringify({confirmation:"DELETE"})});const result=await response.json();if(!response.ok)throw new Error(result.error||"Account deletion failed.");window.location.assign("/");}catch(err){setError(err instanceof Error?err.message:"Account deletion failed.");setSaving(false);}}
  return <div className="settings-page">
-  <header className="settings-heading"><p className="eyebrow">WORKSPACE / ACCOUNT</p><h1>Settings</h1><p className="lead">Manage your profile, password, email verification, and workspace preferences.</p></header>
+  <header className="settings-heading"><p className="eyebrow">ACCOUNT / SECURITY</p><h1>Settings</h1><p className="lead">Manage your profile, password, email verification, and workspace preferences.</p></header>
   <div className="settings-layout"><nav className="settings-nav" aria-label="Settings sections">{tabs.map(({id,label,icon:Icon})=><button key={id} className={tab===id?"active":""} onClick={()=>{setTab(id);setError("");setMessage("");}}><Icon size={17}/>{label}</button>)}</nav>
    <main className="settings-content">
     {tab==="profile"&&<div className="settings-stack"><Card title="Profile information" desc="Choose how your name and profile appear in SubnetLab." footer={<><span>Changes are saved to your account profile.</span><button className="button primary settings-save" disabled={!dirty||saving} onClick={saveProfile}>{saving?"Saving...":"Save Changes"}</button></>}>
@@ -79,14 +79,6 @@ export default function SettingsPage(){
      </Card>
      <Card title="Notifications" desc="Choose which account updates you want to receive." footer={<span>Notification preferences save instantly.</span>}>
       <Toggle label="Email notifications" desc="Receive important account and security updates." checked={prefs.emailNotifications} change={v=>pref("emailNotifications",v)}/><Toggle label="In-app notifications" desc="Show updates and reminders inside SubnetLab." checked={prefs.inAppNotifications} change={v=>pref("inAppNotifications",v)}/>
-     </Card>
-    </div>}
-    {tab==="danger"&&<div className="settings-stack">
-     <Card title="Export account data" desc="Download your profile, preferences, network plans, allocations, IP assignments, practice history, and available security activity." footer={<div className="settings-export-actions"><button className="button settings-button" onClick={()=>void exportData("json")}><Download size={15}/> Export JSON</button><button className="button settings-button" onClick={()=>void exportData("csv")}><FileDown size={15}/> Export CSV</button></div>}>
-      <p className="settings-note">Exports are generated from your authenticated account and only include records your account is allowed to access.</p>
-     </Card>
-     <Card danger title="Delete account" desc="Account deletion is permanent and cannot be undone.">
-      <p className="settings-note">This permanently deletes your Supabase Auth account, profile, preferences, workspace records, and avatar files. Confirm that your email OTP is verified and type DELETE.</p><Field label="Confirmation"><input value={deleteText} onChange={e=>setDeleteText(e.target.value)} placeholder="Type DELETE"/></Field><button className="button settings-danger" disabled={saving||deleteText!=="DELETE"} onClick={deleteAccount}><Trash2 size={15}/> {saving?"Deleting...":"Delete account permanently"}</button>
      </Card>
     </div>}
     {error&&<p className="settings-alert error" role="alert">{error}</p>}{message&&<p className="settings-alert" role="status">{message}</p>}
