@@ -27,7 +27,7 @@ export default function ResetPasswordPage() {
       setMessage("Your password has been updated. Redirecting to sign in…");
       window.setTimeout(() => router.replace("/login"), 900);
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Could not update your password. Request a new recovery link.");
+      setError(err instanceof Error ? err.message : "Could not update your password. Return to password recovery and request a new six-digit code.");
     } finally {
       setBusy(false);
     }
@@ -39,7 +39,7 @@ export default function ResetPasswordPage() {
         <Link className="brand" href="/">Subnet<span>Lab</span></Link>
         <p className="eyebrow">ACCOUNT RECOVERY</p>
         <h1>Choose a new password</h1>
-        <p className="muted">Create a strong password for your SubnetLab account.</p>
+        <p className="muted">Your six-digit recovery code has been verified. Create a new password for your SubnetLab account.</p>
         <form onSubmit={submit}>
           <label>New password
             <input className="input" type="password" autoComplete="new-password" minLength={10} maxLength={72} required value={password} onChange={event => setPassword(event.target.value)} />
