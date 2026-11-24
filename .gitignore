@@ -1,6 +1,13 @@
 node_modules/
-.env
 data/*.sqlite*
 *.log
 
 .DS_Store
+
+# Local Vercel configuration
+.vercel/
+
+# Local environment variables
+.env
+.env.*
+!.env.example
