@@ -9,7 +9,7 @@ const googleMark = <svg aria-hidden="true" viewBox="0 0 48 48" width="20" height
 
 function safeNext(value?:string){if(!value||!value.startsWith("/")||value.startsWith("//")||value.includes("\\"))return "/dashboard";const path=value.split("?")[0];return ["/dashboard","/planner","/ipam","/practice","/progress","/settings"].some(p=>path===p||path.startsWith(p+"/"))?value:"/dashboard";}
 
-export default function AuthForm({mode,searchParams}:{mode:"login"|"signup";searchParams:{next?:string;error?:string;reason?:string}}){
+export default function AuthForm({mode,searchParams}:{mode:"login"|"signup";searchParams:{next?:string;error?:string;reason?:string;event?:string}}){
  const router=useRouter();
  const[email,setEmail]=useState("");
  const[username,setUsername]=useState("");
@@ -33,12 +33,12 @@ export default function AuthForm({mode,searchParams}:{mode:"login"|"signup";sear
  const usernameValid=/^[A-Za-z0-9_]{3,20}$/.test(username.trim());
  useEffect(()=>{setNextPath(safeNext(searchParams.next));if(searchParams.error==="auth_unavailable")setMessage("Authentication is temporarily unavailable. Supabase configuration could not be loaded.");else if(searchParams.error==="oauth_callback")setMessage(searchParams.reason?`Google sign-in could not finish: ${searchParams.reason}`:"Google sign-in did not complete. Check the Google provider and allowed callback URLs in Supabase.");},[searchParams.next,searchParams.error,searchParams.reason]);
 
- async function startEmailOtp(supabase:ReturnType<typeof createClient>){
+ async function startEmailOtp(supabase:ReturnType<typeof createClient>,event:"login"|"password_changed"="login"){
   const{data:challengeId,error:challengeError}=await supabase.rpc("begin_email_otp_challenge");
   if(challengeError)throw challengeError;
   const{error:otpError}=await supabase.auth.signInWithOtp({email:email.trim(),options:{shouldCreateUser:false}});
   if(otpError)throw otpError;
-  router.replace("/verify-email?challenge="+encodeURIComponent(challengeId)+"&next="+encodeURIComponent(nextPath));router.refresh();
+  router.replace("/verify-email?challenge="+encodeURIComponent(challengeId)+"&next="+encodeURIComponent(nextPath)+"&event="+event);router.refresh();
  }
  async function submit(e:React.FormEvent){
   e.preventDefault();setBusy(true);setMessage("");
@@ -49,7 +49,7 @@ export default function AuthForm({mode,searchParams}:{mode:"login"|"signup";sear
    if(mode==="login"){
     const{error}=await supabase.auth.signInWithPassword({email:email.trim(),password});
     if(error)throw error;
-    await startEmailOtp(supabase);
+    await startEmailOtp(supabase,searchParams.event==="password_changed"?"password_changed":"login");
    }else{
     if(!usernameValid){setMessage("Username must be 3–20 characters and use only letters, numbers, or underscores.");return;}
     if(!passwordValid){setMessage("Password does not meet all security requirements.");return;}

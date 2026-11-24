@@ -13,7 +13,7 @@ export default function PrivacyPage(){
       <li>Profile information such as display name, biography, and avatar image.</li>
       <li>Workspace content such as saved network plans, VLSM allocations, IP address labels, status, and notes.</li>
       <li>Learning information such as practice answers, correctness, topics, and attempt timestamps.</li>
-      <li>Preferences such as appearance, notifications, and default IP version.</li>
+      <li>Preferences such as appearance, notifications, default IP version, time zone, and language.</li>
     </ul>
     <h2>2. Information processed automatically</h2>
     <p>The hosting, authentication, and database providers may process technical information needed to deliver and secure the service, such as request metadata, security events, and session cookies. Provider logging and retention are governed by their own policies and configuration.</p>

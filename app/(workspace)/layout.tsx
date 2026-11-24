@@ -15,7 +15,7 @@ export default async function WorkspaceLayout({children}:{children:React.ReactNo
   displayName:profile?.display_name??(typeof user.user_metadata?.full_name==="string"?user.user_metadata.full_name:null),
   avatarUrl:profile?.avatar_url??(typeof user.user_metadata?.avatar_url==="string"?user.user_metadata.avatar_url:null),
   bio:profile?.role??null,
-  preferences:{theme:preferences?.theme??"dark",email_notifications:preferences?.email_notifications??true,in_app_notifications:preferences?.in_app_notifications??true,compact_mode:preferences?.compact_mode??false,default_ip_version:preferences?.default_ip_version??"ipv4",monospace_font_size:preferences?.monospace_font_size??14},
+  preferences:{theme:preferences?.theme??"dark",email_notifications:preferences?.email_notifications??true,in_app_notifications:preferences?.in_app_notifications??true,compact_mode:preferences?.compact_mode??false,default_ip_version:preferences?.default_ip_version??"ipv4",monospace_font_size:preferences?.monospace_font_size??14,timezone:preferences?.timezone??"UTC",language:preferences?.language??"en"},
   emailConfirmed:Boolean(user.email_confirmed_at),
   identities:user.identities??[]
  };

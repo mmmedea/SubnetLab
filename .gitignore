@@ -4,8 +4,15 @@ data/*.sqlite*
 
 .DS_Store
 
+# Next.js build output
+.next/
+*.tsbuildinfo
+
 # Local Vercel configuration
 .vercel/
+
+# Local Supabase CLI state
+supabase/.temp/
 
 # Local environment variables
 .env

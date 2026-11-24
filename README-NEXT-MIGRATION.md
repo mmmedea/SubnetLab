@@ -4,7 +4,9 @@ This branch introduces the Next.js App Router workspace while retaining the lega
 
 ## Database status
 
-The Supabase production project has received the additive migrations recorded in `supabase/migrations/` (including schema compatibility, settings/storage, ownership guards, profile column privileges, and consent-trigger hardening):
+Supabase Preview and Production are separate projects. Preview currently contains the latest workspace RLS and Settings migrations, including the password-plus-email-OTP policy correction and security activity/preferences foundation. Before a Production deployment, compare its migration history with `supabase/migrations/` and apply missing migrations in order; keep the Production SMTP configuration in the main Supabase project.
+
+The foundational migrations recorded in `supabase/migrations/` (including schema compatibility, settings/storage, ownership guards, profile column privileges, and consent-trigger hardening):
 - `network_cockpit_auth_compatible`: creates UUID-owned profiles, network plans, VLSM allocations, IP assignments, practice attempts, and an auth audit table.
 - `settings_profiles_preferences_storage`: creates account preferences, profile provisioning for Supabase Auth users, and the avatars bucket.
 
@@ -42,7 +44,7 @@ All new account/workspace tables have RLS enabled and owner-scoped policies. Ano
 
 - Legacy custom-JWT users are not automatically mapped to Supabase Auth users. Existing legacy accounts and data remain intact.
 - Application-owned durable per-IP/per-email auth rate limiting and Turnstile server verification are not implemented. Configure Supabase Auth's own limits and CAPTCHA before public registration.
-- Auth audit writes are wired for successful password/Google sign-in after email OTP, profile/avatar changes, preferences, exports, other-session sign-out, and account deletion.
+- Security activity records cover verified sign-ins, password setup/changes, session revocation, preference changes, and exports. The separate auth audit log continues to record profile/avatar changes and account deletion requests.
 - The current practice set is a small starter question bank; it is not yet an adaptive curriculum.
 - Full IPv6 calculation UI, network tree split/merge, plan sharing, and automated browser/RLS-isolation test coverage remain incomplete.
 - Test actual OTP email delivery, Google sign-in, password recovery, account deletion, and avatar operations against the deployed preview before merging or switching production traffic.

@@ -9,6 +9,8 @@ export type WorkspacePreferences = {
   compact_mode: boolean;
   default_ip_version: "ipv4" | "ipv6";
   monospace_font_size: number;
+  timezone: string;
+  language: string;
 };
 export type WorkspaceProfile = {
   id: string;

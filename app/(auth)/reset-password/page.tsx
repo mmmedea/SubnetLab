@@ -25,7 +25,7 @@ export default function ResetPasswordPage() {
       const { error: updateError } = await createClient().auth.updateUser({ password });
       if (updateError) throw updateError;
       setMessage("Your password has been updated. Redirecting to sign in…");
-      window.setTimeout(() => router.replace("/login"), 900);
+      window.setTimeout(() => router.replace("/login?event=password_changed"), 900);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Could not update your password. Return to password recovery and request a new six-digit code.");
     } finally {

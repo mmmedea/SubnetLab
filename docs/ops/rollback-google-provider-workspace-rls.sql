@@ -1,4 +1,4 @@
--- Rollback for 20261123130000_google_provider_workspace_rls
+-- Rollback for 20261123122151_google_provider_workspace_rls
 -- Restores the pre-change password + OTP + configured-password requirement.
 
 drop policy if exists "network plans owner" on public.network_plans;
