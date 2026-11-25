@@ -14,7 +14,7 @@ export async function PATCH(request: Request) {
   try { body = await request.json(); } catch { return NextResponse.json({ error: "Invalid JSON" }, { status: 400 }); }
   if (!body || typeof body !== "object" || Array.isArray(body)) return NextResponse.json({ error: "Invalid profile" }, { status: 400 });
   const value = body as Record<string, unknown>;
-  const username = typeof value.username === "string" ? value.username.trim().toLowerCase() : "";
+  const username = typeof value.username === "string" ? value.username.trim() : "";
   const display_name = typeof value.displayName === "string" ? value.displayName.trim() : "";
   const role = typeof value.role === "string" ? value.role.trim() : "";
   if (username && !isValidSignupUsername(username)) return NextResponse.json({ error: "Username must be 3–20 characters using letters, numbers, or underscores." }, { status: 400 });
