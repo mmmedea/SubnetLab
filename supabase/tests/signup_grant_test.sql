@@ -10,12 +10,14 @@ declare
   v_expired_user uuid := '00000000-0000-4000-8000-000000000004';
   v_no_eligibility_user uuid := '00000000-0000-4000-8000-000000000005';
   v_existing_session_user uuid := '00000000-0000-4000-8000-000000000006';
+  v_clock_skew_user uuid := '00000000-0000-4000-8000-000000000007';
   v_first_session uuid := '10000000-0000-4000-8000-000000000001';
   v_duplicate_session uuid := '10000000-0000-4000-8000-000000000002';
   v_wrong_session uuid := '10000000-0000-4000-8000-000000000003';
   v_expired_session uuid := '10000000-0000-4000-8000-000000000004';
   v_existing_session uuid := '10000000-0000-4000-8000-000000000006';
   v_no_eligibility_session uuid := '10000000-0000-4000-8000-000000000005';
+  v_clock_skew_session uuid := '10000000-0000-4000-8000-000000000007';
   v_expired_grant uuid;
 begin
   insert into auth.users (
@@ -23,7 +25,7 @@ begin
     raw_app_meta_data, raw_user_meta_data, created_at, updated_at
   ) values
     (v_first_user, 'authenticated', 'authenticated', 'signup-test-1@example.invalid',
-     'test-fixture-hash', now(), '{"provider":"email","providers":["email"]}'::jsonb,
+     'test-fixture-hash', now() + interval '15 seconds', '{"provider":"email","providers":["email"]}'::jsonb,
      '{"username":"signup_test_1"}'::jsonb, now(), now()),
     (v_duplicate_user, 'authenticated', 'authenticated', 'signup-test-2@example.invalid',
      'test-fixture-hash', now(), '{"provider":"email","providers":["email"]}'::jsonb,
@@ -39,12 +41,31 @@ begin
      '{"full_name":"Test Person"}'::jsonb, now(), now()),
     (v_existing_session_user, 'authenticated', 'authenticated', 'signup-test-6@example.invalid',
      'test-fixture-hash', now(), '{"provider":"email","providers":["email"]}'::jsonb,
-     '{"username":"signup_test_6"}'::jsonb, now(), now());
+     '{"username":"signup_test_6"}'::jsonb, now(), now()),
+    (v_clock_skew_user, 'authenticated', 'authenticated', 'signup-test-7@example.invalid',
+     'test-fixture-hash', now() + interval '31 seconds', '{"provider":"email","providers":["email"]}'::jsonb,
+     '{"username":"signup_test_7"}'::jsonb, now(), now());
 
   if not exists (
     select 1 from public.signup_otp_eligibility where user_id = v_first_user
   ) then
     raise exception 'The email signup eligibility trigger did not run.';
+  end if;
+
+  if not exists (
+    select 1 from public.signup_otp_eligibility where user_id = v_clock_skew_user
+  ) then
+    raise exception 'The clock-skew email signup eligibility trigger did not run.';
+  end if;
+
+  v_failed := false;
+  begin
+    perform public.create_signup_otp_grant(v_clock_skew_user, v_clock_skew_session);
+  exception when others then
+    v_failed := true;
+  end;
+  if not v_failed then
+    raise exception 'A confirmation timestamp more than 30 seconds in the future was accepted.';
   end if;
 
   v_grant := public.create_signup_otp_grant(v_first_user, v_first_session);
