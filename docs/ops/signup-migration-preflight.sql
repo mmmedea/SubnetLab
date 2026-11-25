@@ -1,3 +1,5 @@
+-- Username casing is preserved by the migration; uniqueness remains case-insensitive via lower(username).
+-- Neither migration rewrites existing usernames. These queries only report current rows.
 -- READ ONLY. Run these queries separately in both STAGING and PRODUCTION
 -- before applying either signup migration. This file contains SELECTs only.
 
