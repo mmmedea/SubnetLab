@@ -51,21 +51,22 @@ Do not print the database URL, paste it into chat, or store the dump in GitHub. 
 
 ## Release order
 
-The read-only preflight and backup are prerequisites. After the required approval, the **database migration is the first mutating Production release step**: it must precede merging/deploying the application code.
+The read-only preflight and backup are prerequisites. After the required approval, resolve any reported username rows by profile id. Then apply the schema migrations before merging or deploying application code. If no username cleanup is needed, the schema migration is the first Production write.
 
 1. Record the current Production deployment and verify the backup.
-2. Run the read-only Production preflight queries and resolve any username violations or duplicates. Re-run them until the username queries return no rows.
-3. After the exact approval phrase, apply these Production migrations in order:
+2. Run the read-only Production preflight queries. If they show invalid usernames or duplicate groups, stop before any write until the exact approval phrase.
+3. After approval, manually correct only the reported profile ids: set invalid names to NULL or manually chosen valid names; for each duplicate group, keep one selected profile and manually change the others to unique names or NULL. Never derive from email or delete users. Rerun the username queries until they return no rows.
+4. Apply these Production migrations in order:
 
    1. `supabase/migrations/20261125120000_allow_first_signup_session_without_second_otp.sql`
    2. `supabase/migrations/20261125120500_enforce_username_3_20.sql`
 
    Apply through the Production Supabase SQL Editor only after approval. Do not apply a rollback file as part of the release.
 
-4. Run the read-only preflight again. Confirm the username queries return no rows. Verify both new tables have RLS enabled, the grant functions are SECURITY DEFINER with an empty search path, only `service_role` can execute them, and row counts for `email_otp_verified_sessions` and `auth_audit_log` are consistent with the recorded pre-migration counts.
-5. Merge the application code using the confirmed branch path below. Use GitHub **Squash and merge** only after approval. Do not merge PR #25 before the migration and post-migration checks pass.
-6. Wait for the Production deployment to finish and confirm Vercel reports Ready for the expected commit. Do not manually deploy a different branch.
-7. Run the smoke script below, then perform authenticated checks with the designated test account. Do not put credentials or OTPs in the script or release record.
+5. Run the read-only preflight again. Confirm the username queries return no rows. Verify both new tables have RLS enabled, the grant functions are SECURITY DEFINER with an empty search path, only `service_role` can execute them, and row counts for `email_otp_verified_sessions` and `auth_audit_log` are consistent with the recorded pre-migration counts.
+6. Merge the application code using the confirmed branch path below. Use GitHub **Squash and merge** only after approval. Do not merge PR #25 before the migration and post-migration checks pass.
+7. Wait for the Production deployment to finish and confirm Vercel reports Ready for the expected commit. Do not manually deploy a different branch.
+8. Run the smoke script below, then perform authenticated checks with the designated test account. Do not put credentials or OTPs in the script or release record.
 
 ### Path A — Production Branch is `settings-system`
 
