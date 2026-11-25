@@ -2,9 +2,9 @@ name: CI
 
 on:
   push:
-    branches: [main, "improve/**", "fix/**", "feat/**", "feature/**"]
+    branches: ["settings-system", "fix/*", "phase-*", "chore/*"]
   pull_request:
-    branches: [main]
+    branches: ["settings-system", "fix/*", "phase-*", "chore/*"]
 
 permissions:
   contents: read
@@ -24,6 +24,9 @@ jobs:
         run: |
           npm install --package-lock-only --ignore-scripts --no-audit --no-fund
           npm ci --no-audit --no-fund
+      - name: Dependency audit (report only)
+        run: npm audit
+        continue-on-error: true
       - name: TypeScript check
         run: npm run check
       - name: Run tests
