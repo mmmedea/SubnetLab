@@ -1,22 +1,35 @@
+-- Refuse to change the schema while current usernames violate the new rule.
+-- This preflight changes no profile or auth.users rows.
 do $preflight$
+declare
+  v_invalid_username_rows bigint;
+  v_duplicate_username_groups bigint;
 begin
-  if exists (
-    select 1
-      from public.profiles
-     where username is not null
-       and username !~ '^[A-Za-z0-9_]{3,20}$'
-  ) then
-    raise exception 'Existing profile usernames need manual review before applying the 3–20 character rule.';
-  end if;
+  select count(*)
+    into v_invalid_username_rows
+    from public.profiles
+   where username is not null
+     and username !~ '^[A-Za-z0-9_]{3,20}$';
 
-  if exists (
-    select lower(username)
-      from public.profiles
-     where username is not null
-     group by lower(username)
-    having count(*) > 1
-  ) then
-    raise exception 'Existing case-insensitive duplicate usernames need manual review before applying the unique index.';
+  select count(*)
+    into v_duplicate_username_groups
+    from (
+      select lower(username)
+        from public.profiles
+       where username is not null
+       group by lower(username)
+      having count(*) > 1
+    ) as duplicates;
+
+  if v_invalid_username_rows > 0 or v_duplicate_username_groups > 0 then
+    raise exception using
+      errcode = '23514',
+      message = pg_catalog.format(
+        'Username migration stopped before schema changes: %s invalid username row(s), %s case-insensitive duplicate group(s).',
+        v_invalid_username_rows,
+        v_duplicate_username_groups
+      ),
+      hint = 'Run docs/ops/signup-migration-preflight.sql. By profile id, manually set invalid usernames to NULL or a manually chosen valid unique name. For each duplicate group, choose one row to keep and manually change the others to unique names or NULL. Do not derive usernames from emails or delete users, then rerun this migration.';
   end if;
 end;
 $preflight$;
@@ -30,36 +43,6 @@ create unique index profiles_username_lower_unique
   on public.profiles (lower(username))
   where username is not null;
 
--- Optional metadata-only backfill for an operator to review and run separately.
--- It never derives a username from an email address and is not executed by this migration.
--- with candidates as (
---   select p.id,
---          lower(coalesce(nullif(u.raw_user_meta_data->>'username', ''),
---                         nullif(u.raw_user_meta_data->>'user_name', ''))) as candidate,
---          row_number() over (
---            partition by lower(coalesce(nullif(u.raw_user_meta_data->>'username', ''),
---                                        nullif(u.raw_user_meta_data->>'user_name', '')))
---            order by p.id
---          ) as duplicate_rank
---     from public.profiles p
---     join auth.users u on u.id = p.id
---    where p.username is null
---      and coalesce(nullif(u.raw_user_meta_data->>'username', ''),
---                   nullif(u.raw_user_meta_data->>'user_name', '')) ~ '^[A-Za-z0-9_]{3,20}$'
--- ), available as (
---   select c.id, c.candidate
---     from candidates c
---    where c.duplicate_rank = 1
---      and not exists (
---        select 1 from public.profiles other
---         where other.id <> c.id and lower(other.username) = c.candidate
---      )
--- )
--- update public.profiles p
---    set username = available.candidate
---   from available
---  where p.id = available.id;
-
 create or replace function public.handle_new_auth_user_settings()
 returns trigger
 language plpgsql
@@ -67,12 +50,15 @@ security definer
 set search_path = ''
 as $function$
 declare
-  v_username text := lower(coalesce(
+  v_username text;
+  v_provider text;
+begin
+  v_username := lower(coalesce(
     nullif(new.raw_user_meta_data->>'username', ''),
     nullif(new.raw_user_meta_data->>'user_name', '')
   ));
-  v_provider text := coalesce(new.raw_app_meta_data->>'provider', '');
-begin
+  v_provider := coalesce(new.raw_app_meta_data->>'provider', '');
+
   if v_username is not null and v_username !~ '^[A-Za-z0-9_]{3,20}$' then
     raise exception 'Username must be 3–20 characters using letters, numbers, or underscores.'
       using errcode = '22023';
