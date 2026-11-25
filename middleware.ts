@@ -1,8 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createServerClient } from "@supabase/ssr";
 import { getSupabaseConfig } from "@/utils/supabase/config";
-import { safeNext } from "@/utils/security/auth-validation.js";
-import { shouldRedirectVerifiedSession } from "@/utils/security/signup-security.js";
+import { safeNext, shouldRedirectVerifiedSession } from "@/utils/security/auth-validation.js";
 
 const protectedRoutes = ["/dashboard", "/planner", "/ipam", "/practice", "/progress", "/settings"];
 
