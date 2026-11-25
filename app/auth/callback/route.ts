@@ -1,17 +1,12 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createServerClient } from "@supabase/ssr";
 import { getSupabaseConfig } from "@/utils/supabase/config";
-
-function safeNext(value: string | null) {
-  if (!value || !value.startsWith("/") || value.startsWith("//") || value.includes("\\")) return "/dashboard";
-  const path = value.split("?")[0];
-  return ["/dashboard", "/planner", "/ipam", "/practice", "/progress", "/settings", "/reset-password"].some((route) => path === route || path.startsWith(route + "/")) ? value : "/dashboard";
-}
+import { safeNext } from "@/utils/security/auth-validation.js";
 
 export async function GET(request: NextRequest) {
   const requestUrl = new URL(request.url);
   const code = requestUrl.searchParams.get("code");
-  const next = safeNext(requestUrl.searchParams.get("next"));
+  const next = safeNext(requestUrl.searchParams.get("next"), { allowResetPassword: true });
   const providerError = requestUrl.searchParams.get("error");
   const providerDescription = requestUrl.searchParams.get("error_description") || providerError;
 

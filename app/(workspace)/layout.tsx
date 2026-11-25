@@ -11,13 +11,13 @@ export default async function WorkspaceLayout({children}:{children:React.ReactNo
  const initialProfile={
   id:user.id,
   email:user.email??"",
-  username:profile?.username??(typeof user.user_metadata?.user_name==="string"?user.user_metadata.user_name:null),
-  displayName:profile?.display_name??(typeof user.user_metadata?.full_name==="string"?user.user_metadata.full_name:null),
+  username:profile?.username??(typeof user.user_metadata?.username==="string"?user.user_metadata.username:null),
+  displayName:profile?.display_name??(typeof user.user_metadata?.full_name==="string"?user.user_metadata.full_name:typeof user.user_metadata?.name==="string"?user.user_metadata.name:null),
   avatarUrl:profile?.avatar_url??(typeof user.user_metadata?.avatar_url==="string"?user.user_metadata.avatar_url:null),
   bio:profile?.role??null,
   preferences:{theme:preferences?.theme??"dark",email_notifications:preferences?.email_notifications??true,in_app_notifications:preferences?.in_app_notifications??true,compact_mode:preferences?.compact_mode??false,default_ip_version:preferences?.default_ip_version??"ipv4",monospace_font_size:preferences?.monospace_font_size??14,timezone:preferences?.timezone??"UTC",language:preferences?.language??"en"},
   emailConfirmed:Boolean(user.email_confirmed_at),
   identities:user.identities??[]
  };
- return <UserProfileProvider initialProfile={initialProfile}><div className="shell"><WorkspaceSidebar/><main className="workspace-main"><div className="topline"><span>WORKSPACE / NETWORK OPERATIONS</span><span className="session-indicator">{initialProfile.displayName||initialProfile.username||initialProfile.email}</span></div>{children}</main></div></UserProfileProvider>;
+ return <UserProfileProvider initialProfile={initialProfile}><div className="shell"><WorkspaceSidebar/><main className="workspace-main"><div className="topline"><span>WORKSPACE / NETWORK OPERATIONS</span><span className="session-indicator">{initialProfile.displayName||initialProfile.username}</span></div>{children}</main></div></UserProfileProvider>;
 }

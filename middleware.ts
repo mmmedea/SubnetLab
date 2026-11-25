@@ -1,14 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createServerClient } from "@supabase/ssr";
 import { getSupabaseConfig } from "@/utils/supabase/config";
+import { safeNext, shouldRedirectVerifiedSession } from "@/utils/security/auth-validation.js";
 
 const protectedRoutes = ["/dashboard", "/planner", "/ipam", "/practice", "/progress", "/settings"];
-
-function safeNext(value: string | null) {
-  if (!value || !value.startsWith("/") || value.startsWith("//") || value.includes("\\")) return "/dashboard";
-  const path = value.split("?")[0];
-  return protectedRoutes.some((route) => path === route || path.startsWith(route + "/")) ? value : "/dashboard";
-}
 
 export async function middleware(req: NextRequest) {
   let response = NextResponse.next({ request: req });
@@ -65,6 +60,16 @@ export async function middleware(req: NextRequest) {
         return redirect;
       }
     }
+    if (path === "/verify-email" && user) {
+      const { data: verified, error: verificationError } = await supabase.rpc("is_email_otp_session_verified");
+      if (!verificationError && shouldRedirectVerifiedSession(verified)) {
+        const redirect = NextResponse.redirect(new URL(safeNext(req.nextUrl.searchParams.get("next")), req.url));
+        response.cookies.getAll().forEach((cookie) => redirect.cookies.set(cookie));
+        redirect.headers.set("Cache-Control", "private, no-store");
+        return redirect;
+      }
+    }
+
     if (isAuth && user) {
       const destination = path === "/" ? "/dashboard" : safeNext(req.nextUrl.searchParams.get("next"));
       const redirect = NextResponse.redirect(new URL(destination, req.url));
@@ -81,5 +86,5 @@ export async function middleware(req: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/", "/dashboard/:path*", "/planner/:path*", "/ipam/:path*", "/practice/:path*", "/progress/:path*", "/settings/:path*", "/login", "/signup"],
+  matcher: ["/", "/verify-email", "/dashboard/:path*", "/planner/:path*", "/ipam/:path*", "/practice/:path*", "/progress/:path*", "/settings/:path*", "/login", "/signup"],
 };

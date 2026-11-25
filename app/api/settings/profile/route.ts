@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@/utils/supabase/server";
+import { isValidSignupUsername } from "@/utils/security/auth-validation.js";
 
 export async function PATCH(request: Request) {
   const supabase = await createClient();
@@ -13,10 +14,10 @@ export async function PATCH(request: Request) {
   try { body = await request.json(); } catch { return NextResponse.json({ error: "Invalid JSON" }, { status: 400 }); }
   if (!body || typeof body !== "object" || Array.isArray(body)) return NextResponse.json({ error: "Invalid profile" }, { status: 400 });
   const value = body as Record<string, unknown>;
-  const username = typeof value.username === "string" ? value.username.trim().toLowerCase() : "";
+  const username = typeof value.username === "string" ? value.username.trim() : "";
   const display_name = typeof value.displayName === "string" ? value.displayName.trim() : "";
   const role = typeof value.role === "string" ? value.role.trim() : "";
-  if (username && !/^[a-z0-9_]{3,32}$/.test(username)) return NextResponse.json({ error: "Username must be 3–32 characters using letters, numbers, or underscores." }, { status: 400 });
+  if (username && !isValidSignupUsername(username)) return NextResponse.json({ error: "Username must be 3–20 characters using letters, numbers, or underscores." }, { status: 400 });
   if (display_name.length > 60 || role.length > 80) return NextResponse.json({ error: "Display name or role is too long." }, { status: 400 });
   const { data, error } = await supabase.from("profiles").upsert({ id: user.id, username: username || null, display_name: display_name || null, role: role || null, updated_at: new Date().toISOString() }).select("username,display_name,role,avatar_url").single();
   if (error) return NextResponse.json({ error: error.code === "23505" ? "That username is already taken." : error.message }, { status: error.code === "23505" ? 409 : 400 });
