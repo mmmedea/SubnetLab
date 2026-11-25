@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import { isValidSignupUsername, safeNext } from "../utils/security/auth-validation.js";
+import { isValidSignupUsername, safeNext, shouldRedirectVerifiedSession } from "../utils/security/auth-validation.js";
 import {
   buildSignupRateLimitKeys,
   decideSignupRateLimits,
@@ -9,7 +9,6 @@ import {
   readSessionIdFromAccessToken,
   safeSignupLogRecord,
   selectTrustedIp,
-  shouldRedirectVerifiedSession,
 } from "../utils/security/signup-security.js";
 
 const sessionId = "6f9619ff-8b86-4011-842d-00c04fc964ff";
