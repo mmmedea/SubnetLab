@@ -70,6 +70,11 @@ Expected: the trigger is present; both RPCs are SECURITY DEFINER with an empty s
 
 ## Staging acceptance checks
 
+- [ ] Submit a duplicate case-insensitive username signup using a project-owner-controlled test email. Record the exact error text visible in the browser, verbatim, below. Do not include the email, OTP, or other account data.
+  - Browser error text observed: **[pending staging test]**
+  - Do not change the AuthForm mapping for a generic database error until the project owner reports the exact browser text.
+  - If the browser displays `Database error saving new user`, report that exact text first; mapping it to the duplicate-username message remains pending the project owner's report.
+
 - [ ] Create a fresh email/password account with a unique username, enter the signup code once, and confirm it goes directly to `/dashboard`.
 - [ ] Confirm the dashboard greeting uses the signup username and the workspace header no longer shows the email.
 - [ ] Confirm `profiles.password_configured_at` is populated by the existing trigger.
@@ -87,4 +92,4 @@ The local Windows visual comparison remains a manual gate: every route must stay
 
 For STAGING, first restore the legacy verification flow by setting `NEXT_PUBLIC_SIGNUP_VERIFICATION_MODE=legacy` in the Preview environment and redeploying. Then run `docs/ops/rollback-username-3-20.sql`, followed by `docs/ops/rollback-first-signup-session.sql`.
 
-The grant rollback removes only verified-session rows created by consumed signup grants, then removes the signup grant tables/functions and auth.users trigger. The username rollback restores the former 3–32 profile constraint and auth-user trigger behavior without deleting or rewriting users. Production rollback SQL requires separate explicit user approval.
+`rollback-first-signup-session.sql` deletes rows from `email_otp_verified_sessions` that were created by consumed signup grants, then removes the signup grant tables/functions and auth.users trigger. This session-row deletion requires explicit project-owner approval before running the rollback, including in STAGING. The username rollback restores the former 3–32 profile constraint and auth-user trigger behavior without deleting or rewriting profiles or users. Production rollback SQL also requires separate explicit user approval.
