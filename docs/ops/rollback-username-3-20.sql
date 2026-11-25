@@ -1,5 +1,6 @@
 -- Restore the former 3–32 character username rule and trigger behavior.
 -- This restores the schema only; it does not delete or rewrite profiles or users.
+-- Existing mixed-case usernames remain unchanged. The restored legacy trigger lowercases usernames only for future auth-user inserts.
 
 drop index if exists public.profiles_username_lower_unique;
 
