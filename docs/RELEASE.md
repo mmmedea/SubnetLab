@@ -33,25 +33,25 @@ Other reported triggers: `sync_auth_user_consent` and `sync_profile_password_con
 
 ## Mandatory release gate
 
-Do not run Production DML/DDL, merge PR #25, or deploy this release until the project owner explicitly replies. The read-only SELECT preflight requested for Production is allowed and makes no changes:
+Do not run any Production SQL, including read-only preflight queries, create the Production backup, merge PR #25, change Vercel settings, or deploy this release until the project owner explicitly replies:
 
 ```text
 APPROVE RELEASE 25
 ```
 
-That approval is required for Production changes. It does not authorize rollback SQL; get separate explicit approval before running rollback SQL. Staging changes also require notice to the owner before applying.
+That approval is required before any Production SQL, backup, Vercel setting change, merge, or deployment. It does not authorize rollback SQL; get separate explicit approval before running rollback SQL. Staging changes also require notice to the owner before applying.
 
 ## Pre-release checklist
 
 - [ ] Do not merge or push to `settings-system` while the current Production deployment mechanism is unexplained. Treat that action as potentially Production-affecting. PR #24 changes only CI, but merging it to `settings-system` is still covered by this hold.
 - [ ] Confirm PR #25 is open against `settings-system`, its current head checks pass, and the staging signup test and Windows visual comparison have passed.
 - [ ] Confirm the PR #25 Preview URL is Ready and points to the STAGING Supabase project. Vercel project settings are authoritative; do not infer the database project from the hostname.
-- [ ] Run the read-only preflight SELECTs in STAGING and PRODUCTION before any migration. PR #25 adds `docs/ops/signup-migration-preflight.sql`; [the file on that branch](https://github.com/mmmedea/SubnetLab/blob/fix/signup-single-verification-username-v2/docs/ops/signup-migration-preflight.sql) contains username violations, lower(username) duplicates, auth.users trigger definitions/order, function name collisions, and the two table row counts.
+- [ ] In this staging procedure, run the read-only preflight SELECTs in STAGING only. Do not run Production SQL before the exact approval above. After approval, the same preflight file can be run in Production before the Production migrations. PR #25 adds `docs/ops/signup-migration-preflight.sql`; [the file on that branch](https://github.com/mmmedea/SubnetLab/blob/fix/signup-single-verification-username-v2/docs/ops/signup-migration-preflight.sql) contains username violations, lower(username) duplicates, auth.users trigger definitions/order, function name collisions, and the two table row counts.
 - [ ] In STAGING, resolve username violations by profile id as described in PR #25. Keep one row per duplicate lowercase username; manually change other rows to a user-chosen unique 3–20 character username or NULL. Never derive usernames from email or delete users.
-- [ ] In PRODUCTION, run only the read-only SELECT preflight before approval. If it returns username violations or duplicate groups, record the profile ids and stop; do not run Production UPDATE/DDL until the exact approval phrase. After approval, resolve rows manually by id before applying the migrations.
-- [ ] Confirm the read-only username queries return no violating rows and no duplicate groups in STAGING. Production must be clear before the migration is applied.
+- [ ] Do not run any Production SQL before the exact approval above. After approval, run the read-only SELECT preflight in PRODUCTION. If it returns username violations or duplicate groups, record the profile ids and stop; resolve rows manually by id, then rerun the queries before applying the migrations.
+- [ ] Confirm the read-only username queries return no violating rows and no duplicate groups in STAGING. After approval, confirm the same in PRODUCTION before applying any Production migration.
 - [ ] Confirm Production Auth SMTP is still configured in the main Supabase project. Do not copy or expose credentials.
-- [ ] Create a manual Production database backup before any Production write. On a trusted Windows machine with PostgreSQL client tools installed, keep the database URL in a protected process environment variable and run:
+- [ ] After the exact release approval, create a manual Production database backup before any Production write. On a trusted Windows machine with PostgreSQL client tools installed, keep the database URL in a protected process environment variable and run:
 
 ```powershell
 pg_dump --format=custom --no-owner --no-acl --dbname="$env:SUBNETLAB_PROD_DATABASE_URL" --file="subnetlab-prod-before-release.dump"
@@ -68,10 +68,10 @@ Do not print the database URL, paste it into chat, or store the dump in GitHub. 
 
 ## Release order
 
-The read-only preflight and backup are prerequisites. After the required approval, resolve any reported username rows by profile id. Then apply the schema migrations before merging or deploying application code. If no username cleanup is needed, the schema migration is the first Production write.
+No Production SQL or backup is authorized before the exact release approval. After approval, record the current deployment, create and verify the backup, and run the read-only Production preflight. Resolve any reported username rows by profile id and rerun the checks. Then apply the schema migrations before merging or deploying application code. If no username cleanup is needed, the schema migration is the first Production write.
 
 1. Record the current Production deployment and verify the backup.
-2. Run the read-only Production preflight queries. If they show invalid usernames or duplicate groups, stop before any write until the exact approval phrase.
+2. After the exact approval, run the read-only Production preflight queries. If they show invalid usernames or duplicate groups, resolve them manually by profile id and rerun the queries before any migration.
 3. After approval, manually correct only the reported profile ids: set invalid names to NULL or manually chosen valid names; for each duplicate group, keep one selected profile and manually change the others to unique names or NULL. Never derive from email or delete users. Rerun the username queries until they return no rows.
 4. Apply these Production migrations in order:
 
