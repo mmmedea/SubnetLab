@@ -1,3 +1,5 @@
+begin;
+
 create table public.signup_otp_eligibility (
   user_id uuid primary key references auth.users(id) on delete cascade,
   eligible_at timestamptz not null default now(),
@@ -81,11 +83,12 @@ begin
     from auth.users
    where id = p_user_id;
 
+  -- Allow up to 30 seconds of clock skew between Auth and database timestamps.
   if not found
      or v_auth_user.raw_app_meta_data ->> 'provider' is distinct from 'email'
      or v_auth_user.email_confirmed_at is null
      or v_auth_user.email_confirmed_at < v_now - interval '5 minutes'
-     or v_auth_user.email_confirmed_at > v_now then
+     or v_auth_user.email_confirmed_at > v_now + interval '30 seconds' then
     raise exception 'Signup verification could not be completed.' using errcode = '42501';
   end if;
 
@@ -189,3 +192,5 @@ revoke all on function public.consume_signup_otp_grant(uuid, uuid, uuid)
   from public, anon, authenticated;
 grant execute on function public.create_signup_otp_grant(uuid, uuid) to service_role;
 grant execute on function public.consume_signup_otp_grant(uuid, uuid, uuid) to service_role;
+
+commit;
