@@ -4,8 +4,8 @@ import Link from "next/link";
 import {useEffect,useMemo,useState} from "react";
 import {useRouter} from "next/navigation";
 import {createClient} from "@/utils/supabase/client";
+import {safeNext} from "@/utils/security/auth-validation.js";
 
-function safeNext(value:string){if(!value.startsWith("/")||value.startsWith("//")||value.includes("\\"))return "/dashboard";const path=value.split("?")[0];return ["/dashboard","/planner","/ipam","/practice","/progress","/settings"].some(p=>path===p||path.startsWith(p+"/"))?value:"/dashboard";}
 const validPassword=(p:string)=>p.length>=10&&/[A-Z]/.test(p)&&/[a-z]/.test(p)&&/[0-9]/.test(p)&&/[^A-Za-z0-9]/.test(p);
 
 export default function GooglePasswordSetup({next}:{next:string}){
