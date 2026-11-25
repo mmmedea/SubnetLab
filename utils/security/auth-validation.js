@@ -70,3 +70,7 @@ export function safeNext(value, options = {}) {
     ? value
     : fallback;
 }
+
+export function shouldRedirectVerifiedSession(value) {
+  return value === true;
+}
