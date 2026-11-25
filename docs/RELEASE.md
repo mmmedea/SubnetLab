@@ -2,18 +2,34 @@
 
 **Status:** Documented, not verified. No Production settings were changed, no Production SQL was run, and no release was performed.
 
-## Release-specific values to confirm
+## Release-specific values (as of 2026-11-25)
 
-- Production Branch: **[UNCONFIRMED — replace with `settings-system` or `main`]**
-- Require Verified Commits: **[UNCONFIRMED]**
-- Current Production deployment ID, commit SHA, and URL: **[RECORD BEFORE RELEASE]**
-- Preview environment variable names: **[UNCONFIRMED — record names only; never copy values into this document]**
-- Supabase project Preview targets: **[UNCONFIRMED]**
-- Supabase project Production targets: **[UNCONFIRMED]**
-- Preview and Production use the same Supabase project: **[UNCONFIRMED]**
-- Instant Rollback / promoting a previous Production deployment: **[UNCONFIRMED — check the project UI before relying on it]**
+- Production Branch: **`main`**, shown in the owner's Vercel Environments screenshot.
+- Current Production deployment: **`dpl_9C3vHoZS64A4XRVXLPr8f4RNPoHm`**, commit **`03a0cf9b5dfeef784f6e1bc1db1aa453a4b78de2`**, status READY, message **`feat: complete auth and settings release`** (owner-reported).
+- The owner reports that deployment as branch **`settings-system`**, while the screenshot shows Production branch tracking **`main`**. Keep these as separate facts and confirm the deployment's originating ref in Vercel before release.
+- Require Verified Commits: **not verified**.
+- Preview environment variable names only: `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY`, `SUPABASE_SERVICE_ROLE_KEY`. No values are recorded here.
+- Preview Supabase: **SubnetLab-Staging** (`pvqyaczfyanyklnabjmg`).
+- Production Supabase: **SubnetLab** (`jfqgttbnmubhzaqzlzjo`).
+- Preview and Production use the same Supabase project: **No**.
+- Instant Rollback: **reported available**. A previous Production deployment is marked as a rollback candidate. Promotion availability is reported; the dashboard action itself was not tested.
 
-Do not infer the Production Branch or Preview database. The selected path must be confirmed by the project owner.
+The Production Branch is confirmed as `main`, so use Path B below. The connector could not independently read these Vercel settings; the deployment and environment details above are owner-reported, except the Production branch value shown in the supplied screenshot.
+
+## Preflight evidence
+
+The owner reports that the read-only preflight was run in both STAGING and PRODUCTION on 2026-11-25:
+
+| Check | STAGING | PRODUCTION |
+|---|---:|---:|
+| Invalid username rows | 0 | 0 |
+| Case-insensitive duplicate username groups | 0 | 0 |
+| `email_otp_verified_sessions` rows | 1 | 1 |
+| `auth_audit_log` rows | 0 | 0 |
+
+The owner also reports reviewing the `auth.users` triggers. I independently read the current `handle_new_auth_user_settings()` definition through the connected Supabase read-only query in both projects: both definitions are identical, SECURITY DEFINER with an empty search_path. The existing `on_auth_user_created_settings` trigger calls that same function. The proposed migration replaces the function in place, retains profile and preference creation plus the display-name, role, and avatar assignments, and intentionally changes behavior: usernames outside 3–20 now raise an error instead of becoming NULL; duplicate usernames now reject signup instead of falling back to a profile without a username. The function body and trigger are not applied or changed in either database. This behavior change is part of the signup requirement and must be included in staging verification.
+
+Other reported triggers: `sync_auth_user_consent` and `sync_profile_password_configured`. No migration has been applied.
 
 ## Mandatory release gate
 
@@ -46,8 +62,9 @@ Get-FileHash .\subnetlab-prod-before-release.dump -Algorithm SHA256
 
 Do not print the database URL, paste it into chat, or store the dump in GitHub. Keep the backup in access-controlled storage and record its path and checksum in the release record. Confirm the dump is non-empty and readable before continuing.
 
-- [ ] In Vercel, record the current Production deployment ID, commit SHA, URL, and creation time. Keep the previous Ready Production deployment available for promotion if the project provides that control. Do not assume Hobby exposes Instant Rollback; verify it first.
-- [ ] Confirm the exact Production Branch and Require Verified Commits values. Replace the placeholders above and select the matching path below.
+- [ ] Before release, recheck the current Production deployment ID, commit SHA, URL, and creation time; the values above are owner-reported on 2026-11-25. Confirm the originating ref because the reported deployment branch (`settings-system`) differs from the Production branch-tracking setting (`main`).
+- [ ] Require Verified Commits is still unverified; check it in Vercel before selecting a release commit.
+- [ ] The owner reports that a previous Production deployment is a rollback candidate and Instant Rollback is available. Verify the promotion action in Vercel before relying on it.
 
 ## Release order
 
@@ -76,7 +93,7 @@ After migration and verification, squash-merge PR #25 into `settings-system`. Ve
 
 After migration and verification, squash-merge PR #25 into `settings-system` and verify its Preview/staging deployment. Then open a separate PR from `settings-system` to `main`. Merge that release PR only after the same explicit release approval and passing checks. Vercel should deploy `main` automatically. Verify the Production deployment commit matches the merged release commit.
 
-**Selected path:** [UNCONFIRMED — fill in only after Production Branch is read from Vercel].
+**Selected path:** **Path B — Production Branch is `main`**, confirmed by the owner's screenshot on 2026-11-25.
 
 ## Production smoke test script
 
