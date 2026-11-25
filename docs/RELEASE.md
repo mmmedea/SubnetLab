@@ -7,7 +7,10 @@
 - Production Branch: **[UNCONFIRMED — replace with `settings-system` or `main`]**
 - Require Verified Commits: **[UNCONFIRMED]**
 - Current Production deployment ID, commit SHA, and URL: **[RECORD BEFORE RELEASE]**
-- Preview environment variable names and Preview Supabase project: **[UNCONFIRMED — verify names/project in Vercel; never copy values into this document]**
+- Preview environment variable names: **[UNCONFIRMED — record names only; never copy values into this document]**
+- Supabase project Preview targets: **[UNCONFIRMED]**
+- Supabase project Production targets: **[UNCONFIRMED]**
+- Preview and Production use the same Supabase project: **[UNCONFIRMED]**
 - Instant Rollback / promoting a previous Production deployment: **[UNCONFIRMED — check the project UI before relying on it]**
 
 Do not infer the Production Branch or Preview database. The selected path must be confirmed by the project owner.
