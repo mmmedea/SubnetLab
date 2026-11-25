@@ -56,7 +56,7 @@ export default function AuthForm({mode,searchParams}:{mode:"login"|"signup";sear
     if(!passwordValid){setMessage("Password does not meet all security requirements.");return;}
     if(password!==confirmPassword){setMessage("Passwords do not match.");return;}
     if(!termsAccepted){setMessage("You must agree to the Terms of Service and Privacy Policy to continue.");return;}
-    const{data,error}=await supabase.auth.signUp({email:email.trim(),password,options:{emailRedirectTo:`${window.location.origin}/auth/callback?next=${encodeURIComponent(nextPath)}`,data:{username:username.trim().toLowerCase(),terms_accepted_at:new Date().toISOString()}}});
+    const{data,error}=await supabase.auth.signUp({email:email.trim(),password,options:{emailRedirectTo:`${window.location.origin}/auth/callback?next=${encodeURIComponent(nextPath)}`,data:{username:username.trim(),terms_accepted_at:new Date().toISOString()}}});
     if(error)throw error;
     if(data.session){
      const{error:passwordError}=await supabase.auth.signInWithPassword({email:email.trim(),password});
