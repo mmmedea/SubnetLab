@@ -4,8 +4,8 @@ import Link from "next/link";
 import {useEffect,useMemo,useRef,useState} from "react";
 import {useRouter} from "next/navigation";
 import {createClient} from "@/utils/supabase/client";
+import {safeNext} from "@/utils/security/auth-validation.js";
 
-function safeNext(value:string){if(!value.startsWith("/")||value.startsWith("//")||value.includes("\\"))return "/dashboard";const path=value.split("?")[0];return ["/dashboard","/planner","/ipam","/practice","/progress","/settings"].some(p=>path===p||path.startsWith(p+"/"))?value:"/dashboard";}
 export default function VerifyEmailOtp({next,challenge,event}:{next:string;challenge:string;event:"login"|"password_set"|"password_changed"}){
  const router=useRouter(),supabase=useMemo(()=>createClient(),[]),inputs=useRef<Array<HTMLInputElement|null>>([]);
  const[loading,setLoading]=useState(true),[email,setEmail]=useState(""),[challengeId,setChallengeId]=useState(challenge),[digits,setDigits]=useState(["","","","","",""]),[busy,setBusy]=useState(false),[error,setError]=useState(""),[notice,setNotice]=useState(""),[resendSeconds,setResendSeconds]=useState(60);
