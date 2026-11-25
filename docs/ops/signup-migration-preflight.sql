@@ -1,7 +1,8 @@
 -- Username casing is preserved by the migration; uniqueness remains case-insensitive via lower(username).
 -- Neither migration rewrites existing usernames. These queries only report current rows.
--- READ ONLY. Run these queries separately in both STAGING and PRODUCTION
--- before applying either signup migration. This file contains SELECTs only.
+-- READ ONLY. For the staging checklist, run these queries in STAGING only.
+-- Production use is gated by the exact APPROVE RELEASE 25 approval; do not
+-- run any Production SQL before that approval. This file contains SELECTs only.
 
 -- (a) Usernames that do not satisfy the proposed 3–20 rule.
 -- This includes too-short, too-long, and non-alphanumeric/underscore values.
