@@ -1,6 +1,24 @@
 # Signup verification: staging procedure
 
-This checklist is for **STAGING only**. Do not apply either migration to Production.
+This checklist is for **STAGING**. Do not apply either migration to Production from this checklist.
+
+## Read-only preflight
+
+Before applying anything, run every SELECT in `docs/ops/signup-migration-preflight.sql` separately in the Supabase SQL Editor for **STAGING and PRODUCTION**. The file checks usernames, case-insensitive duplicates, auth.users triggers, matching public functions, and row counts for the existing OTP session and auth audit tables. It does not modify data.
+
+## Username migration behavior and manual cleanup
+
+`20261125120500_enforce_username_3_20.sql` counts invalid username rows and lower(username) duplicate groups before making schema changes. If either count is nonzero, it raises an exception before changing the schema or any profile/auth.users rows. It does not use NOT VALID constraints, derive usernames from email addresses, or delete users. After cleanup, rerun the read-only preflight and then rerun the migration.
+
+For each invalid username returned by query (a), inspect the profile by `profile_id` and manually choose either a compliant, unique 3–20 character username or NULL. Example for one row (replace the UUID with the returned profile id):
+
+```sql
+update public.profiles
+set username = null
+where id = '<profile-uuid>'::uuid;
+```
+
+For each duplicate group returned by query (b), manually select one profile id to keep its current username. For every other profile id in that group, run an individual UPDATE assigning a manually chosen name that is valid and unused under `lower(username)`, or set that row's username to NULL using the statement above. Then rerun query (b) until it returns no rows. Do not generate replacements from email addresses, automatically suffix names, or delete profiles/auth.users rows.
 
 ## Security behavior
 
@@ -14,11 +32,14 @@ The new grant functions are SECURITY DEFINER with a fixed empty search path. EXE
 
 ## Apply and verify in STAGING
 
-1. Confirm the Preview deployment points to the STAGING Supabase project. Confirm the Preview environment has the existing server-only `SUPABASE_SERVICE_ROLE_KEY` variable configured; never paste its value into chat or logs.
-2. Apply `supabase/migrations/20261125120000_allow_first_signup_session_without_second_otp.sql` in the STAGING SQL Editor.
-3. Apply `supabase/migrations/20261125120500_enforce_username_3_20.sql` in the STAGING SQL Editor. Its preflight stops without changing usernames if existing values violate the new length/character rule or collide case-insensitively.
-4. Run `supabase/tests/signup_grant_test.sql` in STAGING. It starts a transaction and ends with ROLLBACK; it creates only temporary test fixtures.
-5. Confirm the trigger and function security properties with:
+Before applying a migration to STAGING, notify the project owner as required by the project release rules. Confirm the Ready Preview URL from PR #25's Vercel check/comment and confirm it uses the STAGING Supabase project. Never paste secret values into chat or logs.
+
+1. Confirm the Preview environment has the server-only `SUPABASE_SERVICE_ROLE_KEY` configured.
+2. If query (b) found duplicates, resolve them manually as described above. Resolve invalid values from query (a) before running the username migration.
+3. Apply `supabase/migrations/20261125120000_allow_first_signup_session_without_second_otp.sql` in the STAGING SQL Editor.
+4. Apply `supabase/migrations/20261125120500_enforce_username_3_20.sql` in the STAGING SQL Editor.
+5. Run `supabase/tests/signup_grant_test.sql` in STAGING. It starts a transaction and ends with ROLLBACK; it creates only temporary test fixtures.
+6. Confirm the trigger and function security properties with:
 
 ```sql
 select t.tgname
@@ -45,7 +66,7 @@ where n.nspname = 'public'
   and c.relname in ('signup_otp_eligibility', 'signup_otp_grants');
 ```
 
-Expected: the trigger is present; both RPCs are SECURITY DEFINER with an empty search path; anon/authenticated cannot execute them; service_role can; RLS is enabled on both new tables.
+Expected: the trigger is present; both RPCs are SECURITY DEFINER with an empty search path; anon/authenticated cannot execute them; service_role can; RLS is enabled on both new tables. Rerun username preflight query (a) and (b) after cleanup to confirm no rows/groups remain.
 
 ## Staging acceptance checks
 
@@ -60,12 +81,10 @@ Expected: the trigger is present; both RPCs are SECURITY DEFINER with an empty s
 - [ ] Review Vercel function logs; confirm they contain no email, code, token, raw IP, or grant ID.
 - [ ] Confirm an account created before the migration follows the normal OTP path once.
 
-The Vercel Preview URL and the project it uses must be taken from the PR checks or comments and verified before running these checks. The local Windows visual comparison is user-run: every route should remain at zero diff except for the approved dashboard greeting and shared workspace header email removal.
+The local Windows visual comparison remains a manual gate: every route must stay at zero diff, with the approved dashboard greeting and workspace header email removal verified against the existing baseline.
 
 ## Rollback
 
-1. Set `NEXT_PUBLIC_SIGNUP_VERIFICATION_MODE=legacy` in the STAGING Preview environment and redeploy first.
-2. Run `docs/ops/rollback-username-3-20.sql`.
-3. Run `docs/ops/rollback-first-signup-session.sql`.
+For STAGING, first restore the legacy verification flow by setting `NEXT_PUBLIC_SIGNUP_VERIFICATION_MODE=legacy` in the Preview environment and redeploying. Then run `docs/ops/rollback-username-3-20.sql`, followed by `docs/ops/rollback-first-signup-session.sql`.
 
-The grant rollback removes only verified-session rows created by consumed signup grants, then removes the signup grant tables/functions and auth.users trigger. The username rollback restores the former 3–32 profile constraint and auth-user trigger behavior. No Production SQL has been applied.
+The grant rollback removes only verified-session rows created by consumed signup grants, then removes the signup grant tables/functions and auth.users trigger. The username rollback restores the former 3–32 profile constraint and auth-user trigger behavior without deleting or rewriting users. Production rollback SQL requires separate explicit user approval.
