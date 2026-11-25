@@ -1,3 +1,6 @@
+-- Restore the former 3–32 character username rule and trigger behavior.
+-- This restores the schema only; it does not delete or rewrite profiles or users.
+
 drop index if exists public.profiles_username_lower_unique;
 
 alter table public.profiles
