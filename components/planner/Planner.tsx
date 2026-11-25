@@ -52,19 +52,46 @@ export default function Planner(){
   async function savePlan(){
     if(!result.base||!planName.trim())return;
     setSaving(true);setError("");setNotice("");
-    const {data:plan,error:planError}=await supabase.from("network_plans").insert({user_id:profile.id,name:planName.trim(),cidr:result.base.network+"/"+result.base.prefix,ip_version:4}).select("id,name,cidr,ip_version,updated_at").single();
-    if(planError||!plan){setError(planError?.message||"Could not save this plan.");setSaving(false);return;}
-    const allocations=result.blocks.map(block=>({plan_id:plan.id,user_id:profile.id,segment:block.name,network:block.network,prefix:block.prefix,hosts:block.hosts,start_num:block.start.toString(),end_num:block.end.toString(),notes:""}));
-    if(allocations.length){
-      const {error:allocationError}=await supabase.from("allocations").insert(allocations);
-      if(allocationError){
-        await supabase.from("network_plans").delete().eq("id",plan.id).eq("user_id",profile.id);
-        setError("The plan could not save its VLSM allocations: "+allocationError.message);
+    if(process.env.NEXT_PUBLIC_PLAN_SAVE_MODE==="legacy"){
+      const {data:plan,error:planError}=await supabase.from("network_plans").insert({user_id:profile.id,name:planName.trim(),cidr:result.base.network+"/"+result.base.prefix,ip_version:4}).select("id,name,cidr,ip_version,updated_at").single();
+      if(planError||!plan){setError(planError?.message||"Could not save this plan.");setSaving(false);return;}
+      const allocations=result.blocks.map(block=>({plan_id:plan.id,user_id:profile.id,segment:block.name,network:block.network,prefix:block.prefix,hosts:block.hosts,start_num:block.start.toString(),end_num:block.end.toString(),notes:""}));
+      if(allocations.length){
+        const {error:allocationError}=await supabase.from("allocations").insert(allocations);
+        if(allocationError){
+          await supabase.from("network_plans").delete().eq("id",plan.id).eq("user_id",profile.id);
+          setError("The plan could not save its VLSM allocations: "+allocationError.message);
+          setSaving(false);return;
+        }
+      }
+      setSaved(current=>[plan as SavedPlan,...current]);
+      setNotice("Plan and "+allocations.length+" segment allocations saved.");
+      setSaving(false);return;
+    }
+
+    try{
+      const response=await fetch("/api/plans/save",{
+        method:"POST",
+        headers:{
+          "Content-Type":"application/json",
+          "Idempotency-Key":window.crypto.randomUUID(),
+        },
+        body:JSON.stringify({
+          name:planName.trim(),
+          cidr:result.base.network+"/"+result.base.prefix,
+          requirements:req.map(item=>({name:item.name,hosts:item.hosts})),
+        }),
+      });
+      const payload=await response.json() as {plan?:SavedPlan;allocationCount?:number;error?:string};
+      if(!response.ok||!payload.plan){
+        setError(payload.error||"Could not save this plan.");
         setSaving(false);return;
       }
+      setSaved(current=>[payload.plan as SavedPlan,...current]);
+      setNotice("Plan and "+Number(payload.allocationCount||0)+" segment allocations saved.");
+    }catch{
+      setError("Could not save this plan.");
     }
-    setSaved(current=>[plan as SavedPlan,...current]);
-    setNotice("Plan and "+allocations.length+" segment allocations saved.");
     setSaving(false);
   }
   async function openPlan(plan:SavedPlan){
