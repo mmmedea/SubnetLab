@@ -25,7 +25,7 @@ begin
     raw_app_meta_data, raw_user_meta_data, created_at, updated_at
   ) values
     (v_first_user, 'authenticated', 'authenticated', 'signup-test-1@example.invalid',
-     'test-fixture-hash', now() + interval '15 seconds', '{"provider":"email","providers":["email"]}'::jsonb,
+     'test-fixture-hash', now(), '{"provider":"email","providers":["email"]}'::jsonb,
      '{"username":"signup_test_1"}'::jsonb, now(), now()),
     (v_duplicate_user, 'authenticated', 'authenticated', 'signup-test-2@example.invalid',
      'test-fixture-hash', now(), '{"provider":"email","providers":["email"]}'::jsonb,
@@ -43,7 +43,7 @@ begin
      'test-fixture-hash', now(), '{"provider":"email","providers":["email"]}'::jsonb,
      '{"username":"signup_test_6"}'::jsonb, now(), now()),
     (v_clock_skew_user, 'authenticated', 'authenticated', 'signup-test-7@example.invalid',
-     'test-fixture-hash', now() + interval '31 seconds', '{"provider":"email","providers":["email"]}'::jsonb,
+     'test-fixture-hash', now(), '{"provider":"email","providers":["email"]}'::jsonb,
      '{"username":"signup_test_7"}'::jsonb, now(), now());
 
   if not exists (
@@ -58,6 +58,10 @@ begin
     raise exception 'The clock-skew email signup eligibility trigger did not run.';
   end if;
 
+  update auth.users
+     set email_confirmed_at = pg_catalog.clock_timestamp() + interval '60 seconds'
+   where id = v_clock_skew_user;
+
   v_failed := false;
   begin
     perform public.create_signup_otp_grant(v_clock_skew_user, v_clock_skew_session);
@@ -67,6 +71,10 @@ begin
   if not v_failed then
     raise exception 'A confirmation timestamp more than 30 seconds in the future was accepted.';
   end if;
+
+  update auth.users
+     set email_confirmed_at = pg_catalog.clock_timestamp() + interval '15 seconds'
+   where id = v_first_user;
 
   v_grant := public.create_signup_otp_grant(v_first_user, v_first_session);
 
