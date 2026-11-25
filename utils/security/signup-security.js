@@ -94,6 +94,3 @@ export function safeSignupLogRecord(event) {
   return JSON.stringify({ level: "warn", event: safeEvent });
 }
 
-export function shouldRedirectVerifiedSession(value) {
-  return value === true;
-}
