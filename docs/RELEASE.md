@@ -6,7 +6,7 @@
 
 - Production Branch: **`main`**, shown in the owner's Vercel Environments screenshot.
 - Current Production deployment: **`dpl_9C3vHoZS64A4XRVXLPr8f4RNPoHm`**, commit **`03a0cf9b5dfeef784f6e1bc1db1aa453a4b78de2`**, status READY, message **`feat: complete auth and settings release`** (owner-reported).
-- The owner reports that deployment as branch **`settings-system`**, while the screenshot shows Production branch tracking **`main`**. Keep these as separate facts and confirm the deployment's originating ref in Vercel before release.
+- The owner reports that deployment as branch **`settings-system`**, while the screenshot shows Production branch tracking **`main`**. The mechanism that produced deployment `dpl_9C3vHoZS64A4XRVXLPr8f4RNPoHm` from `settings-system` is **unknown** pending the owner's explanation. Keep these as separate facts.
 - Require Verified Commits: **not verified**.
 - Preview environment variable names only: `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY`, `SUPABASE_SERVICE_ROLE_KEY`. No values are recorded here.
 - Preview Supabase: **SubnetLab-Staging** (`pvqyaczfyanyklnabjmg`).
@@ -14,7 +14,7 @@
 - Preview and Production use the same Supabase project: **No**.
 - Instant Rollback: **reported available**. A previous Production deployment is marked as a rollback candidate. Promotion availability is reported; the dashboard action itself was not tested.
 
-The supplied screenshot shows Production tracking `main`, while the owner reports the current Production deployment was built from `settings-system`. The owner will explain how that deployment was made. Until then, treat every merge or push to `settings-system` as potentially Production-affecting. No release path is selected. The connector could not independently read the Vercel settings; the deployment and environment details above are owner-reported, except the branch-tracking value shown in the screenshot.
+The supplied screenshot shows Production tracking `main`, while the owner reports the current Production deployment was built from `settings-system`; how it was made remains unknown. The owner leans toward Path A, and this runbook recommends Path A for the reasons below. This is not authorization to change settings or merge code. Until the deployment mechanism is explained and the release gate is satisfied, treat every merge or push to `settings-system` as potentially Production-affecting. The connector could not independently read Vercel; the deployment and environment details above are owner-reported, except the branch-tracking value shown in the screenshot.
 
 ## Preflight evidence
 
@@ -27,7 +27,7 @@ The owner reports that the read-only preflight was run in both STAGING and PRODU
 | `email_otp_verified_sessions` rows | 1 | 1 |
 | `auth_audit_log` rows | 0 | 0 |
 
-The owner also reports reviewing the `auth.users` triggers. I independently read the current `handle_new_auth_user_settings()` definition through the connected Supabase read-only query in both projects: both definitions are identical, SECURITY DEFINER with an empty search_path. The existing `on_auth_user_created_settings` trigger calls that same function. The proposed migration replaces the function in place, retains profile and preference creation plus the display-name, role, and avatar assignments, and intentionally changes behavior: usernames outside 3–20 now raise an error instead of becoming NULL; duplicate usernames now reject signup instead of falling back to a profile without a username. The function body and trigger are not applied or changed in either database. This behavior change is part of the signup requirement and must be included in staging verification.
+The owner also reports reviewing the `auth.users` triggers. I independently read the current `handle_new_auth_user_settings()` definition through the connected Supabase read-only query in both projects: both definitions are identical, SECURITY DEFINER with an empty search_path. The existing `on_auth_user_created_settings` trigger calls that same function. The proposed migration replaces the function in place, retains profile and preference creation plus the display-name, role, and avatar assignments, and intentionally changes behavior: usernames outside 3–20 now raise an error instead of becoming NULL; duplicate usernames now reject signup instead of falling back to a profile without a username. New username writes preserve the submitted casing while the unique index remains case-insensitive on `lower(username)`. Neither migration rewrites or backfills existing usernames. The function body and trigger are not applied or changed in either database. These behavior changes must be included in staging verification.
 
 Other reported triggers: `sync_auth_user_consent` and `sync_profile_password_configured`. No migration has been applied.
 
@@ -87,7 +87,9 @@ The read-only preflight and backup are prerequisites. After the required approva
 
 ### Path A — change Production Branch to `settings-system` for release
 
-This path requires the owner to choose A and send `APPROVE RELEASE 25`. No Vercel setting changes are authorized before that.
+**Recommended path; the owner currently leans A.** This limits the release to the branch intended for the application update. Path B would bring 325 commits and has current overlap with the non-mergeable #16 and #5 branches; #23 and #22 are already ancestors of `settings-system`. The current deployment's creation mechanism is still unknown, so this recommendation does not make pushes safe.
+
+This path requires the exact `APPROVE RELEASE 25` before Production changes. No Vercel setting changes are authorized before that.
 
 1. Complete the Production read-only preflight, backup, and deployment record.
 2. Apply the two Production migrations in the order above only after the exact approval, then run the post-migration verification queries.
@@ -116,7 +118,7 @@ Do not close, retarget, or otherwise change PRs #23, #22, #16, or #5 as part of 
 
 A promoted Preview deployment remains a Preview build using Preview environment variables, including the Staging Supabase target. **Do not promote a Preview deployment to Production.** Build Production from the selected Git release path with the Production environment.
 
-**Selected path:** **Waiting for the owner to choose A or B.**
+**Recommendation:** **Path A.** Execution path remains unconfirmed until the owner explains how the current `settings-system` deployment was made and sends the required release approval. Path B remains an available alternative.
 
 ## Production smoke test script
 
@@ -156,7 +158,7 @@ If the deployment or smoke test fails:
 1. Stop further release steps and record the failing URL, time, commit, and deployment ID without recording personal data or secrets.
 2. Promote the previously recorded Ready Production deployment using Vercel's deployment controls if available. Promote only a known Production deployment. Never promote a Preview deployment: it was built with Preview variables and targets Staging. If the project does not show a promotion/Instant Rollback option, stop and use the Vercel dashboard's supported rollback process; do not guess a CLI command or deploy an unverified branch.
 3. If the new signup verification flow is the issue, set `NEXT_PUBLIC_SIGNUP_VERIFICATION_MODE=legacy` for Production and redeploy the intended Production commit. This is a build-time switch; verify the resulting deployment before resuming signups.
-4. Run Production rollback SQL only after separate explicit user approval, in reverse migration order: `docs/ops/rollback-username-3-20.sql`, then `docs/ops/rollback-first-signup-session.sql`.
+4. Run Production rollback SQL only after separate explicit user approval, in reverse migration order: `docs/ops/rollback-username-3-20.sql`, then `docs/ops/rollback-first-signup-session.sql`. The username rollback does not rewrite existing profiles; stored mixed-case usernames remain unchanged, while the restored legacy trigger lowercases usernames only for future auth-user inserts.
 5. Restore the database backup **last**, only if the owner explicitly approves it and after checking the impact of restoring post-release writes. A database restore can remove changes made after the backup.
 
 ## First 24 hours
