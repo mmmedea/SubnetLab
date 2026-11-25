@@ -1,3 +1,5 @@
+begin;
+
 -- Refuse to change the schema while current usernames violate the new rule.
 -- This preflight changes no profile or auth.users rows.
 do $preflight$
@@ -91,3 +93,5 @@ end;
 $function$;
 
 revoke all on function public.handle_new_auth_user_settings() from public, anon, authenticated;
+
+commit;
