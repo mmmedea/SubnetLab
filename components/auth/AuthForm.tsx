@@ -4,10 +4,11 @@ import {useEffect,useRef,useState} from "react";
 import {useRouter} from "next/navigation";
 import {Eye,EyeOff} from "lucide-react";
 import {createClient} from "@/utils/supabase/client";
+import {isValidSignupUsername,safeNext} from "@/utils/security/auth-validation.js";
 
 const googleMark = <svg aria-hidden="true" viewBox="0 0 48 48" width="20" height="20"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5Z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.73 7.18l7.65 5.93c4.47-4.13 7.12-10.2 7.12-17.58Z"/><path fill="#FBBC05" d="M10.53 28.59A14.4 14.4 0 0 1 9.75 24c0-1.59.27-3.13.76-4.59l-7.98-6.19A23.9 23.9 0 0 0 0 24c0 3.87.93 7.53 2.56 10.78l7.97-6.19Z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.9-5.87l-7.65-5.93c-2.13 1.43-4.86 2.28-8.25 2.28-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48Z"/></svg>;
+const useServerSignupVerification = process.env.NEXT_PUBLIC_SIGNUP_VERIFICATION_MODE !== "legacy";
 
-function safeNext(value?:string){if(!value||!value.startsWith("/")||value.startsWith("//")||value.includes("\\"))return "/dashboard";const path=value.split("?")[0];return ["/dashboard","/planner","/ipam","/practice","/progress","/settings"].some(p=>path===p||path.startsWith(p+"/"))?value:"/dashboard";}
 
 export default function AuthForm({mode,searchParams}:{mode:"login"|"signup";searchParams:{next?:string;error?:string;reason?:string;event?:string}}){
  const router=useRouter();
@@ -30,7 +31,7 @@ export default function AuthForm({mode,searchParams}:{mode:"login"|"signup";sear
   useEffect(()=>{if(resendSeconds<=0)return;const timer=window.setInterval(()=>setResendSeconds(s=>Math.max(0,s-1)),1000);return()=>window.clearInterval(timer);},[resendSeconds]);
  const passwordRules={length:password.length>=10,upper:/[A-Z]/.test(password),lower:/[a-z]/.test(password),number:/[0-9]/.test(password),symbol:/[^A-Za-z0-9]/.test(password)};
  const passwordValid=Object.values(passwordRules).every(Boolean);
- const usernameValid=/^[A-Za-z0-9_]{3,20}$/.test(username.trim());
+ const usernameValid=isValidSignupUsername(username.trim());
  useEffect(()=>{setNextPath(safeNext(searchParams.next));if(searchParams.error==="auth_unavailable")setMessage("Authentication is temporarily unavailable. Supabase configuration could not be loaded.");else if(searchParams.error==="oauth_callback")setMessage(searchParams.reason?`Google sign-in could not finish: ${searchParams.reason}`:"Google sign-in did not complete. Check the Google provider and allowed callback URLs in Supabase.");},[searchParams.next,searchParams.error,searchParams.reason]);
 
  async function startEmailOtp(supabase:ReturnType<typeof createClient>,event:"login"|"password_changed"="login"){
@@ -75,7 +76,7 @@ export default function AuthForm({mode,searchParams}:{mode:"login"|"signup";sear
    if(raw.includes("smtp")||raw.includes("email provider")||raw.includes("error sending")||raw.includes("535")||raw.includes("mail send"))setMessage("We could not send your verification code. The email provider rejected delivery. Please contact support or try again later.");
    else if(raw.includes("invalid login credentials"))setMessage("Invalid email or password.");
    else if(raw.includes("user already registered")||raw.includes("already been registered")||value.code==="user_already_exists")setMessage("An account with this email already exists. Try signing in instead.");
-   else if(raw.includes("username")&&(raw.includes("duplicate")||raw.includes("unique")))setMessage("That username is already taken. Try another one.");
+   else if(raw.includes("username")&&(raw.includes("taken")||raw.includes("duplicate")||raw.includes("unique")))setMessage("That username is already taken. Try another one.");
    else if(raw.includes("weak password"))setMessage("Password does not meet all security requirements.");
    else if(raw.includes("rate limit")||raw.includes("too many requests")||value.status===429)setMessage("Too many sign-in attempts. Please wait a few minutes and try again.");
    else if(raw.includes("network")||raw.includes("fetch failed"))setMessage("Unable to connect. Please check your internet connection and try again.");
@@ -86,13 +87,27 @@ export default function AuthForm({mode,searchParams}:{mode:"login"|"signup";sear
  async function verify(e:React.FormEvent){
   e.preventDefault();setBusy(true);setMessage("");
   try{
+   if(useServerSignupVerification){
+    const response=await fetch("/api/auth/verify-signup",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({email:email.trim(),token:code}),cache:"no-store"});
+    const result=await response.json().catch(()=>null) as {success?:boolean;fallback?:string}|null;
+    if(result?.success===true){router.replace(safeNext(nextPath));router.refresh();return;}
+    if(result?.fallback==="email-otp"){
+     const supabase=createClient();
+     const{error:passwordError}=await supabase.auth.signInWithPassword({email:email.trim(),password});
+     if(passwordError)throw new Error("Email confirmed, but password sign-in failed. Please return to sign in.");
+     await startEmailOtp(supabase);
+     return;
+    }
+    if(response.status===429)throw new Error("Too many sign-in attempts. Please wait a few minutes and try again.");
+    throw new Error("Invalid verification code. Please check your email and try again.");
+   }
    const supabase=createClient();
    const{error}=await supabase.auth.verifyOtp({email:email.trim(),token:code,type:"signup"});
    if(error)throw error;
    const{error:passwordError}=await supabase.auth.signInWithPassword({email:email.trim(),password});
    if(passwordError)throw new Error("Email confirmed, but password sign-in failed. Please return to sign in.");
    await startEmailOtp(supabase);
-  }catch(err){const raw=(err as {message?:string})?.message?.toLowerCase()||"";setMessage(raw.includes("expired")?"This code has expired. Request a new code to continue.":"Invalid verification code. Please check your email and try again.");}
+  }catch(err){const raw=(err as {message?:string})?.message?.toLowerCase()||"";setMessage(raw.includes("expired")?"This code has expired. Request a new code to continue.":raw.includes("too many")?"Too many sign-in attempts. Please wait a few minutes and try again.":"Invalid verification code. Please check your email and try again.");}
   finally{setBusy(false);}
  }
  async function resendCode(){
