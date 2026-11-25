@@ -30,6 +30,10 @@ The new grant functions are SECURITY DEFINER with a fixed empty search path. EXE
 
 `NEXT_PUBLIC_SIGNUP_VERIFICATION_MODE` is a build-time switch. It defaults to server verification. Set it to `legacy` only to restore the previous browser verification flow; changing it requires a redeploy. The server route also falls back to the existing email OTP screen if the grant functions are unavailable or reject a grant.
 
+## Staging email delivery prerequisite
+
+Supabase's default SMTP sends only to organization team members and is limited to 2 emails per hour. Use an organization team-member test address, or configure Brevo SMTP in STAGING before email-signup checks. Do not change Production SMTP as part of this staging checklist.
+
 ## Apply and verify in STAGING
 
 Before applying a migration to STAGING, notify the project owner as required by the project release rules. Confirm the Ready Preview URL from PR #25's Vercel check/comment and confirm it uses the STAGING Supabase project. Never paste secret values into chat or logs.
@@ -38,7 +42,7 @@ Before applying a migration to STAGING, notify the project owner as required by 
 2. If query (b) found duplicates, resolve them manually as described above. Resolve invalid values from query (a) before running the username migration.
 3. Apply `supabase/migrations/20261125120000_allow_first_signup_session_without_second_otp.sql` in the STAGING SQL Editor.
 4. Apply `supabase/migrations/20261125120500_enforce_username_3_20.sql` in the STAGING SQL Editor.
-5. Run `supabase/tests/signup_grant_test.sql` in STAGING. It starts a transaction and ends with ROLLBACK; it creates only temporary test fixtures.
+5. Verify `supabase/tests/signup_grant_test.sql` ends with `ROLLBACK;`, then run it in STAGING. It starts a transaction and creates only temporary test fixtures.
 6. Confirm the trigger and function security properties with:
 
 ```sql
@@ -70,13 +74,14 @@ Expected: the trigger is present; both RPCs are SECURITY DEFINER with an empty s
 
 ## Staging acceptance checks
 
-- [ ] Submit a duplicate case-insensitive username signup using a project-owner-controlled test email. Record the exact error text visible in the browser, verbatim, below. Do not include the email, OTP, or other account data.
+- [ ] Sign up using a project-owner-controlled email and username `Maricris_Test`. Complete the signup OTP and confirm the dashboard greeting displays the typed username exactly as `Maricris_Test`.
+- [ ] Using a second project-owner-controlled test email, try the case-variant username `maricris_test`. Expect the existing message: `That username is already taken. Try another one.` Record the exact browser-visible error text verbatim below. Do not include email addresses, OTPs, or other account data.
   - Browser error text observed: **[pending staging test]**
-  - Do not change the AuthForm mapping for a generic database error until the project owner reports the exact browser text.
-  - If the browser displays `Database error saving new user`, report that exact text first; mapping it to the duplicate-username message remains pending the project owner's report.
+  - If the browser shows `Database error saving new user`, report that exact text. Do not change the AuthForm mapping until the project owner reports the observed text.
+  - Existing usernames must not be rewritten or backfilled to change their casing.
 
 - [ ] Create a fresh email/password account with a unique username, enter the signup code once, and confirm it goes directly to `/dashboard`.
-- [ ] Confirm the dashboard greeting uses the signup username and the workspace header no longer shows the email.
+- [ ] Confirm the dashboard greeting preserves the signup username's typed case and the workspace header no longer shows the email.
 - [ ] Confirm `profiles.password_configured_at` is populated by the existing trigger.
 - [ ] Reuse the signup code and try an expired/unknown code; wrong, expired, and unknown code responses use the same generic message.
 - [ ] Confirm the verification response includes `Cache-Control: no-store`.
@@ -92,4 +97,4 @@ The local Windows visual comparison remains a manual gate: every route must stay
 
 For STAGING, first restore the legacy verification flow by setting `NEXT_PUBLIC_SIGNUP_VERIFICATION_MODE=legacy` in the Preview environment and redeploying. Then run `docs/ops/rollback-username-3-20.sql`, followed by `docs/ops/rollback-first-signup-session.sql`.
 
-`rollback-first-signup-session.sql` deletes rows from `email_otp_verified_sessions` that were created by consumed signup grants, then removes the signup grant tables/functions and auth.users trigger. This session-row deletion requires explicit project-owner approval before running the rollback, including in STAGING. The username rollback restores the former 3–32 profile constraint and auth-user trigger behavior without deleting or rewriting profiles or users. Production rollback SQL also requires separate explicit user approval.
+`rollback-first-signup-session.sql` deletes rows from `email_otp_verified_sessions` that were created by consumed signup grants, then removes the signup grant tables/functions and auth.users trigger. This session-row deletion requires explicit project-owner approval before running the rollback, including in STAGING. The username rollback restores the former 3–32 profile constraint and legacy auth-user trigger behavior without deleting or rewriting existing usernames. Existing mixed-case values remain unchanged; the restored trigger lowercases usernames only for future auth-user inserts. Production rollback SQL also requires separate explicit user approval.
