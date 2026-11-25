@@ -55,10 +55,10 @@ declare
   v_username text;
   v_provider text;
 begin
-  v_username := lower(coalesce(
+  v_username := coalesce(
     nullif(new.raw_user_meta_data->>'username', ''),
     nullif(new.raw_user_meta_data->>'user_name', '')
-  ));
+  );
   v_provider := coalesce(new.raw_app_meta_data->>'provider', '');
 
   if v_username is not null and v_username !~ '^[A-Za-z0-9_]{3,20}$' then
