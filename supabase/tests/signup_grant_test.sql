@@ -59,7 +59,7 @@ begin
   end if;
 
   update auth.users
-     set email_confirmed_at = pg_catalog.clock_timestamp() + interval '60 seconds'
+     set email_confirmed_at = pg_catalog.clock_timestamp() + interval '31 seconds'
    where id = v_clock_skew_user;
 
   v_failed := false;
@@ -179,4 +179,4 @@ begin
 end;
 $test$;
 
-rollback;
+ROLLBACK;
