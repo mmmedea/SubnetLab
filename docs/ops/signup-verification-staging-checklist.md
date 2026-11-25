@@ -4,7 +4,7 @@ This checklist is for **STAGING**. Do not apply either migration to Production f
 
 ## Read-only preflight
 
-Before applying anything, run every SELECT in `docs/ops/signup-migration-preflight.sql` separately in the Supabase SQL Editor for **STAGING and PRODUCTION**. The file checks usernames, case-insensitive duplicates, auth.users triggers, matching public functions, and row counts for the existing OTP session and auth audit tables. It does not modify data.
+For this STAGING procedure, run every SELECT in `docs/ops/signup-migration-preflight.sql` separately in the Supabase SQL Editor for **STAGING only**. The file checks usernames, case-insensitive duplicates, auth.users triggers, matching public functions, and row counts for the existing OTP session and auth audit tables. It does not modify data. Do not run Production SQL from this checklist; the separate Production preflight is gated by the exact `APPROVE RELEASE 25` approval.
 
 ## Username migration behavior and manual cleanup
 
