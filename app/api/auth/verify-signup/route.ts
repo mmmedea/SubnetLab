@@ -119,12 +119,25 @@ export async function POST(request: NextRequest) {
       },
     });
 
+    // A duplicate request can arrive after the first request consumed the code
+    // and completed the verified-session grant. Treat that session as success.
+    const { data: alreadyVerified, error: statusError } = await supabase.rpc("is_email_otp_session_verified");
+    if (!statusError && alreadyVerified === true) {
+      return jsonResponse({ success: true }, 200, cookieCarrier);
+    }
+
     const { data, error } = await supabase.auth.verifyOtp({ email, token, type: "signup" });
     if (
       error ||
       !data.user ||
       data.user.email?.trim().toLowerCase() !== email
     ) {
+      // Another request may have consumed this one-time code in parallel.
+      // Re-check the current session before returning a misleading expiry error.
+      const { data: completed, error: completionStatusError } = await supabase.rpc("is_email_otp_session_verified");
+      if (!completionStatusError && completed === true) {
+        return jsonResponse({ success: true }, 200, cookieCarrier);
+      }
       return jsonResponse({ success: false, error: invalidCodeMessage }, 400, cookieCarrier);
     }
 
