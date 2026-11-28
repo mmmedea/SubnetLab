@@ -7,13 +7,41 @@ import {createClient} from "@/utils/supabase/client";
 import {safeNext} from "@/utils/security/auth-validation.js";
 
 export default function VerifyEmailOtp({next,challenge,event}:{next:string;challenge:string;event:"login"|"password_set"|"password_changed"}){
- const router=useRouter(),supabase=useMemo(()=>createClient(),[]),inputs=useRef<Array<HTMLInputElement|null>>([]);
+ const router=useRouter(),supabase=useMemo(()=>createClient(),[]),inputs=useRef<Array<HTMLInputElement|null>>([]),verificationInFlight=useRef(false);
  const[loading,setLoading]=useState(true),[email,setEmail]=useState(""),[challengeId,setChallengeId]=useState(challenge),[digits,setDigits]=useState(["","","","","",""]),[busy,setBusy]=useState(false),[error,setError]=useState(""),[notice,setNotice]=useState(""),[resendSeconds,setResendSeconds]=useState(60);
  const code=digits.join(""),target=safeNext(next);
  useEffect(()=>{if(resendSeconds<=0)return;const timer=window.setInterval(()=>setResendSeconds(s=>Math.max(0,s-1)),1000);return()=>window.clearInterval(timer);},[resendSeconds]);
  useEffect(()=>{let active=true;(async()=>{const{data:{user},error}=await supabase.auth.getUser();if(error||!user){router.replace("/login");return;}if(!active)return;setEmail(user.email??"");if(!challenge){const{data:id,error:challengeError}=await supabase.rpc("begin_email_otp_challenge");if(challengeError)throw challengeError;const{error:sendError}=await supabase.auth.signInWithOtp({email:user.email??"",options:{shouldCreateUser:false}});if(sendError)throw sendError;if(active){setChallengeId(id);setNotice("A six-digit verification code has been sent. Check your inbox, spam, junk, and Promotions folders.");setResendSeconds(60);}}setLoading(false);})().catch(err=>{if(active){setError(err instanceof Error?err.message:"Could not prepare email verification.");setLoading(false);}});return()=>{active=false};},[challenge,router,supabase]);
  async function resend(){setBusy(true);setError("");setNotice("");try{const{data:id,error:challengeError}=await supabase.rpc("begin_email_otp_challenge");if(challengeError)throw challengeError;const{error}=await supabase.auth.signInWithOtp({email,options:{shouldCreateUser:false}});if(error)throw error;setChallengeId(id);setDigits(["","","","","",""]);setNotice("A fresh six-digit verification code has been sent. Check your inbox, spam, junk, and Promotions folders.");setResendSeconds(60);inputs.current[0]?.focus();}catch(err){setError(err instanceof Error?err.message:"Could not send the email verification code. Sign in with your password again if this request expired.");}finally{setBusy(false);}}
- async function verify(value=code){if(!/^\d{6}$/.test(value)||busy)return;setBusy(true);setError("");try{const{error:verifyError}=await supabase.auth.verifyOtp({email,token:value,type:"email"});if(verifyError)throw verifyError;const{error:completeError}=await supabase.rpc("complete_email_otp_challenge",{p_challenge_id:challengeId});if(completeError)throw completeError;void supabase.rpc("record_auth_audit_event",{p_event:"email_otp_verified"});try{await fetch("/api/settings/security-events",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({event_type:event})});}catch{}router.replace(target);router.refresh();}catch(err){setError(err instanceof Error?err.message:"The email code could not be verified. Request a new code.");}finally{setBusy(false);}}
+ async function verify(value=code){
+  if(!/^\d{6}$/.test(value)||verificationInFlight.current)return;
+  verificationInFlight.current=true;setBusy(true);setError("");
+  const goToDestination=()=>window.location.replace(target);
+  try{
+   const{error:verifyError}=await supabase.auth.verifyOtp({email,token:value,type:"email"});
+   if(verifyError){
+    const{data:alreadyVerified,error:statusError}=await supabase.rpc("is_email_otp_session_verified");
+    if(!statusError&&alreadyVerified){goToDestination();return;}
+    throw verifyError;
+   }
+   const{error:completeError}=await supabase.rpc("complete_email_otp_challenge",{p_challenge_id:challengeId});
+   if(completeError){
+    const{data:alreadyVerified,error:statusError}=await supabase.rpc("is_email_otp_session_verified");
+    if(!statusError&&alreadyVerified){goToDestination();return;}
+    throw completeError;
+   }
+   void supabase.rpc("record_auth_audit_event",{p_event:"email_otp_verified"});
+   try{await fetch("/api/settings/security-events",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({event_type:event})});}catch{}
+   goToDestination();
+  }catch(err){
+   try{
+    const{data:alreadyVerified,error:statusError}=await supabase.rpc("is_email_otp_session_verified");
+    if(!statusError&&alreadyVerified){goToDestination();return;}
+   }catch{}
+   const message=err instanceof Error?err.message:"The email code could not be verified. Request a new code.";
+   setError(message.toLowerCase().includes("expired")?"This code is invalid or expired. Request a fresh code if needed.":message);
+  }finally{verificationInFlight.current=false;setBusy(false);}
+ }
  function changeDigit(index:number,value:string){const digit=value.replace(/\D/g,"").slice(-1),nextDigits=[...digits];nextDigits[index]=digit;setDigits(nextDigits);if(digit&&index<5)inputs.current[index+1]?.focus();if(nextDigits.every(Boolean))void verify(nextDigits.join(""));}
  function paste(e:React.ClipboardEvent<HTMLInputElement>){const value=e.clipboardData.getData("text").replace(/\D/g,"").slice(0,6);if(!value)return;e.preventDefault();const nextDigits=[...value.split(""),..."".padEnd(6-value.length).split("")];setDigits(nextDigits);inputs.current[Math.min(value.length,5)]?.focus();if(value.length===6)void verify(value);}
  if(loading)return <main className="auth-wrap"><section className="auth-card"><p className="muted">Preparing email verification…</p></section></main>;
