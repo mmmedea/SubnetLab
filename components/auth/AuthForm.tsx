@@ -24,7 +24,7 @@ export default function AuthForm({mode,searchParams}:{mode:"login"|"signup";sear
  const[message,setMessage]=useState("");
  const[otp,setOtp]=useState(false);
  const[codeDigits,setCodeDigits]=useState<string[]>(["","","","","",""]);
- const otpInputs=useRef<Array<HTMLInputElement|null>>([]);
+ const otpInputs=useRef<Array<HTMLInputElement|null>>([]),signupVerifyInFlight=useRef(false);
  const code=codeDigits.join("");
  const[nextPath,setNextPath]=useState("/dashboard");
  const[resendSeconds,setResendSeconds]=useState(0);
@@ -85,12 +85,14 @@ export default function AuthForm({mode,searchParams}:{mode:"login"|"signup";sear
   finally{setBusy(false);}
  }
  async function verify(e:React.FormEvent){
-  e.preventDefault();setBusy(true);setMessage("");
+  e.preventDefault();
+  if(signupVerifyInFlight.current)return;
+  signupVerifyInFlight.current=true;setBusy(true);setMessage("");
   try{
    if(useServerSignupVerification){
     const response=await fetch("/api/auth/verify-signup",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({email:email.trim(),token:code}),cache:"no-store"});
-    const result=await response.json().catch(()=>null) as {success?:boolean;fallback?:string}|null;
-    if(result?.success===true){router.replace(safeNext(nextPath));router.refresh();return;}
+    const result=await response.json().catch(()=>null) as {success?:boolean;fallback?:string;error?:string}|null;
+    if(result?.success===true){window.location.replace(safeNext(nextPath));return;}
     if(result?.fallback==="email-otp"){
      const supabase=createClient();
      const{error:passwordError}=await supabase.auth.signInWithPassword({email:email.trim(),password});
@@ -99,7 +101,8 @@ export default function AuthForm({mode,searchParams}:{mode:"login"|"signup";sear
      return;
     }
     if(response.status===429)throw new Error("Too many sign-in attempts. Please wait a few minutes and try again.");
-    throw new Error("Invalid verification code. Please check your email and try again.");
+    if(response.status>=500)throw new Error(result?.error||"Verification is temporarily unavailable. Please try again.");
+    throw new Error(result?.error||"Invalid or expired verification code. Request a fresh code if needed.");
    }
    const supabase=createClient();
    const{error}=await supabase.auth.verifyOtp({email:email.trim(),token:code,type:"signup"});
@@ -107,8 +110,10 @@ export default function AuthForm({mode,searchParams}:{mode:"login"|"signup";sear
    const{error:passwordError}=await supabase.auth.signInWithPassword({email:email.trim(),password});
    if(passwordError)throw new Error("Email confirmed, but password sign-in failed. Please return to sign in.");
    await startEmailOtp(supabase);
-  }catch(err){const raw=(err as {message?:string})?.message?.toLowerCase()||"";setMessage(raw.includes("expired")?"This code has expired. Request a new code to continue.":raw.includes("too many")?"Too many sign-in attempts. Please wait a few minutes and try again.":"Invalid verification code. Please check your email and try again.");}
-  finally{setBusy(false);}
+  }catch(err){
+   const raw=(err as {message?:string})?.message?.toLowerCase()||"";
+   setMessage(raw.includes("expired")?"This code is invalid or expired. Request a fresh code if needed.":raw.includes("too many")?"Too many sign-in attempts. Please wait a few minutes and try again.":raw.includes("temporarily unavailable")?((err as {message?:string}).message||"Verification is temporarily unavailable. Please try again."):"Invalid verification code. Please check your email and try again.");
+  }finally{signupVerifyInFlight.current=false;setBusy(false);}
  }
  async function resendCode(){
   setBusy(true);setMessage("");
